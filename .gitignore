@@ -1,0 +1,20 @@
+# Dumps produced by projdump itself
+*_dump.md
+*_dump.xml
+*_dump.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Temp
+*.log
+*.tmp
+

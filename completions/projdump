@@ -1,0 +1,57 @@
+# projdump — shell completion (bash; also works in zsh via bashcompinit)
+#
+# bash:  install to ~/.local/share/bash-completion/completions/projdump
+# zsh:   install to ~/.local/share/zsh/site-functions/_projdump
+#        then add to ~/.zshrc:  autoload -U +X bashcompinit && bashcompinit
+
+_projdump() {
+  # `words`/`cword` are filled in by _init_completion from bash-completion.
+  # shellcheck disable=SC2034
+  local cur prev words cword
+  if declare -F _init_completion >/dev/null 2>&1; then
+    _init_completion || return
+  else
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+  fi
+
+  local opts="-o --output -f --format -e --ext-only -x --exclude -i --include \
+--since --sort --tokens-budget --max-size --no-tree --note --list --dry-run \
+--stdout --copy --no-copy -v --verbose -q --quiet --version --help"
+  local exts="sh bash bats py js ts tsx go rs c cpp java rb php html css md json yml yaml toml sql xml"
+  local sizes="10 50 100 200 500 1000 2000"
+
+  case "$prev" in
+    -o|--output)
+      mapfile -t COMPREPLY < <(compgen -f -- "$cur")
+      return ;;
+    -f|--format)
+      mapfile -t COMPREPLY < <(compgen -W "md xml json" -- "$cur")
+      return ;;
+    -e|--ext-only)
+      mapfile -t COMPREPLY < <(compgen -W "$exts" -- "$cur")
+      return ;;
+    --max-size|--tokens-budget)
+      mapfile -t COMPREPLY < <(compgen -W "$sizes" -- "$cur")
+      return ;;
+    --sort)
+      mapfile -t COMPREPLY < <(compgen -W "name size size-desc ext" -- "$cur")
+      return ;;
+    -x|--exclude|-i|--include)
+      mapfile -t COMPREPLY < <(compgen -d -- "$cur")
+      return ;;
+    --since)
+      # complete with git refs when inside a repository
+      local refs
+      refs="$(git branch --format='%(refname:short)' 2>/dev/null; printf 'HEAD\nHEAD~1\nHEAD~5\nmain\nmaster')"
+      mapfile -t COMPREPLY < <(compgen -W "$refs" -- "$cur")
+      return ;;
+  esac
+
+  case "$cur" in
+    -*) mapfile -t COMPREPLY < <(compgen -W "$opts" -- "$cur") ;;
+    *)  mapfile -t COMPREPLY < <(compgen -f -- "$cur") ;;
+  esac
+}
+
+complete -F _projdump projdump

@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: '.'
+          severity: warning
+
+  test:
+    name: Tests (bash ${{ matrix.bash }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        bash: ['5.1', '5.2']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install bats
+        run: |
+          git clone --depth 1 https://github.com/bats-core/bats-core.git /tmp/bats
+          echo "/tmp/bats/bin" >> "$GITHUB_PATH"
+
+      - name: Install fixtures
+        run: sudo apt-get update && sudo apt-get install -y file tree
+
+      - name: Run tests
+        run: |
+          bats --version
+          bats test/
+
+  smoke:
+    name: Smoke test (bash ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dump this repo in all three formats
+        run: |
+          bash --version | head -1
+          ./projdump.sh --stdout --format md   | head -20
+          ./projdump.sh --stdout --format xml  | head -5
+          ./projdump.sh --stdout --format json | head -5
+          ./projdump.sh --ext-only sh --no-tree --quiet --stdout > /dev/null
+          ./projdump.sh --list --no-copy
+          ./projdump.sh --list --quiet --no-copy --sort size-desc | head -3
+          ./projdump.sh --include 'lib/*' --include 'test/*' --no-tree --quiet --stdout > /dev/null
+          ./projdump.sh --tokens-budget 4000 --quiet --stdout > /dev/null
+          ./projdump.sh --note 'CI smoke test' --no-tree --quiet --stdout > /dev/null
+          ./projdump.sh --version
+

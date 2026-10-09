@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="320" viewBox="0 0 1200 320" role="img" aria-label="projdump — dump your whole project into one file for AI">
+  <defs>
+    <linearGradient id="pdGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#34d399">
+        <animate attributeName="stop-color" values="#34d399;#67e8f9;#fbbf24;#34d399" dur="8s" repeatCount="indefinite"/>
+      </stop>
+      <stop offset="1" stop-color="#0d9488">
+        <animate attributeName="stop-color" values="#0d9488;#fbbf24;#67e8f9;#0d9488" dur="8s" repeatCount="indefinite"/>
+      </stop>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0c1210"/>
+      <stop offset="1" stop-color="#0a0f0d"/>
+    </linearGradient>
+    <pattern id="dots" width="26" height="26" patternUnits="userSpaceOnUse">
+      <circle cx="1.6" cy="1.6" r="1.6" fill="#1c2b24"/>
+    </pattern>
+    <linearGradient id="termBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#101916"/>
+      <stop offset="1" stop-color="#0d1411"/>
+    </linearGradient>
+    <clipPath id="typeClip">
+      <rect x="690" y="104" width="0" height="30">
+        <animate attributeName="width" values="0;13;27;40;54;67;81;94;108;122;135;148" calcMode="discrete" dur="1.3s" begin="0.7s" fill="freeze"/>
+      </rect>
+    </clipPath>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="18" flood-color="#000" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <!-- background -->
+  <rect width="1200" height="320" fill="url(#bgGrad)"/>
+  <rect width="1200" height="320" fill="url(#dots)"/>
+  <circle cx="180" cy="40" r="150" fill="#10b981" opacity="0.07"/>
+  <circle cx="1060" cy="300" r="170" fill="#fbbf24" opacity="0.05"/>
+
+  <!-- left: wordmark -->
+  <text x="72" y="130" font-family="'JetBrains Mono','Cascadia Code',Consolas,Menlo,monospace" font-size="74" font-weight="bold" fill="url(#pdGrad)" letter-spacing="-2">projdump</text>
+  <text x="74" y="176" font-family="system-ui,-apple-system,'Segoe UI',sans-serif" font-size="24" fill="#8fa79b">Your whole codebase. One file. AI-ready.</text>
+
+  <!-- badges -->
+  <g font-family="'JetBrains Mono',Consolas,Menlo,monospace" font-size="15" font-weight="bold">
+    <rect x="74" y="208" width="118" height="34" rx="8" fill="#101916" stroke="#223028"/>
+    <text x="88" y="230" fill="#34d399">bash 5.0+</text>
+    <rect x="202" y="208" width="118" height="34" rx="8" fill="#101916" stroke="#223028"/>
+    <text x="216" y="230" fill="#fbbf24">0 deps</text>
+    <rect x="330" y="208" width="152" height="34" rx="8" fill="#101916" stroke="#223028"/>
+    <text x="344" y="230" fill="#67e8f9">md · xml · json</text>
+    <rect x="494" y="208" width="112" height="34" rx="8" fill="#101916" stroke="#223028"/>
+    <text x="508" y="230" fill="#8fa79b">MIT</text>
+  </g>
+
+  <!-- right: terminal card -->
+  <g filter="url(#soft)">
+    <rect x="640" y="52" width="496" height="216" rx="14" fill="url(#termBg)" stroke="#1d2a24"/>
+    <rect x="640" y="52" width="496" height="40" rx="14" fill="#121c18"/>
+    <rect x="640" y="80" width="496" height="12" fill="#121c18"/>
+    <circle cx="668" cy="72" r="6.5" fill="#ff5f57"/>
+    <circle cx="690" cy="72" r="6.5" fill="#febc2e"/>
+    <circle cx="712" cy="72" r="6.5" fill="#28c840"/>
+    <text x="850" y="77" font-family="'JetBrains Mono',Consolas,Menlo,monospace" font-size="13" fill="#5f7268" text-anchor="middle">bash — my-project</text>
+
+    <text x="666" y="126" font-family="'JetBrains Mono',Consolas,Menlo,monospace" font-size="19" font-weight="bold">
+      <tspan fill="#34d399">$ </tspan>
+    </text>
+    <g clip-path="url(#typeClip)">
+      <text x="690" y="126" font-family="'JetBrains Mono',Consolas,Menlo,monospace" font-size="19" fill="#e7f1eb">projdump</text>
+    </g>
+    <rect x="692" y="111" width="10" height="19" fill="#34d399">
+      <animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.5;0.5;1" dur="1.1s" repeatCount="indefinite"/>
+    </rect>
+
+    <text x="666" y="164" font-family="'JetBrains Mono',Consolas,Menlo,monospace" font-size="16" fill="#5f7268" opacity="0">
+      Scanning project…
+      <animate attributeName="opacity" values="0;1" dur="0.3s" begin="2.2s" fill="freeze"/>
+    </text>
+    <text x="666" y="196" font-family="'JetBrains Mono',Consolas,Menlo,monospace" font-size="17" fill="#34d399" opacity="0">
+      ✓ 128 files · 4,213 lines
+      <animate attributeName="opacity" values="0;1" dur="0.3s" begin="2.9s" fill="freeze"/>
+    </text>
+    <text x="666" y="228" font-family="'JetBrains Mono',Consolas,Menlo,monospace" font-size="17" fill="#fbbf24" opacity="0">
+      → my-project_dump.md
+      <animate attributeName="opacity" values="0;1" dur="0.3s" begin="3.5s" fill="freeze"/>
+    </text>
+  </g>
+</svg>

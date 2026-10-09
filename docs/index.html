@@ -1,0 +1,2987 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>projdump — Your whole codebase. One file. AI-ready.</title>
+<meta name="description" content="projdump packs any project — tree, sources and stats — into a single Markdown, XML or JSON file, ready to paste into Claude, ChatGPT, DeepSeek or Gemini. Zero dependencies, pure bash.">
+<meta name="keywords" content="projdump, codebase, LLM, Claude, ChatGPT, prompt, context window, bash, cli, developer tools">
+<meta name="author" content="Soroush Chegini">
+<meta name="theme-color" content="#0b100e">
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="projdump">
+<meta property="og:title" content="projdump — Your whole codebase. One file. AI-ready.">
+<meta property="og:description" content="Pack any project into a single Markdown, XML or JSON file for Claude, ChatGPT, DeepSeek or Gemini. Pure bash, zero dependencies.">
+<meta property="og:url" content="https://cheginisoroush.github.io/projdump/">
+<meta property="og:image" content="https://cheginisoroush.github.io/projdump/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="fa_IR">
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="projdump — Your whole codebase. One file. AI-ready.">
+<meta name="twitter:description" content="Pack any project into a single Markdown, XML or JSON file for your favourite AI. Pure bash, zero dependencies.">
+<meta name="twitter:image" content="https://cheginisoroush.github.io/projdump/assets/og-image.png">
+<link rel="canonical" href="https://cheginisoroush.github.io/projdump/">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="assets/logo.png">
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "projdump",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Linux, macOS, WSL",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Person", "name": "Soroush Chegini" },
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://cheginisoroush.github.io/projdump/",
+  "description": "Dump an entire project into a single Markdown, XML or JSON file, ready to paste into AI chatbots.",
+  "softwareVersion": "1.1.0"
+}
+</script>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   projdump docs — design tokens
+   ═══════════════════════════════════════════════════════════════ */
+:root{
+  --bg:#0b100e; --bg-soft:#0e1512; --surface:#111916; --surface-2:#16211d;
+  --border:#1f2c26; --border-strong:#2b3d34;
+  --text:#e7f1eb; --muted:#8fa79b; --faint:#5f7268;
+  --accent:#34d399; --accent-strong:#10b981; --accent-dim:rgba(52,211,153,.12);
+  --amber:#fbbf24; --amber-dim:rgba(251,191,36,.12);
+  --red:#f87171; --cyan:#67e8f9;
+  --code-bg:#0d1411; --code-border:#1d2a24;
+  --shadow:0 20px 60px rgba(0,0,0,.45);
+  --radius:14px; --radius-sm:9px;
+  --nav-h:64px;
+  --font-sans:'Vazirmatn',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Tahoma,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace;
+}
+html[data-theme="light"]{
+  --bg:#f5f8f6; --bg-soft:#eef4f0; --surface:#ffffff; --surface-2:#f0f5f1;
+  --border:#dbe6de; --border-strong:#c3d4c8;
+  --text:#15211b; --muted:#54685d; --faint:#7d9186;
+  --accent:#059669; --accent-strong:#047857; --accent-dim:rgba(5,150,105,.10);
+  --amber:#b45309; --amber-dim:rgba(180,83,9,.10);
+  --red:#dc2626; --cyan:#0e7490;
+  --code-bg:#0d1411; --code-border:#1d2a24;
+  --shadow:0 18px 50px rgba(21,40,31,.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--nav-h) + 16px)}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+body{
+  font-family:var(--font-sans);background:var(--bg);color:var(--text);
+  line-height:1.7;font-size:16px;-webkit-font-smoothing:antialiased;
+  min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden;
+}
+::selection{background:rgba(52,211,153,.28)}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+img{max-width:100%}
+button{font-family:inherit;cursor:pointer}
+.skip-link{position:absolute;top:-48px;right:16px;background:var(--accent);color:#06281c;padding:8px 16px;border-radius:8px;font-weight:700;z-index:200;transition:top .2s}
+.skip-link:focus{top:12px}
+.container{width:min(1180px,92%);margin-inline:auto}
+.mono{font-family:var(--font-mono)}
+
+/* ─── Ambient background ─────────────────────────────────────── */
+.bg-fx{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.bg-fx .orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.16;animation:drift 26s ease-in-out infinite alternate}
+.bg-fx .orb.o1{width:560px;height:560px;background:var(--accent-strong);top:-180px;inset-inline-start:-120px}
+.bg-fx .orb.o2{width:460px;height:460px;background:var(--amber);bottom:-160px;inset-inline-end:-100px;animation-delay:-8s;opacity:.10}
+.bg-fx .grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:44px 44px;opacity:.16;mask-image:radial-gradient(ellipse 90% 60% at 50% 0%,#000 30%,transparent 75%)}
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(60px,40px) scale(1.12)}}
+
+/* ─── Navigation ─────────────────────────────────────────────── */
+.nav{position:fixed;top:0;inset-inline:0;height:var(--nav-h);z-index:100;
+  background:color-mix(in srgb,var(--bg) 78%,transparent);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border)}
+.nav-inner{height:var(--nav-h);display:flex;align-items:center;gap:14px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:1.12rem;color:var(--text);letter-spacing:-.02em}
+.brand:hover{text-decoration:none}
+.brand img{width:30px;height:30px;border-radius:8px}
+.brand .cursor-dot{color:var(--accent)}
+.nav-links{display:flex;gap:2px;margin-inline-start:10px}
+.nav-links a{color:var(--muted);font-size:.92rem;font-weight:500;padding:7px 12px;border-radius:8px;transition:.18s;white-space:nowrap}
+.nav-links a:hover{color:var(--text);background:var(--surface-2);text-decoration:none}
+.nav-links a.active{color:var(--accent);background:var(--accent-dim)}
+.nav-actions{margin-inline-start:auto;display:flex;align-items:center;gap:8px}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-size:1rem;transition:.18s}
+.icon-btn:hover{color:var(--text);border-color:var(--border-strong);transform:translateY(-1px)}
+.lang-btn{width:auto;padding-inline:12px;font-weight:700;font-size:.85rem;gap:6px}
+.github-btn{display:inline-flex;align-items:center;gap:8px;height:38px;padding-inline:14px;border-radius:10px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-weight:600;font-size:.88rem;transition:.18s}
+.github-btn:hover{border-color:var(--accent);color:var(--accent);text-decoration:none;transform:translateY(-1px)}
+.github-btn .stars{color:var(--amber);font-size:.8rem}
+#hamburger{display:none}
+.mobile-menu{display:none}
+
+/* ─── Hero ───────────────────────────────────────────────────── */
+.hero{padding:calc(var(--nav-h) + 68px) 0 56px;position:relative}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+.kicker{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;border:1px solid var(--border-strong);background:var(--surface);color:var(--accent);font-size:.82rem;font-weight:700;margin-bottom:20px}
+.kicker .pulse{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 0 rgba(52,211,153,.5);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(52,211,153,.45)}70%{box-shadow:0 0 0 9px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
+h1{font-size:clamp(2.1rem,4.6vw,3.4rem);font-weight:900;line-height:1.16;letter-spacing:-.03em;margin-bottom:18px}
+h1 .grad{background:linear-gradient(92deg,var(--accent) 10%,var(--cyan) 45%,var(--amber) 90%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:gradShift 7s ease-in-out infinite alternate}
+@keyframes gradShift{from{background-position:0% 50%}to{background-position:100% 50%}}
+.hero p.lead{color:var(--muted);font-size:1.08rem;max-width:56ch;margin-bottom:26px}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:26px}
+.btn{display:inline-flex;align-items:center;gap:9px;padding:12px 22px;border-radius:12px;font-weight:700;font-size:.95rem;border:1px solid transparent;transition:.2s}
+.btn:hover{text-decoration:none;transform:translateY(-2px)}
+.btn-primary{background:linear-gradient(135deg,var(--accent-strong),#0d9488);color:#04241a;box-shadow:0 8px 26px rgba(16,185,129,.30)}
+.btn-primary:hover{box-shadow:0 12px 32px rgba(16,185,129,.42)}
+.btn-ghost{background:var(--surface);border-color:var(--border-strong);color:var(--text)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.hero-meta{display:flex;gap:18px;flex-wrap:wrap;color:var(--faint);font-size:.85rem}
+.hero-meta span{display:inline-flex;align-items:center;gap:6px}
+
+/* terminal */
+.terminal{background:var(--code-bg);border:1px solid var(--code-border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;transform:perspective(1200px) rotateY(0deg);transition:transform .3s}
+.terminal:hover{transform:perspective(1200px) rotateY(-1.2deg) translateY(-3px)}
+.terminal-bar{display:flex;align-items:center;gap:8px;padding:11px 14px;background:var(--surface-2);border-bottom:1px solid var(--code-border)}
+.terminal-bar .dot{width:12px;height:12px;border-radius:50%}
+.dot.r{background:#ff5f57}.dot.y{background:#febc2e}.dot.g{background:#28c840}
+.terminal-bar .title{margin-inline-start:8px;color:var(--faint);font-size:.78rem;font-family:var(--font-mono)}
+.terminal-body{padding:18px;min-height:300px;font-family:var(--font-mono);font-size:.85rem;line-height:1.85;direction:ltr;text-align:left}
+.terminal-body .t-prompt{color:var(--accent);font-weight:700}
+.terminal-body .t-cmd{color:var(--text)}
+.terminal-body .t-out{color:var(--muted)}
+.terminal-body .t-ok{color:var(--accent)}
+.terminal-body .t-warn{color:var(--amber)}
+.terminal-body .t-dim{color:var(--faint)}
+.caret{display:inline-block;width:8px;height:1.05em;background:var(--accent);vertical-align:text-bottom;animation:blink 1s steps(1) infinite;margin-inline-start:2px}
+@keyframes blink{50%{opacity:0}}
+
+/* stats strip */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:52px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 16px;text-align:center;transition:.2s}
+.stat:hover{transform:translateY(-3px);border-color:var(--border-strong);box-shadow:var(--shadow)}
+.stat b{display:block;font-size:1.65rem;font-weight:900;color:var(--accent);font-family:var(--font-mono)}
+.stat span{color:var(--muted);font-size:.85rem;font-weight:500}
+
+/* ─── Sections ───────────────────────────────────────────────── */
+section{padding:76px 0}
+.section-head{text-align:center;max-width:720px;margin:0 auto 46px}
+.section-head .tag{display:inline-block;color:var(--accent);font-weight:800;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px}
+html[dir="rtl"] .section-head .tag{letter-spacing:0}
+h2{font-size:clamp(1.6rem,3vw,2.3rem);font-weight:900;letter-spacing:-.02em;line-height:1.25}
+.section-head p{color:var(--muted);margin-top:10px}
+
+/* features */
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:16px}
+.feature{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;transition:.22s;position:relative;overflow:hidden}
+.feature::after{content:"";position:absolute;inset-inline-start:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--accent),transparent);opacity:0;transition:.22s}
+.feature:hover{transform:translateY(-4px);border-color:var(--border-strong);box-shadow:var(--shadow)}
+.feature:hover::after{opacity:1}
+.feature .f-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;background:var(--accent-dim);margin-bottom:14px}
+.feature h3{font-size:1.02rem;font-weight:800;margin-bottom:6px}
+.feature p{color:var(--muted);font-size:.9rem}
+.feature code{font-family:var(--font-mono);font-size:.8em;background:var(--code-bg);color:var(--accent);padding:2px 7px;border-radius:6px;border:1px solid var(--code-border)}
+html[dir="rtl"] .feature code{direction:ltr;display:inline-block}
+
+/* install */
+.install-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.step-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;position:relative;transition:.22s}
+.step-card:hover{border-color:var(--border-strong);transform:translateY(-3px)}
+.step-card .num{position:absolute;top:-14px;inset-inline-start:20px;width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--accent-strong),#0d9488);color:#04241a;font-weight:900;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);box-shadow:0 6px 16px rgba(16,185,129,.35)}
+.step-card h3{margin:8px 0 8px;font-size:1.02rem;font-weight:800}
+.step-card p{color:var(--muted);font-size:.9rem;margin-bottom:14px}
+
+/* code blocks */
+.codeblock{position:relative;background:var(--code-bg);border:1px solid var(--code-border);border-radius:var(--radius-sm);overflow:hidden}
+.codeblock pre{padding:16px 18px;overflow-x:auto;font-family:var(--font-mono);font-size:.84rem;line-height:1.8;color:#d5e3da;direction:ltr;text-align:left}
+.codeblock .copy{position:absolute;top:9px;inset-inline-end:9px;width:32px;height:32px;border-radius:8px;border:1px solid var(--code-border);background:rgba(255,255,255,.05);color:#9db4a8;display:flex;align-items:center;justify-content:center;transition:.18s;font-size:.85rem}
+.codeblock .copy:hover{color:#fff;border-color:var(--accent)}
+.codeblock .copy.done{color:var(--accent);border-color:var(--accent)}
+.tok-c{color:#5f7268;font-style:italic}
+.tok-k{color:#34d399;font-weight:600}
+.tok-s{color:#fbbf24}
+.tok-f{color:#67e8f9}
+.tok-p{color:#e7f1eb}
+.tok-n{color:#c4b5fd}
+.scrollbar-lite::-webkit-scrollbar{height:8px;width:8px}
+.scrollbar-lite::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:8px}
+.scrollbar-lite::-webkit-scrollbar-track{background:transparent}
+
+/* builder */
+.builder{display:grid;grid-template-columns:340px 1fr;gap:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow)}
+.builder-controls{display:flex;flex-direction:column;gap:14px;max-height:560px;overflow-y:auto;padding-inline-end:6px}
+.field label{display:block;font-size:.8rem;font-weight:700;color:var(--muted);margin-bottom:6px}
+.field input[type="text"],.field input[type="number"],.field select{
+  width:100%;padding:9px 12px;border-radius:9px;border:1px solid var(--border-strong);
+  background:var(--bg-soft);color:var(--text);font-size:.9rem;font-family:var(--font-mono);transition:.18s}
+.field input:focus,.field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.seg{display:flex;border:1px solid var(--border-strong);border-radius:9px;overflow:hidden}
+.seg button{flex:1;padding:9px 4px;background:var(--bg-soft);border:0;color:var(--muted);font-family:var(--font-mono);font-size:.85rem;font-weight:600;transition:.15s}
+.seg button.on{background:var(--accent-dim);color:var(--accent)}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.check{display:flex;align-items:center;gap:8px;font-size:.84rem;color:var(--muted);font-family:var(--font-mono);cursor:pointer;user-select:none}
+.check input{accent-color:var(--accent-strong);width:15px;height:15px}
+.builder-preview{display:flex;flex-direction:column;gap:14px}
+.builder-preview .hint{color:var(--faint);font-size:.85rem}
+.cmd-out{flex:1;display:flex;flex-direction:column;justify-content:center}
+.cmd-out .codeblock pre{font-size:.95rem;line-height:2}
+
+/* formats tabs */
+.tabs{display:flex;gap:6px;justify-content:center;margin-bottom:22px;flex-wrap:wrap}
+.tab-btn{padding:9px 20px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-family:var(--font-mono);font-weight:700;font-size:.88rem;transition:.18s}
+.tab-btn.on{color:var(--accent);border-color:var(--accent);background:var(--accent-dim)}
+.tab-pane{display:none;max-width:880px;margin-inline:auto}
+.tab-pane.on{display:block;animation:fadeUp .35s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* options table */
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.filter-row{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center}
+.filter-row input{flex:1;max-width:380px;padding:9px 13px;border-radius:9px;border:1px solid var(--border-strong);background:var(--bg-soft);color:var(--text);font-size:.9rem}
+.filter-row input:focus{outline:none;border-color:var(--accent)}
+.filter-row .count{color:var(--faint);font-size:.82rem;font-family:var(--font-mono)}
+table.opts{width:100%;border-collapse:collapse;font-size:.9rem}
+table.opts th{position:sticky;top:0;background:var(--surface-2);color:var(--muted);text-align:start;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;padding:11px 16px;border-bottom:1px solid var(--border)}
+table.opts td{padding:11px 16px;border-bottom:1px solid var(--border);vertical-align:top}
+table.opts tr:last-child td{border-bottom:0}
+table.opts tr:hover td{background:var(--surface-2)}
+table.opts td:first-child{font-family:var(--font-mono);color:var(--accent);white-space:nowrap;font-size:.83rem}
+table.opts td:last-child{color:var(--muted)}
+table.opts .max-h{max-height:430px;overflow-y:auto}
+html[dir="rtl"] table.opts td:first-child{direction:ltr;text-align:end}
+
+/* bilingual visibility pairs */
+html[lang="en"] .fa-only{display:none}
+html[lang="fa"] .en-only{display:none}
+html[dir="rtl"] .dstep summary,html[dir="rtl"] .faq summary{gap:12px}
+</style>
+<style>
+/* deploy accordion */
+.deploy-flow{position:relative;max-width:860px;margin-inline:auto}
+.deploy-flow::before{content:"";position:absolute;inset-inline-start:27px;top:12px;bottom:12px;width:2px;background:linear-gradient(180deg,var(--accent),var(--border-strong) 80%);opacity:.5}
+.dstep{position:relative;margin-bottom:14px;padding-inline-start:64px}
+.dstep .dnum{position:absolute;inset-inline-start:12px;top:14px;width:32px;height:32px;border-radius:50%;background:var(--surface);border:2px solid var(--accent);color:var(--accent);font-weight:900;font-family:var(--font-mono);display:flex;align-items:center;justify-content:center;font-size:.88rem;z-index:1;transition:.2s}
+.dstep:hover .dnum{background:var(--accent);color:#04241a;box-shadow:0 0 0 6px var(--accent-dim)}
+.dstep details{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:.2s}
+.dstep details[open]{border-color:var(--border-strong);box-shadow:var(--shadow)}
+.dstep summary{list-style:none;display:flex;align-items:center;gap:10px;padding:15px 18px;font-weight:800;font-size:.98rem;cursor:pointer;user-select:none}
+.dstep summary::-webkit-details-marker{display:none}
+.dstep summary .chev{margin-inline-start:auto;color:var(--faint);transition:transform .25s;font-size:.8rem}
+.dstep details[open] summary .chev{transform:rotate(180deg);color:var(--accent)}
+.dstep summary .mini-tag{font-size:.68rem;font-weight:700;color:var(--amber);background:var(--amber-dim);border:1px solid transparent;padding:2px 8px;border-radius:999px}
+.dstep .dbody{padding:0 18px 18px;color:var(--muted);font-size:.92rem;display:flex;flex-direction:column;gap:12px}
+.dstep .dbody ul{padding-inline-start:20px;display:flex;flex-direction:column;gap:6px}
+.dstep .dbody a{font-weight:600}
+
+/* faq */
+.faq{max-width:820px;margin-inline:auto}
+.faq details{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:10px;transition:.2s}
+.faq details[open]{border-color:var(--border-strong)}
+.faq summary{list-style:none;display:flex;align-items:center;gap:10px;padding:15px 18px;font-weight:700;cursor:pointer;user-select:none;font-size:.96rem}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary .q{color:var(--accent);font-weight:900;font-family:var(--font-mono)}
+.faq summary .chev{margin-inline-start:auto;color:var(--faint);transition:transform .25s;font-size:.8rem}
+.faq details[open] summary .chev{transform:rotate(180deg);color:var(--accent)}
+.faq .a{padding:0 18px 16px 44px;color:var(--muted);font-size:.92rem}
+html[dir="rtl"] .faq .a{padding:0 44px 16px 18px}
+
+/* CTA band */
+.cta-band{background:linear-gradient(135deg,var(--accent-dim),var(--amber-dim));border:1px solid var(--border-strong);border-radius:18px;padding:44px 30px;text-align:center;position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:-40%;background:conic-gradient(from 0deg,transparent 60%,rgba(52,211,153,.10),transparent);animation:spin 9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.cta-band h2{margin-bottom:10px;position:relative}
+.cta-band p{color:var(--muted);margin-bottom:22px;position:relative}
+.cta-band .btn{position:relative}
+
+/* footer */
+footer{margin-top:auto;background:var(--bg-soft);border-top:1px solid var(--border);padding:38px 0 30px}
+.footer-grid{display:flex;align-items:flex-start;justify-content:space-between;gap:26px;flex-wrap:wrap}
+.footer-brand{display:flex;align-items:center;gap:10px;font-weight:900}
+.footer-brand img{width:26px;height:26px;border-radius:7px}
+footer .fcol{display:flex;flex-direction:column;gap:7px;font-size:.9rem}
+footer .fcol b{color:var(--text);font-size:.85rem;margin-bottom:3px}
+footer .fcol a{color:var(--muted)}
+footer .fcol a:hover{color:var(--accent)}
+.footer-bottom{margin-top:28px;padding-top:18px;border-top:1px solid var(--border);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--faint);font-size:.83rem}
+.footer-bottom .heart{color:var(--red)}
+
+/* toast */
+.toast{position:fixed;bottom:26px;inset-inline-start:50%;transform:translateX(-50%) translateY(80px);background:var(--surface-2);border:1px solid var(--accent);color:var(--text);padding:11px 22px;border-radius:12px;font-size:.88rem;font-weight:600;opacity:0;transition:.3s;z-index:300;box-shadow:var(--shadow);pointer-events:none}
+html[dir="rtl"] .toast{transform:translateX(50%) translateY(80px)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+html[dir="rtl"] .toast.show{transform:translateX(50%) translateY(0)}
+
+/* reveal on scroll */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* back-to-top */
+#toTop{position:fixed;bottom:22px;inset-inline-end:22px;width:42px;height:42px;border-radius:12px;background:var(--surface);border:1px solid var(--border-strong);color:var(--accent);font-size:1.05rem;opacity:0;pointer-events:none;transition:.25s;z-index:90}
+#toTop.show{opacity:1;pointer-events:auto}
+#toTop:hover{transform:translateY(-3px);border-color:var(--accent)}
+
+/* ─── pipeline (how it works) ────────────────────────────────── */
+.pipe-wrap{position:relative}
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;position:relative}
+.flow::before,.flow::after{content:"";position:absolute;top:48px;height:2px;left:5%;width:90%}
+.flow::before{background:var(--border-strong);opacity:.5}
+.flow::after{background:linear-gradient(90deg,var(--accent),var(--amber));width:0;transition:width 1.6s ease .35s}
+.pipe-wrap.in .flow::after{width:90%}
+.pipe-step{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 16px 18px;text-align:center;position:relative;transition:.22s}
+.pipe-step:hover{transform:translateY(-4px);border-color:var(--border-strong);box-shadow:var(--shadow)}
+.p-badge{width:52px;height:52px;border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:1.35rem;background:var(--surface);border:2px solid var(--accent);box-shadow:0 0 0 6px var(--accent-dim);position:relative;z-index:1}
+.pipe-step h3{font-size:1rem;font-weight:800;margin-bottom:6px}
+.pipe-step p{color:var(--muted);font-size:.86rem;margin-bottom:12px}
+.pipe-step code{font-family:var(--font-mono);font-size:.72rem;color:var(--accent);background:var(--code-bg);border:1px solid var(--code-border);padding:4px 8px;border-radius:7px;display:inline-block;direction:ltr}
+/* ─── token estimator ────────────────────────────────────────── */
+.est{display:grid;grid-template-columns:300px 1fr;gap:24px;margin-top:20px;padding:24px;border:1px solid var(--border-strong);border-radius:var(--radius);background:linear-gradient(135deg,var(--accent-dim),transparent 55%),var(--surface)}
+.est label{display:block;font-size:.8rem;font-weight:700;color:var(--muted);margin-bottom:6px}
+.est input{width:100%;padding:10px 12px;border-radius:9px;border:1px solid var(--border-strong);background:var(--bg-soft);color:var(--text);font-family:var(--font-mono);font-size:.95rem}
+.est input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.est .hint{color:var(--faint);font-size:.8rem;margin-top:10px}
+.est-out{display:flex;flex-direction:column;gap:14px;justify-content:center}
+.est-tokens{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.est-tokens span{color:var(--muted);font-size:.85rem;font-weight:600}
+.est-tokens b{font-family:var(--font-mono);font-size:1.9rem;color:var(--accent);letter-spacing:-.02em}
+.est-chips{display:flex;gap:8px;flex-wrap:wrap}
+.fit-chip{padding:4px 12px;border-radius:999px;border:1px solid var(--border-strong);font-family:var(--font-mono);font-size:.76rem;color:var(--faint);transition:.2s}
+.fit-chip.ok{color:var(--accent);border-color:var(--accent);background:var(--accent-dim);font-weight:700}
+.est-suggest{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:.85rem;color:var(--muted)}
+.est-flag{font-family:var(--font-mono);font-size:.85rem;font-weight:700;color:var(--amber);background:var(--amber-dim);border:1px dashed var(--amber);padding:6px 12px;border-radius:8px;transition:.2s;cursor:pointer;direction:ltr;unicode-bidi:isolate}
+.est-flag:hover{background:transparent}
+/* ─── comparison table ───────────────────────────────────────── */
+table.cmp{width:100%;border-collapse:collapse;font-size:.9rem}
+table.cmp th{background:var(--surface-2);color:var(--muted);text-align:start;font-size:.78rem;letter-spacing:.05em;text-transform:uppercase;padding:12px 16px;border-bottom:1px solid var(--border)}
+table.cmp th.c-pd{color:var(--accent)}
+table.cmp td{padding:12px 16px;border-bottom:1px solid var(--border);color:var(--muted)}
+table.cmp tr:last-child td{border-bottom:0}
+table.cmp tr:hover td{background:var(--surface-2)}
+table.cmp td.sym{text-align:center;font-family:var(--font-mono);font-weight:800;font-size:.95rem;width:15%}
+table.cmp td.yes{color:var(--accent)}
+table.cmp td.no{color:var(--red)}
+table.cmp td.mid{color:var(--amber)}
+table.cmp td.na{color:var(--faint)}
+table.cmp td:first-child{color:var(--text);font-weight:600}
+/* ─── changelog ──────────────────────────────────────────────── */
+.cl-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:920px;margin-inline:auto}
+.cl-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;transition:.22s;position:relative;overflow:hidden}
+.cl-card::before{content:"";position:absolute;inset-inline-start:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--accent),transparent)}
+.cl-card:hover{transform:translateY(-3px);border-color:var(--border-strong);box-shadow:var(--shadow)}
+.cl-card header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.cl-ver{font-family:var(--font-mono);font-weight:800;font-size:.8rem;color:var(--accent);background:var(--accent-dim);padding:3px 10px;border-radius:999px}
+.cl-card time{color:var(--faint);font-size:.8rem;font-family:var(--font-mono)}
+.cl-card h3{font-size:1.05rem;font-weight:800;margin-bottom:10px}
+.cl-card ul{padding-inline-start:18px;display:flex;flex-direction:column;gap:6px;color:var(--muted);font-size:.88rem}
+.cl-link{text-align:center;margin-top:22px}
+/* ─── polish (round 4) ───────────────────────────────────────── */
+.section-head h2::after{content:"";display:block;width:54px;height:3px;margin:14px auto 0;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--amber))}
+.btn:active{transform:translateY(0) scale(.97)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+/* ─── round 5: progress bar · search palette · anchors · cheat sheet ── */
+#progressBar{position:fixed;top:0;inset-inline-start:0;z-index:120;height:3px;width:100%;transform:scaleX(0);transform-origin:left;background:linear-gradient(90deg,var(--accent-strong),var(--accent),var(--amber));pointer-events:none}
+html[dir="rtl"] #progressBar{transform-origin:right}
+.kbd{font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--faint);background:var(--bg-soft);border:1px solid var(--border-strong);border-bottom-width:2px;border-radius:5px;padding:2px 6px;line-height:1.5;direction:ltr;display:inline-block;white-space:nowrap}
+.search-trigger{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 8px 0 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-size:.84rem;font-weight:600;cursor:pointer;transition:.18s}
+.search-trigger:hover{border-color:var(--accent);color:var(--text);background:var(--surface-2)}
+.search-trigger svg{flex:none;opacity:.8}
+html[dir="rtl"] .search-trigger{padding:0 12px 0 8px}
+.pal-overlay{position:fixed;inset:0;z-index:250;display:flex;justify-content:center;align-items:flex-start;padding:9vh 16px 16px;background:rgba(3,7,5,.6);-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);opacity:0;visibility:hidden;transition:opacity .18s,visibility .18s}
+.pal-overlay.open{opacity:1;visibility:visible}
+.palette{width:min(660px,100%);background:var(--surface);border:1px solid var(--border-strong);border-radius:16px;box-shadow:0 26px 80px rgba(0,0,0,.55);overflow:hidden;transform:translateY(-14px) scale(.98);transition:transform .18s}
+.pal-overlay.open .palette{transform:none}
+.pal-input{display:flex;align-items:center;gap:11px;padding:14px 16px;border-bottom:1px solid var(--border);color:var(--muted)}
+.pal-input input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--text);font-size:1.02rem;font-family:inherit}
+.pal-input input::placeholder{color:var(--faint)}
+.pal-results{max-height:min(52vh,430px);overflow-y:auto;padding:8px;overscroll-behavior:contain}
+.p-group{padding:10px 10px 4px;font-family:var(--font-mono);font-size:.66rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.p-item{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:9px;cursor:pointer;color:var(--muted);font-size:.9rem}
+.p-ic{width:27px;height:27px;flex:none;display:grid;place-items:center;border-radius:8px;background:var(--surface-2);font-size:.82rem}
+.p-txt{display:flex;align-items:baseline;gap:10px;min-width:0;flex:1}
+.p-main{color:var(--text);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.p-flag{font-family:var(--font-mono);font-weight:700;font-size:.84rem;color:var(--text);direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+.p-sub{margin-inline-start:auto;color:var(--faint);font-size:.78rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:55%}
+.p-item mark{background:none;color:var(--accent);font-weight:800}
+.p-item.sel{background:var(--accent-dim)}
+.p-item.sel .p-ic{background:var(--accent);color:#04140d}
+.p-item.sel .p-main,.p-item.sel .p-flag{color:var(--accent)}
+.pal-empty{padding:34px 20px;text-align:center;color:var(--faint);font-size:.9rem}
+.pal-foot{display:flex;gap:18px;flex-wrap:wrap;padding:9px 16px;border-top:1px solid var(--border);color:var(--faint);font-size:.72rem}
+.pal-foot span{display:inline-flex;align-items:center;gap:6px}
+.anchor-btn{display:inline-grid;place-items:center;width:26px;height:26px;margin-inline-start:9px;border:1px solid transparent;border-radius:7px;background:none;color:var(--accent);font-family:var(--font-mono);font-size:.9rem;line-height:1;opacity:.4;vertical-align:middle;transform:translateY(-3px);cursor:pointer;transition:.18s}
+.section-head:hover .anchor-btn,.anchor-btn:focus-visible{opacity:1;background:var(--accent-dim);border-color:var(--accent)}
+.ghost-chip{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:9px;border:1px solid var(--border-strong);background:var(--bg-soft);color:var(--muted);font-weight:600;font-size:.85rem;font-family:inherit;cursor:pointer;transition:.18s;white-space:nowrap}
+.ghost-chip:hover{color:var(--accent);border-color:var(--accent);background:var(--accent-dim)}
+.filter-row{flex-wrap:wrap}
+.filter-row .ghost-chip{margin-inline-start:auto}
+@keyframes rowFlash{0%,25%{background:var(--accent-dim)}100%{background:transparent}}
+.flash-row{animation:rowFlash 1.8s ease-out 1}
+table.opts tbody tr{transition:background .15s}
+table.opts tbody tr:hover td:first-child{color:var(--accent)}
+@media (max-width:760px){
+  .search-trigger{width:38px;padding:0;justify-content:center}
+  .search-trigger .st-label,.search-trigger .kbd{display:none}
+  .pal-overlay{padding:6vh 10px 10px}
+  .p-sub{display:none}
+  .filter-row .ghost-chip{margin-inline-start:0}
+}
+@media (prefers-reduced-motion:reduce){.palette,.pal-overlay,#progressBar{transition:none}}
+
+/* ─── round 6: nav version pill · cookbook ───────────────────── */
+.ver-pill{display:inline-flex;align-items:center;height:26px;padding:0 11px;border-radius:999px;border:1px solid var(--border-strong);background:var(--accent-dim);color:var(--accent);font-family:var(--font-mono);font-size:.72rem;font-weight:700;letter-spacing:.02em;transition:.18s}
+.ver-pill:hover{border-color:var(--accent);text-decoration:none;transform:translateY(-1px)}
+.cook-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.recipe{position:relative;display:flex;flex-direction:column;gap:11px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;overflow:hidden;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease}
+.recipe::before{content:"";position:absolute;inset-inline:0;top:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--amber));opacity:0;transition:opacity .22s ease}
+.recipe:hover{transform:translateY(-4px);border-color:var(--border-strong);box-shadow:var(--shadow)}
+.recipe:hover::before{opacity:1}
+.recipe-top{display:flex;align-items:center;gap:10px}
+.recipe-num{flex:none;font-family:var(--font-mono);font-size:.7rem;font-weight:800;color:var(--accent);background:var(--accent-dim);border-radius:7px;padding:3px 8px;letter-spacing:.06em}
+.recipe-ic{flex:none;font-size:1.1rem}
+.recipe h3{font-size:1rem;font-weight:800;letter-spacing:-.01em}
+.recipe>p{color:var(--muted);font-size:.85rem;line-height:1.65}
+.recipe .codeblock{margin-top:auto}
+.recipe .codeblock pre{font-size:.78rem;line-height:1.75;padding:14px 48px 14px 16px}
+html[dir="rtl"] .recipe .codeblock pre{padding:14px 16px 14px 48px}
+.recipe .codeblock .copy{background:var(--code-bg)}
+
+/* ─── round 7: playground terminal · print ───────────────────── */
+.pg-wrap{position:relative}
+.pg-wrap::before{content:"";position:absolute;inset:-70px -90px;background:radial-gradient(ellipse 62% 55% at 50% 42%,var(--accent-dim),transparent 70%);pointer-events:none}
+.pg-term{position:relative;max-width:880px;margin:0 auto;background:var(--code-bg);border:1px solid var(--code-border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;direction:ltr;text-align:left}
+.pg-bar{display:flex;align-items:center;gap:7px;padding:10px 14px;border-bottom:1px solid var(--code-border);background:rgba(255,255,255,.03)}
+.pg-bar .dot{width:11px;height:11px;border-radius:50%}
+.pg-bar .r{background:#ff5f56}.pg-bar .y{background:#ffbd2e}.pg-bar .g{background:#27c93f}
+.pg-title{margin-inline-start:8px;font-family:var(--font-mono);font-size:.74rem;color:#9db4a8}
+.pg-badge{margin-inline-start:auto;font-family:var(--font-mono);font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--amber);border:1px solid var(--amber);border-radius:999px;padding:2px 9px}
+.pg-out{height:340px;overflow-y:auto;padding:14px 16px;font-family:var(--font-mono);font-size:.8rem;line-height:1.7;color:#d5e3da;white-space:pre-wrap;word-break:break-word}
+.pg-out .c-in{color:#fff}
+.pg-out .c-in::before{content:"$ ";color:var(--accent);font-weight:700}
+.pg-out .c-h{color:#7ee0b8;font-weight:700}
+.pg-out .c-err{color:#ff8a80}
+.pg-out .c-ok{color:#34d399}
+.pg-out .c-dim{color:#9db4a8}
+.pg-out .c-amber{color:#ffd54f}
+.pg-inputrow{display:flex;align-items:center;gap:9px;padding:11px 14px;border-top:1px solid var(--code-border);background:rgba(255,255,255,.03)}
+.pg-ps1{color:#34d399;font-family:var(--font-mono);font-weight:700}
+.pg-inputrow input{flex:1;min-width:0;background:none;border:0;outline:0;color:#fff;font-family:var(--font-mono);font-size:.86rem;caret-color:#34d399}
+.pg-inputrow input::placeholder{color:#5f7a6d}
+#pgRun{width:32px;height:32px;flex:none;border-radius:8px;border:1px solid var(--code-border);background:rgba(255,255,255,.05);color:#9db4a8;font-family:var(--font-mono);transition:.18s}
+#pgRun:hover{color:#34d399;border-color:#34d399}
+.pg-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:9px;margin-top:16px}
+.pg-chip{font-family:var(--font-mono);font-size:.76rem;font-weight:600;color:var(--muted);background:var(--surface);border:1px solid var(--border-strong);border-radius:999px;padding:8px 14px;transition:.18s;direction:ltr}
+.pg-chip:hover{color:var(--accent);border-color:var(--accent);background:var(--accent-dim);transform:translateY(-1px)}
+/* ─── round 9: demo replay · cookbook tools · focus rings ── */
+.pg-chip:focus-visible,.try-btn:focus-visible,.share-btn:focus-visible,.pg-dl:focus-visible,.copy:focus-visible,.tab-btn:focus-visible,.cook-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.pg-demo{color:var(--accent);background:var(--accent-dim);border-color:var(--accent)}
+.pg-demo:hover{color:var(--bg);background:var(--accent);border-color:var(--accent)}
+.pg-demo.running{animation:pgPulse 1.25s ease-in-out infinite}
+@keyframes pgPulse{0%,100%{box-shadow:0 0 0 0 var(--accent-dim)}50%{box-shadow:0 0 0 8px transparent}}
+.cook-tools{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:11px 16px;margin:0 0 20px}
+.cook-note{font-size:.83rem;color:var(--muted)}
+.cook-note b{color:var(--accent);font-weight:700}
+.cook-actions{display:flex;gap:9px;flex-wrap:wrap}
+.cook-btn{font-family:var(--font-mono);font-size:.78rem;font-weight:700;color:var(--text);background:var(--bg);border:1px solid var(--border-strong);border-radius:10px;padding:8px 14px;cursor:pointer;transition:.18s}
+.cook-btn:hover{color:var(--accent);border-color:var(--accent);background:var(--accent-dim);transform:translateY(-1px)}
+.recipe-tags{font-family:var(--font-mono);font-size:.71rem;color:var(--faint);letter-spacing:.02em;margin-top:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.try-btn{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px;border-radius:999px;border:1px solid var(--border-strong);background:var(--surface);color:var(--muted);font-family:var(--font-mono);font-size:.72rem;font-weight:700;transition:.18s;direction:ltr;flex:none}
+.try-btn:hover{color:var(--accent);border-color:var(--accent);background:var(--accent-dim);transform:translateY(-1px)}
+.pg-term:focus-within{border-color:#2f5347}
+@media (max-width:680px){.pg-out{height:280px;font-size:.74rem}}
+.b-try{margin-top:14px;text-align:center}
+
+/* ─── print stylesheet ───────────────────────────────────────── */
+@media print{
+  .nav,.mobile-menu,#progressBar,.bg-fx,.pal-overlay,.hero-ctas,.terminal,.search-trigger,.pg-inputrow,.pg-chips,.cta-band,#toTop,#toast,.anchor-btn,.copy,.ver-pill,#hamburger,.cook-tools{display:none!important}
+  body{background:#fff;color:#111}
+  .codeblock{border-color:#bbb;background:#fff}
+  .codeblock pre,.pg-out{background:#fff!important;color:#111!important;border:1px solid #bbb}
+  .recipe .codeblock .copy{display:none}
+  .try-btn,.share-btn,.pg-dl{display:none}
+  details>*{display:block!important}
+  .recipe,.dstep,.cl-card,.feature,.pg-term{break-inside:avoid;box-shadow:none}
+  .max-h,.pg-out{max-height:none;height:auto;overflow:visible}
+  section{padding:22px 0}
+  .reveal{opacity:1!important;transform:none!important}
+}
+
+/* ─── RTL tweaks ─────────────────────────────────────────────── */
+html[dir="rtl"] body{letter-spacing:0}
+html[dir="rtl"] .terminal-body,html[dir="rtl"] .codeblock pre,html[dir="rtl"] .nav-links a,html[dir="rtl"] .field input,html[dir="rtl"] .field select,html[dir="rtl"] .check,html[dir="rtl"] table.opts td:first-child{font-family:var(--font-mono)}
+html[dir="rtl"] .cl-card code,html[dir="rtl"] .feature code,html[dir="rtl"] .dbody code{direction:ltr;unicode-bidi:isolate;display:inline-block}
+
+/* ─── Responsive ─────────────────────────────────────────────── */
+@media (max-width:1020px){
+  .hero-grid{grid-template-columns:1fr;gap:38px}
+  .builder{grid-template-columns:1fr}
+  .builder-controls{max-height:none}
+  .flow{grid-template-columns:1fr 1fr}
+  .flow::before,.flow::after{display:none}
+  .est{grid-template-columns:1fr}
+  .cl-grid{grid-template-columns:1fr}
+  .cook-grid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:680px){
+  .cook-grid{grid-template-columns:1fr}
+}
+@media (max-width:1120px){
+  .nav-links{display:none}
+  #hamburger{display:inline-flex}
+  .ver-pill{display:none}
+  .mobile-menu{position:fixed;top:var(--nav-h);inset-inline:0;z-index:99;background:color-mix(in srgb,var(--bg) 96%,transparent);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:10px 4% 16px}
+  .mobile-menu.open{display:flex;flex-direction:column;gap:2px}
+  .mobile-menu a{padding:12px 14px;border-radius:10px;color:var(--text);font-weight:600}
+  .mobile-menu a:hover{background:var(--surface-2);text-decoration:none}
+}
+@media (max-width:760px){
+  .github-btn .gh-label,.github-btn .stars{display:none}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  section{padding:58px 0}
+  .hero{padding:calc(var(--nav-h) + 44px) 0 40px}
+  .deploy-flow::before{inset-inline-start:21px}
+  .dstep{padding-inline-start:52px}
+  .dstep .dnum{inset-inline-start:6px}
+  h1{font-size:2rem}
+}
+/* ─── round 10: deep links, palette run action, chip wrap guard ─── */
+.p-run{flex:none;display:inline-flex;align-items:center;justify-content:center;width:26px;height:22px;border-radius:7px;border:1px solid var(--code-border);background:var(--surface-2);color:var(--faint);font-size:.6rem;cursor:pointer;transition:color .16s,border-color .16s,background .16s,transform .16s;padding:0}
+.p-run:hover,.p-item.sel .p-run{color:var(--accent);border-color:var(--accent);background:var(--accent-dim)}
+.p-run:hover{transform:translateY(-1px)}
+.pal-foot .run-hint{display:none}
+.pal-foot.runnable .run-hint{display:inline-flex}
+.recipe.deeplink{animation:deepGlow 2.8s ease-out 1}
+@keyframes deepGlow{0%{box-shadow:0 0 0 0 rgba(16,185,129,0)}12%{box-shadow:0 0 0 4px var(--accent-dim),0 18px 46px rgba(16,185,129,.3)}55%{box-shadow:0 0 0 4px var(--accent-dim),0 18px 46px rgba(16,185,129,.16)}100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}}
+@media (prefers-reduced-motion:reduce){.recipe.deeplink{animation:none}}
+/* ─── round 11: recipe share button + playground transcript ─── */
+.share-btn{margin-inline-start:auto;display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:999px;border:1px solid var(--border-strong);background:var(--surface);color:var(--muted);font-size:.76rem;transition:.18s;flex:none;cursor:pointer;padding:0}
+.share-btn:hover{color:var(--accent);border-color:var(--accent);background:var(--accent-dim);transform:translateY(-1px)}
+.share-btn.done{color:var(--accent);border-color:var(--accent)}
+.pg-dl{margin-inline-start:6px;display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 10px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:transparent;color:#9db4a8;font-family:var(--font-mono);font-size:.62rem;font-weight:700;cursor:pointer;transition:.16s;flex:none;direction:ltr}
+.pg-dl:hover{color:#d5e3da;border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.05)}
+.pg-dl svg{flex:none}
+/* ─── round 12: keyboard shortcuts sheet + palette presets ─── */
+.kbd-sheet{width:min(470px,100%)}
+.kbd-sheet:focus{outline:none}
+.kbd-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:15px 18px;border-bottom:1px solid var(--border)}
+.kbd-grid{max-height:min(62vh,480px);overflow-y:auto;padding:10px 12px 14px}
+.k-group{padding:12px 8px 5px;font-family:var(--font-mono);font-size:.66rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.kbd-row{display:flex;align-items:center;gap:7px;padding:8px;border-radius:9px}
+.kbd-row + .kbd-row{margin-top:2px}
+.kbd-row:hover{background:var(--surface-2)}
+.k-what{color:var(--muted);font-size:.88rem;margin-inline-start:6px}
+html[dir="rtl"] .kbd-row{flex-direction:row}
+.foot-more{margin-inline-start:auto;display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:var(--faint);transition:color .15s}
+.foot-more:hover{color:var(--accent)}
+@media (max-width:680px){.pal-foot .foot-more{margin-inline-start:0}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main" data-i18n="skip">Skip to content</a>
+<div class="bg-fx" aria-hidden="true">
+  <div class="orb o1"></div><div class="orb o2"></div><div class="grid"></div>
+</div>
+
+<!-- ═══════════ NAV ═══════════ -->
+<header class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="#top" aria-label="projdump home">
+      <img src="assets/logo.png" alt="projdump logo">
+      <span>projdump<span class="cursor-dot">_</span></span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#features" data-i18n="nav.features">Features</a>
+      <a href="#install" data-i18n="nav.install">Install</a>
+      <a href="#builder" data-i18n="nav.builder">Builder</a>
+      <a href="#formats" data-i18n="nav.formats">Formats</a>
+      <a href="#options" data-i18n="nav.options">Options</a>
+      <a href="#cookbook" data-i18n="nav.cookbook">Recipes</a>
+      <a href="#deploy" data-i18n="nav.deploy">Go live</a>
+      <a href="#faq" data-i18n="nav.faq">FAQ</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="ver-pill" href="#changelog" title="Version — see what's new">v1.1.0</a>
+      <button id="searchBtn" class="search-trigger" aria-label="Search (Ctrl+K)" aria-haspopup="dialog">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+        <span class="st-label" data-i18n="search.open">Search</span>
+        <span class="kbd" aria-hidden="true">Ctrl K</span>
+      </button>
+      <button id="langBtn" class="icon-btn lang-btn" aria-label="Switch language / تغییر زبان">🌍 <span id="langLabel">فارسی</span></button>
+      <button id="themeBtn" class="icon-btn" aria-label="Toggle theme">🌙</button>
+      <a class="github-btn" href="https://github.com/CheginiSoroush/projdump" target="_blank" rel="noopener">
+        <svg width="17" height="17" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        <span class="gh-label" data-i18n="nav.star">Star</span>
+        <span class="stars" id="starCount" hidden>★ —</span>
+      </a>
+      <button id="hamburger" class="icon-btn" aria-label="Menu" aria-expanded="false">☰</button>
+    </div>
+  </div>
+</header>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#features" data-i18n="nav.features">Features</a>
+  <a href="#install" data-i18n="nav.install">Install</a>
+  <a href="#builder" data-i18n="nav.builder">Builder</a>
+  <a href="#formats" data-i18n="nav.formats">Formats</a>
+  <a href="#options" data-i18n="nav.options">Options</a>
+  <a href="#cookbook" data-i18n="nav.cookbook">Recipes</a>
+  <a href="#deploy" data-i18n="nav.deploy">Go live</a>
+  <a href="#faq" data-i18n="nav.faq">FAQ</a>
+</div>
+
+<main id="main">
+<!-- ═══════════ HERO ═══════════ -->
+<div id="top"></div>
+<section class="hero" aria-labelledby="heroTitle">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <span class="kicker"><span class="pulse"></span><span data-i18n="hero.kicker">v1.1.0 · pure bash · MIT</span></span>
+        <h1 id="heroTitle"><span data-i18n="hero.title1">Your whole codebase.</span><br><span class="grad" data-i18n="hero.title2">One file. AI-ready.</span></h1>
+        <p class="lead" data-i18n="hero.lead">projdump packs any project — directory tree, sources, stats — into a single Markdown, XML or JSON file that drops straight into Claude, ChatGPT, DeepSeek or Gemini. No dependencies. One command.</p>
+        <div class="hero-ctas">
+          <a class="btn btn-primary" href="#install">⚡ <span data-i18n="hero.cta1">Get started</span></a>
+          <a class="btn btn-ghost" href="https://github.com/CheginiSoroush/projdump" target="_blank" rel="noopener">★ <span data-i18n="hero.cta2">Star on GitHub</span></a>
+        </div>
+        <div class="hero-meta">
+          <span>🐧 <span data-i18n="hero.m1">Linux · macOS · WSL</span></span>
+          <span>🔒 <span data-i18n="hero.m2">100% local — your code never leaves the machine</span></span>
+          <span>📦 <span data-i18n="hero.m3">zero hard dependencies</span></span>
+        </div>
+      </div>
+      <div class="terminal" aria-label="Animated demo of projdump running in a terminal">
+        <div class="terminal-bar">
+          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+          <span class="title">bash — my-project</span>
+        </div>
+        <div class="terminal-body" id="heroTerm"></div>
+      </div>
+    </div>
+    <div class="stats reveal" id="stats">
+      <div class="stat"><b data-count="84">84</b><span data-i18n="stats.tests">tests, all green</span></div>
+      <div class="stat"><b data-count="120" data-suffix="+">120+</b><span data-i18n="stats.langs">languages tagged</span></div>
+      <div class="stat"><b data-count="3">3</b><span data-i18n="stats.formats">output formats</span></div>
+      <div class="stat"><b data-count="0">0</b><span data-i18n="stats.deps">hard dependencies</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ PIPELINE ═══════════ -->
+<section id="pipeline" aria-labelledby="pipelineTitle">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="tag" data-i18n="pipeline.tag">Workflow</span>
+      <h2 id="pipelineTitle" data-i18n="pipeline.title">From folder to context in four moves</h2>
+      <p data-i18n="pipeline.sub">No daemons, no config files, no network — one clean pipeline, start to finish.</p>
+    </div>
+    <div class="pipe-wrap reveal">
+      <div class="flow">
+        <div class="pipe-step">
+          <div class="p-badge">📡</div>
+          <h3 data-i18n="p1.t">Scan</h3>
+          <p data-i18n="p1.d">Walks the repo, reading git ls-files so .gitignore is honoured.</p>
+          <code>git ls-files -z</code>
+        </div>
+        <div class="pipe-step">
+          <div class="p-badge">🧹</div>
+          <h3 data-i18n="p2.t">Filter</h3>
+          <p data-i18n="p2.d">Applies ‎--include/‎--exclude, ‎--ext-only, ‎--max-size and the token budget.</p>
+          <code>‎--include 'src/*'</code>
+        </div>
+        <div class="pipe-step">
+          <div class="p-badge">✍️</div>
+          <h3 data-i18n="p3.t">Write</h3>
+          <p data-i18n="p3.d">Streams every surviving file into one Markdown, XML or JSON document.</p>
+          <code>&gt; my-project_dump.md</code>
+        </div>
+        <div class="pipe-step">
+          <div class="p-badge">📋</div>
+          <h3 data-i18n="p4.t">Copy &amp; report</h3>
+          <p data-i18n="p4.d">Drops the dump on your clipboard and prints the summary + token estimate.</p>
+          <code>pbcopy · clip.exe</code>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ FEATURES ═══════════ -->
+<section id="features" aria-labelledby="featuresTitle">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="tag" data-i18n="features.tag">Features</span>
+      <h2 id="featuresTitle" data-i18n="features.title">Everything you need to brief an AI</h2>
+      <p data-i18n="features.sub">One binary-free script, obsessively polished: 10+ bugs squashed, 84 tests, shellcheck-clean.</p>
+    </div>
+    <div class="features">
+      <div class="feature reveal"><div class="f-icon">🌳</div><h3 data-i18n="f1.t">Directory tree</h3><p data-i18n="f1.d">Uses tree(1) when installed, falls back to a built-in renderer so the AI always sees the project layout.</p></div>
+      <div class="feature reveal"><div class="f-icon">🎨</div><h3 data-i18n="f2.t">120+ language tags</h3><p data-i18n="f2.d">Every fenced block gets the right language tag, so Markdown and XML dumps render with proper highlighting.</p></div>
+      <div class="feature reveal"><div class="f-icon">🧩</div><h3 data-i18n="f3.t">Precision filters</h3><p><code>‎--ext-only</code> <code>‎--exclude</code> <code>‎--include</code> — <span data-i18n="f3.d">repeatable globs, byte-accurate ‎--max-size, .gitignore respected in git repos.</span></p></div>
+      <div class="feature reveal"><div class="f-icon">✂️</div><h3 data-i18n="f4.t">Dump only what changed</h3><p><code>‎--since HEAD~5</code> — <span data-i18n="f4.d">diff-driven file list plus untracked files, validated up-front.</span></p></div>
+      <div class="feature reveal"><div class="f-icon">💰</div><h3 data-i18n="f5.t">Token budget</h3><p><code>‎--tokens-budget 60000</code> — <span data-i18n="f5.d">stop adding files once the estimate hits your context window.</span></p></div>
+      <div class="feature reveal"><div class="f-icon">🎯</div><h3 data-i18n="f6.t">Three formats</h3><p data-i18n="f6.d">Markdown for humans, XML &lt;file&gt; blocks for Claude, JSON for jq and scripts.</p></div>
+      <div class="feature reveal"><div class="f-icon">🔍</div><h3 data-i18n="f7.t">Dry-run preview</h3><p><code>‎--list</code> — <span data-i18n="f7.d">see exactly which files would be dumped, with sizes, lines and tokens.</span></p></div>
+      <div class="feature reveal"><div class="f-icon">📝</div><h3 data-i18n="f8.t">Note for the AI</h3><p><code>‎--note 'Review auth for XSS'</code> — <span data-i18n="f8.d">inject your task at the top of every dump.</span></p></div>
+      <div class="feature reveal"><div class="f-icon">📋</div><h3 data-i18n="f9.t">Clipboard everywhere</h3><p data-i18n="f9.d">Auto-copies via pbcopy, wl-copy, xclip/xsel, clip.exe (WSL) and putclip (Cygwin).</p></div>
+      <div class="feature reveal"><div class="f-icon">🌿</div><h3 data-i18n="f10.t">Git-aware</h3><p data-i18n="f10.d">Header carries branch @ sha (dirty?), scope line for ‎--since, and language breakdown.</p></div>
+      <div class="feature reveal"><div class="f-icon">🛡️</div><h3 data-i18n="f11.t">Can't break itself</h3><p data-i18n="f11.d">Safe fence growth, CDATA splitting, XML escaping — adversarial filenames survive all three formats.</p></div>
+      <div class="feature reveal"><div class="f-icon">🩺</div><h3 data-i18n="f12.t">Explains itself</h3><p><code>-v</code> — <span data-i18n="f12.d">verbose mode reports every skipped file and why.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ INSTALL ═══════════ -->
+<section id="install" aria-labelledby="installTitle" style="background:var(--bg-soft);border-block:1px solid var(--border)">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="tag" data-i18n="install.tag">Install</span>
+      <h2 id="installTitle" data-i18n="install.title">Up and running in 30 seconds</h2>
+      <p data-i18n="install.sub">Requires bash 5.0+. Optional helpers picked up automatically: tree, jq, python3, file.</p>
+    </div>
+    <div class="install-grid">
+      <div class="step-card reveal">
+        <span class="num">1</span>
+        <h3 data-i18n="i1.t">Clone</h3>
+        <p data-i18n="i1.d">Grab the repo — it's tiny and dependency-free.</p>
+        <div class="codeblock"><button class="copy" aria-label="Copy">⧉</button><pre>git clone https://github.com/CheginiSoroush/projdump.git
+cd projdump</pre></div>
+      </div>
+      <div class="step-card reveal">
+        <span class="num">2</span>
+        <h3 data-i18n="i2.t">Install</h3>
+        <p data-i18n="i2.d">Symlinks the binary and adds bash + zsh completions. git pull keeps it fresh.</p>
+        <div class="codeblock"><button class="copy" aria-label="Copy">⧉</button><pre>./install.sh
+<span class="tok-c"># custom location:</span>
+./install.sh ‎--prefix /usr/local</pre></div>
+      </div>
+      <div class="step-card reveal">
+        <span class="num">3</span>
+        <h3 data-i18n="i3.t">Dump</h3>
+        <p data-i18n="i3.d">Run it inside any project. The dump lands on your clipboard automatically.</p>
+        <div class="codeblock"><button class="copy" aria-label="Copy">⧉</button><pre><span class="tok-k">cd</span> ~/my-project
+projdump
+<span class="tok-c"># → my-project_dump.md  ✓ copied</span></pre></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ BUILDER ═══════════ -->
+<section id="builder" aria-labelledby="builderTitle">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="tag" data-i18n="builder.tag">Playground</span>
+      <h2 id="builderTitle" data-i18n="builder.title">Build your perfect command</h2>
+      <p data-i18n="builder.sub">Toggle the options, copy the command, paste it in your terminal.</p>
+    </div>
+    <div class="builder reveal">
+      <div class="builder-controls scrollbar-lite">
+        <div class="field">
+          <label data-i18n="b.format">Output format</label>
+          <div class="seg" role="group" aria-label="format">
+            <button type="button" data-fmt="md" class="on">Markdown</button>
+            <button type="button" data-fmt="xml">XML</button>
+            <button type="button" data-fmt="json">JSON</button>
+          </div>
+        </div>
+        <div class="field"><label>—output&nbsp;(-o)</label><input type="text" id="bOut" placeholder="review.md"></div>
+        <div class="field"><label>—ext-only&nbsp;(-e)</label><input type="text" id="bExt" placeholder="sh,py,md"></div>
+        <div class="field"><label>—include&nbsp;(-i)</label><input type="text" id="bInc" placeholder="src/*, docs/*"></div>
+        <div class="field"><label>—exclude&nbsp;(-x)</label><input type="text" id="bExc" placeholder="test/*, *.min.js"></div>
+        <div class="field"><label>—since&nbsp;(git ref)</label><input type="text" id="bSince" placeholder="HEAD~3"></div>
+        <div class="field">
+          <label>—sort</label>
+          <select id="bSort">
+            <option value="" data-i18n="b.default">default (name)</option>
+            <option value="name">name</option>
+            <option value="size">size</option>
+            <option value="size-desc">size-desc</option>
+            <option value="ext">ext</option>
+          </select>
+        </div>
+        <div class="field"><label>—tokens-budget</label><input type="number" id="bBudget" placeholder="60000" min="1"></div>
+        <div class="field"><label>—max-size (KB)</label><input type="number" id="bMax" placeholder="500" min="1"></div>
+        <div class="field"><label>—note</label><input type="text" id="bNote" placeholder="Review auth for security bugs"></div>
+        <div class="field">
+          <label data-i18n="b.flags">Switches</label>
+          <div class="checks">
+            <label class="check"><input type="checkbox" id="bNoTree"> ‎--no-tree</label>
+            <label class="check"><input type="checkbox" id="bList"> ‎--list</label>
+            <label class="check"><input type="checkbox" id="bStdout"> ‎--stdout</label>
+            <label class="check"><input type="checkbox" id="bCopy"> ‎--copy</label>
+            <label class="check"><input type="checkbox" id="bV"> -v</label>
+            <label class="check"><input type="checkbox" id="bQ"> -q</label>
+          </div>
+        </div>
+      </div>
+      <div class="builder-preview">
+        <p class="hint" data-i18n="b.hint">💡 Start inside your project folder. The command updates live as you toggle options.</p>
+        <div class="cmd-out">
+          <div class="codeblock">
+            <button class="copy" aria-label="Copy command">⧉</button>
+            <pre id="cmdPreview" aria-live="polite">projdump</pre>
+          </div>
+        </div>
+        <p class="hint" data-i18n="b.hint2">Pro tip: combine ‎--sort size-desc with ‎--tokens-budget to pack the most important (largest) files into a tight context window.</p>
+        <div class="b-try"><a class="btn btn-ghost" href="#playground">▶ <span data-i18n="b.try">Try it in the playground</span></a></div>
+      </div>
+    </div>
+    <div class="est reveal" id="estimator">
+      <div class="est-in">
+        <label for="estKb" data-i18n="est.kb">Total project size (KB)</label>
+        <input type="number" id="estKb" min="0" step="any" placeholder="1500" inputmode="decimal">
+        <p class="hint" data-i18n="est.hint">Estimate = bytes ÷ 3.5 — the same heuristic projdump prints in its summary.</p>
+      </div>
+      <div class="est-out">
+        <div class="est-tokens"><span data-i18n="est.tokens">≈ estimated tokens</span><b id="estTokens">—</b></div>
+        <div class="est-chips" id="estChips" aria-label="context window fit">
+          <span class="fit-chip" data-win="8000">8K</span>
+          <span class="fit-chip" data-win="32768">32K</span>
+          <span class="fit-chip" data-win="131072">128K</span>
+          <span class="fit-chip" data-win="200000">200K</span>
+          <span class="fit-chip" data-win="1000000">1M</span>
+        </div>
+        <div class="est-suggest">
+          <span data-i18n="est.suggest">Suggested flag:</span>
+          <button type="button" id="estBudget" class="est-flag" title="Copy">‎--tokens-budget …</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ PLAYGROUND (SIMULATED TERMINAL) ═══════════ -->
+<section id="playground" aria-labelledby="pgTitle">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="tag" data-i18n="pg.tag">Playground</span>
+      <h2 id="pgTitle" data-i18n="pg.title">Try it — no install needed</h2>
+      <p data-i18n="pg.sub">A faithful simulation of the CLI on a small sample project. Type a command or press a chip — history works with ↑/↓, flags complete with Tab.</p>
+    </div>
+    <div class="pg-wrap reveal">
+      <div class="pg-term">
+        <div class="pg-bar">
+          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+          <span class="pg-title">bash — try projdump</span>
+          <span class="pg-badge" data-i18n="pg.badge">simulated</span>
+          <button type="button" class="pg-dl" id="pgDl" title="Save this session's output as a text file">⬇ <span data-i18n="pg.dl">transcript</span></button>
+        </div>
+        <div class="pg-out scrollbar-lite" id="pgOut" aria-live="polite"></div>
+        <div class="pg-inputrow">
+          <span class="pg-ps1" aria-hidden="true">$</span>
+          <input id="pgIn" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Command input">
+          <button type="button" id="pgRun" aria-label="Run command">↵</button>
+        </div>
+      </div>
+      <div class="pg-chips" role="group" aria-label="Preset commands">
+        <button type="button" class="pg-chip pg-demo" id="pgDemo" title="Watch a hands-free run">▶ <span data-i18n="pg.demo">demo</span></button>
+        <button type="button" class="pg-chip" data-cmd="projdump --list">projdump --list</button>
+        <button type="button" class="pg-chip" data-cmd='projdump --format xml --note "Find the memory leak"'>xml + note</button>
+        <button type="button" class="pg-chip" data-cmd="projdump --tokens-budget 200 --sort size-desc">budget</button>
+        <button type="button" class="pg-chip" data-cmd="projdump -v -e py">-v -e py</button>
+        <button type="button" class="pg-chip" data-cmd="projdump --since main">--since main</button>
+        <button type="button" class="pg-chip" data-cmd="help">help</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ FORMATS ═══════════ -->
+<section id="formats" aria-labelledby="formatsTitle" style="background:var(--bg-soft);border-block:1px solid var(--border)">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="tag" data-i18n="formats.tag">Output</span>
+      <h2 id="formatsTitle" data-i18n="formats.title">One project, three shapes</h2>
+      <p data-i18n="formats.sub">Same content, three serialisations — pick the one your model (or pipeline) loves.</p>
+    </div>
+    <div class="tabs reveal" role="tablist" aria-label="Output formats">
+      <button class="tab-btn on" role="tab" aria-selected="true" data-tab="md">Markdown</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="xml">XML</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="json">JSON</button>
+    </div>
+    <div class="tab-pane on" id="pane-md" role="tabpanel">
+      <div class="codeblock"><button class="copy" aria-label="Copy">⧉</button><pre><span class="tok-k"># 📦 my-project — Project Dump</span>
+
+<span class="tok-c">**Generated:**</span> 2026-10-08 12:00 UTC
+<span class="tok-c">**Git:**</span> main @ a1b2c3d (clean)
+
+<span class="tok-k">## 📄 Source Files</span>
+
+<span class="tok-k">### `src/main.py`</span>
+
+<span class="tok-s">```python</span>
+<span class="tok-f">print</span>(<span class="tok-s">"hello"</span>)
+<span class="tok-s">```</span>
+
+<span class="tok-k">## 📊 Summary</span>
+
+| Files | Lines | Size |
+|---:|---:|---:|
+| 128 | 4213 | 96.4KB |
+
+<span class="tok-c">&gt; Roughly 1,204 tokens (bytes ÷ 3.5)</span></pre></div>
+    </div>
+    <div class="tab-pane" id="pane-xml" role="tabpanel">
+      <div class="codeblock"><button class="copy" aria-label="Copy">⧉</button><pre><span class="tok-k">&lt;project</span> <span class="tok-f">name</span>=<span class="tok-s">"my-project"</span> <span class="tok-f">tool</span>=<span class="tok-s">"projdump v1.1.0"</span> <span class="tok-f">git</span>=<span class="tok-s">"main @ a1b2c3d (clean)"</span><span class="tok-k">&gt;</span>
+  <span class="tok-k">&lt;file</span> <span class="tok-f">path</span>=<span class="tok-s">"src/main.py"</span> <span class="tok-f">lang</span>=<span class="tok-s">"python"</span> <span class="tok-f">lines</span>=<span class="tok-s">"1"</span> <span class="tok-f">bytes</span>=<span class="tok-s">"19"</span><span class="tok-k">&gt;</span>
+    <span class="tok-n">&lt;![CDATA[</span>
+<span class="tok-p">print("hello")</span>
+    <span class="tok-n">]]&gt;</span>
+  <span class="tok-k">&lt;/file&gt;</span>
+  <span class="tok-k">&lt;stats</span> <span class="tok-f">files</span>=<span class="tok-s">"128"</span> <span class="tok-f">lines</span>=<span class="tok-s">"4213"</span> <span class="tok-f">tokens</span>=<span class="tok-s">"1204"</span><span class="tok-k">&gt;</span>
+    <span class="tok-k">&lt;language</span> <span class="tok-f">name</span>=<span class="tok-s">"python"</span> <span class="tok-f">files</span>=<span class="tok-s">"96"</span><span class="tok-k">/&gt;</span>
+  <span class="tok-k">&lt;/stats&gt;</span>
+<span class="tok-k">&lt;/project&gt;</span></pre></div>
+    </div>
+    <div class="tab-pane" id="pane-json" role="tabpanel">
+      <div class="codeblock"><button class="copy" aria-label="Copy">⧉</button><pre>{
+  <span class="tok-f">"project"</span>: <span class="tok-s">"my-project"</span>,
+  <span class="tok-f">"git"</span>: <span class="tok-s">"main @ a1b2c3d (clean)"</span>,
+  <span class="tok-f">"files"</span>: [
+    { <span class="tok-f">"path"</span>: <span class="tok-s">"src/main.py"</span>, <span class="tok-f">"lang"</span>: <span class="tok-s">"python"</span>,
+      <span class="tok-f">"lines"</span>: 1, <span class="tok-f">"bytes"</span>: 19,
+      <span class="tok-f">"content"</span>: <span class="tok-s">"print(\"hello\")\n"</span> }
+  ],
+  <span class="tok-f">"stats"</span>: { <span class="tok-f">"files"</span>: 128, <span class="tok-f">"lines"</span>: 4213, <span class="tok-f">"tokens"</span>: 1204,
+             <span class="tok-f">"languages"</span>: { <span class="tok-s">"python"</span>: { <span class="tok-f">"files"</span>: 96 } } }
+}</pre></div>
+    </div>
+  </div>
+</section>
+<!-- ═══════════ OPTIONS ═══════════ -->
+<section id="options" aria-labelledby="optionsTitle">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="tag" data-i18n="options.tag">Reference</span>
+      <h2 id="optionsTitle" data-i18n="options.title">Every flag, explained</h2>
+      <p data-i18n="options.sub">Type to filter — the table searches both flag names and descriptions.</p>
+    </div>
+    <div class="table-wrap reveal">
+      <div class="filter-row">
+        <input type="search" id="optFilter" placeholder="⌕ filter options…" aria-label="Filter options">
+        <span class="count" id="optCount">20</span>
+        <button type="button" id="cheatBtn" class="ghost-chip" title="Download a Markdown cheat sheet">⬇ <span data-i18n="options.cheat">Cheat sheet</span></button>
+      </div>
+      <div class="max-h scrollbar-lite">
+        <table class="opts" id="optsTable">
+          <thead><tr><th data-i18n="options.flag">Flag</th><th data-i18n="options.desc">Description</th></tr></thead>
+          <tbody>
+            <tr><td>[output]</td><td><span class="en-only">Output file (positional). Default: <b>&lt;project&gt;_dump.md|xml|json</b>.</span><span class="fa-only">فایل خروجی (موضعی). پیش‌فرض: <b>&lt;project&gt;_dump.md|xml|json</b>.</span></td></tr>
+            <tr><td>-o, ‎--output FILE</td><td><span class="en-only">Explicit output path; missing parent directories are created for you.</span><span class="fa-only">مسیر خروجی صریح؛ پوشه‌های والدِ ناموجود خودکار ساخته می‌شوند.</span></td></tr>
+            <tr><td>-f, ‎--format md|xml|json</td><td><span class="en-only">Output format (default <b>md</b>). XML is Claude-friendly, JSON is jq-friendly.</span><span class="fa-only">قالب خروجی (پیش‌فرض <b>md</b>). XML برای Claude و JSON برای jq مناسب است.</span></td></tr>
+            <tr><td>-e, ‎--ext-only LIST</td><td><span class="en-only">Only files with these extensions, comma-separated, case-insensitive. Spaces around commas are fine.</span><span class="fa-only">فقط فایل‌های با این پسوندها، جداشده با ویرگول؛ بزرگی/کوچکی حروف بی‌اهمیت است.</span></td></tr>
+            <tr><td>-x, ‎--exclude GLOB</td><td><span class="en-only">Skip paths matching the glob. Repeatable.</span><span class="fa-only">رد شدن از مسیرهای مطابق با الگو. قابل تکرار.</span></td></tr>
+            <tr><td>-i, ‎--include GLOB</td><td><span class="en-only">Only include paths matching at least one glob. Repeatable; the inverse of ‎--exclude.</span><span class="fa-only">فقط مسیرهای منطبق با حداقل یک الگو وارد شوند. قابل تکرار؛ معکوسِ ‎--exclude.</span></td></tr>
+            <tr><td>‎--since REF</td><td><span class="en-only">Only files changed since a git ref (working-tree diff + untracked), with early validation.</span><span class="fa-only">فقط فایل‌های تغییرکرده از یک رفرنس گیت (تفاوت با درخت کاری + فایل‌های untracked) با اعتبارسنجی زودهنگام.</span></td></tr>
+            <tr><td>‎--sort KEY</td><td><span class="en-only">name (default) · size · size-desc · ext — NUL-safe ordering.</span><span class="fa-only">name (پیش‌فرض) · size · size-desc · ext — مرتب‌سازی امن برای نام فایل‌ها.</span></td></tr>
+            <tr><td>‎--tokens-budget N</td><td><span class="en-only">Stop adding files once the estimated token count reaches N. The first file is always kept.</span><span class="fa-only">پس از رسیدن تخمین توکن‌ها به N افزودن فایل متوقف می‌شود. فایل اول همیشه حفظ می‌شود.</span></td></tr>
+            <tr><td>‎--max-size N</td><td><span class="en-only">Skip files larger than N KB (default 500). Byte-accurate comparison.</span><span class="fa-only">رد شدن از فایل‌های بزرگ‌تر از N کیلوبایت (پیش‌فرض ۵۰۰). مقایسه در سطح بایت.</span></td></tr>
+            <tr><td>‎--no-tree</td><td><span class="en-only">Omit the directory tree section.</span><span class="fa-only">حذف بخش درخت دایرکتوری.</span></td></tr>
+            <tr><td>‎--note TEXT</td><td><span class="en-only">Inject a “note for the AI” block at the top of the dump (all three formats).</span><span class="fa-only">درج بلوک «یادداشت برای هوش مصنوعی» در ابتدای خروجی (در هر سه قالب).</span></td></tr>
+            <tr><td>‎--list</td><td><span class="en-only">Dry run: print the file list with sizes, lines and token totals, then exit.</span><span class="fa-only">اجرای خشک: چاپ فهرست فایل‌ها با حجم، تعداد خط و تخمین توکن، سپس خروج.</span></td></tr>
+            <tr><td>‎--stdout</td><td><span class="en-only">Write the dump to stdout instead of a file — perfect for pipes.</span><span class="fa-only">نوشتن خروجی به stdout به‌جای فایل — عالی برای پایپ‌ها.</span></td></tr>
+            <tr><td>‎--copy / ‎--no-copy</td><td><span class="en-only">Force or disable the automatic clipboard copy.</span><span class="fa-only">اجبار یا غیرفعال‌سازی کپی خودکار در کلیپ‌بورد.</span></td></tr>
+            <tr><td>-v, ‎--verbose</td><td><span class="en-only">Explain every skipped file and the reason, plus skip totals in the summary.</span><span class="fa-only">گزارش دلیل ردشدن هر فایل به‌همراه آمار کلی در خلاصه.</span></td></tr>
+            <tr><td>-q, ‎--quiet</td><td><span class="en-only">Suppress the summary line.</span><span class="fa-only">حذف خط خلاصه.</span></td></tr>
+            <tr><td>‎--version</td><td><span class="en-only">Print version and exit.</span><span class="fa-only">چاپ نسخه و خروج.</span></td></tr>
+            <tr><td>-h, ‎--help</td><td><span class="en-only">Show the full help.</span><span class="fa-only">نمایش راهنمای کامل.</span></td></tr>
+            <tr><td>‎--dry-run</td><td><span class="en-only">Alias of ‎--list.</span><span class="fa-only">مترادفِ ‎--list.</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ COOKBOOK ═══════════ -->
+<section id="cookbook" aria-labelledby="cookbookTitle" style="background:var(--bg-soft);border-block:1px solid var(--border)">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="tag" data-i18n="cookbook.tag">Cookbook</span>
+      <h2 id="cookbookTitle" data-i18n="cookbook.title">Six recipes for real work</h2>
+      <p data-i18n="cookbook.sub">Copy, paste, done — the six workflows projdump was built for.</p>
+    </div>
+    <div class="cook-tools reveal">
+      <span class="cook-note" data-i18n="cook.verified">Every recipe is <b>verified against the real CLI</b>.</span>
+      <span class="cook-actions">
+        <button type="button" class="cook-btn" id="cookCopyAll">⧉ <span data-i18n="cook.copyall">Copy all</span></button>
+        <button type="button" class="cook-btn" id="cookDl">⬇ <span data-i18n="cook.dl">Download .sh</span></button>
+      </span>
+    </div>
+    <div class="cook-grid">
+
+      <article class="recipe reveal">
+        <div class="recipe-top"><span class="recipe-num">R1</span><span class="recipe-ic" aria-hidden="true">🐞</span><h3 data-i18n="r1.t">Brief an AI on a bug</h3></div>
+        <p data-i18n="r1.d">XML file blocks are Claude-friendly, and the note pins your task to the very top of the dump.</p>
+        <p class="recipe-tags" dir="ltr">--format xml · --note · -x</p>
+        <div class="codeblock"><button class="copy" aria-label="Copy">⧉</button><pre>projdump --format xml \
+  --note "Login fails on Safari 17. Find the root cause." \
+  -x 'dist/*' -x '*.lock'</pre></div>
+      </article>
+
+      <article class="recipe reveal">
+        <div class="recipe-top"><span class="recipe-num">R2</span><span class="recipe-ic" aria-hidden="true">📦</span><h3 data-i18n="r2.t">Fit a big repo in a context window</h3></div>
+        <p data-i18n="r2.d">Stop at 60k estimated tokens, biggest files first, skip anything over 200 KB.</p>
+        <p class="recipe-tags" dir="ltr">--tokens-budget · --sort · --max-size</p>
+        <div class="codeblock"><button class="copy" aria-label="Copy">⧉</button><pre>projdump --tokens-budget 60000 \
+  --sort size-desc --max-size 200</pre></div>
+      </article>
+
+      <article class="recipe reveal">
+        <div class="recipe-top"><span class="recipe-num">R3</span><span class="recipe-ic" aria-hidden="true">🔍</span><h3 data-i18n="r3.t">Review only what changed</h3></div>
+        <p data-i18n="r3.d">Feed the diff since a ref — plus untracked files — straight into a code review.</p>
+        <p class="recipe-tags" dir="ltr">--since · --note</p>
+        <div class="codeblock"><button class="copy" aria-label="Copy">⧉</button><pre>projdump --since main \
+  --note "Review this diff for security issues."</pre></div>
+      </article>
+
+      <article class="recipe reveal">
+        <div class="recipe-top"><span class="recipe-num">R4</span><span class="recipe-ic" aria-hidden="true">📊</span><h3 data-i18n="r4.t">Audit the language mix</h3></div>
+        <p data-i18n="r4.d">A dry run sorted by extension shows sizes and token estimates per file — nothing is written.</p>
+        <p class="recipe-tags" dir="ltr">--list · --sort ext</p>
+        <div class="codeblock"><button class="copy" aria-label="Copy">⧉</button><pre>projdump --list --sort ext</pre></div>
+      </article>
+
+      <article class="recipe reveal">
+        <div class="recipe-top"><span class="recipe-num">R5</span><span class="recipe-ic" aria-hidden="true">🚿</span><h3 data-i18n="r5.t">Pipe it into jq</h3></div>
+        <p data-i18n="r5.d">--stdout skips the file and the clipboard; JSON out means jq, python or curl can chew on it.</p>
+        <p class="recipe-tags" dir="ltr">--stdout · --format json · | jq</p>
+        <div class="codeblock"><button class="copy" aria-label="Copy">⧉</button><pre>projdump --stdout --format json \
+  | jq '.stats.languages'</pre></div>
+      </article>
+
+      <article class="recipe reveal">
+        <div class="recipe-top"><span class="recipe-num">R6</span><span class="recipe-ic" aria-hidden="true">🎨</span><h3 data-i18n="r6.t">Frontend-only snapshot</h3></div>
+        <p data-i18n="r6.d">Two include globs and one exclude — the whole UI story in one tidy file.</p>
+        <p class="recipe-tags" dir="ltr">-i ×2 · -e · -o</p>
+        <div class="codeblock"><button class="copy" aria-label="Copy">⧉</button><pre>projdump -i 'src/*' -i 'styles/*' \
+  -e '*.min.js' -o frontend.md</pre></div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ DEPLOY (ZERO → 100) ═══════════ -->
+<section id="deploy" aria-labelledby="deployTitle">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="tag" data-i18n="deploy.tag">Zero → 100</span>
+      <h2 id="deployTitle" data-i18n="deploy.title">Ship this site to GitHub Pages — and get seen</h2>
+      <p data-i18n="deploy.sub">The docs you're reading live in /docs — GitHub Pages serves them with zero configuration. Follow the steps; then use the growth playbook.</p>
+    </div>
+    <div class="deploy-flow">
+
+      <div class="dstep reveal"><span class="dnum">1</span>
+        <details>
+          <summary><span class="en-only">Create the repository on GitHub</span><span class="fa-only">ساخت مخزن در گیت‌هاب</span><span class="chev">▾</span></summary>
+          <div class="dbody">
+            <span class="en-only"><ul>
+              <li>Create a repo named <b>projdump</b> — public (required for free Pages), with a description and topics.</li>
+              <li>Don't tick “Add a README” if you already have one locally — it would need a merge.</li>
+            </ul></span>
+            <span class="fa-only"><ul>
+              <li>یک مخزن عمومی به نام <b>projdump</b> بسازید (برای Pages رایگان، عمومی بودن لازم است) و توضیحات و تاپیک‌ها را وارد کنید.</li>
+              <li>اگر README را لوکال دارید، گزینهٔ «Add a README» را نزنید تا نیاز به Merge پیدا نکنید.</li>
+            </ul></span>
+          </div>
+        </details>
+      </div>
+
+      <div class="dstep reveal"><span class="dnum">2</span>
+        <details>
+          <summary><span class="en-only">Push the project (first upload)</span><span class="fa-only">پیش‌فرستادن پروژه (اولین آپلود)</span><span class="chev">▾</span></summary>
+          <div class="dbody">
+            <div class="codeblock"><button class="copy" aria-label="Copy">⧉</button><pre>cd projdump
+git init
+git add -A
+git commit -m "feat: v1.1.0 — docs site, bilingual README"
+git branch -M main
+git remote add origin https://github.com/&lt;user&gt;/projdump.git
+git push -u origin main</pre></div>
+            <span class="en-only"><p>Future updates are just: <code class="mono">git add -A && git commit -m "…" && git push</code></p></span>
+            <span class="fa-only"><p>به‌روزرسانی‌های بعدی فقط همین است: <code class="mono">git add -A && git commit -m "…" && git push</code></p></span>
+          </div>
+        </details>
+      </div>
+
+      <div class="dstep reveal"><span class="dnum">3</span>
+        <details>
+          <summary><span class="en-only">Turn on GitHub Pages from the /docs folder</span><span class="fa-only">روشن‌کردن GitHub Pages از پوشهٔ docs</span><span class="chev">▾</span></summary>
+          <div class="dbody">
+            <span class="en-only"><ul>
+              <li>Repo → <b>Settings</b> → <b>Pages</b>.</li>
+              <li>Source: <b>Deploy from a branch</b> → Branch <b>main</b> → Folder <b>/docs</b> → Save.</li>
+              <li>Wait ~1 minute → your site is at <code class="mono">https://&lt;user&gt;.github.io/projdump/</code></li>
+              <li>No build step, no CI — the folder is already a finished static site.</li>
+            </ul></span>
+            <span class="fa-only"><ul>
+              <li>در مخزن: <b>Settings</b> → <b>Pages</b>.</li>
+              <li>Source را روی <b>Deploy from a branch</b> بگذارید؛ شاخه <b>main</b> و پوشه <b>/docs</b> را انتخاب و Save کنید.</li>
+              <li>حدود یک دقیقه صبر کنید → سایت شما روی <code class="mono">https://&lt;user&gt;.github.io/projdump/</code> در دسترس است.</li>
+              <li>نه بیلد می‌خواهد نه CI — پوشهٔ docs همین حالا یک سایت استاتیک کامل است.</li>
+            </ul></span>
+          </div>
+        </details>
+      </div>
+
+      <div class="dstep reveal"><span class="dnum">4</span>
+        <details>
+          <summary><span class="en-only">Optional: deploy with GitHub Actions instead</span><span class="fa-only">اختیاری: استقرار با GitHub Actions</span><span class="chev">▾</span></summary>
+          <div class="dbody">
+            <span class="en-only"><p>If you prefer CI, add <b>.github/workflows/pages.yml</b>:</p></span>
+            <span class="fa-only"><p>اگر CI را ترجیح می‌دهید، فایل <b>.github/workflows/pages.yml</b> را بسازید:</p></span>
+            <div class="codeblock"><button class="copy" aria-label="Copy">⧉</button><pre>name: pages
+on: { push: { branches: [main] } }
+permissions: { contents: read, pages: write, id-token: write }
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: { name: github-pages }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: docs }
+      - uses: actions/deploy-pages@v4</pre></div>
+          </div>
+        </details>
+      </div>
+
+      <div class="dstep reveal"><span class="dnum">5</span>
+        <details>
+          <summary><span class="en-only">Optional: custom domain + HTTPS</span><span class="fa-only">اختیاری: دامنهٔ اختصاصی + HTTPS</span><span class="chev">▾</span></summary>
+          <div class="dbody">
+            <span class="en-only"><ul>
+              <li>Buy a domain, then add a <b>CNAME</b> file inside <b>docs/</b> containing just the domain.</li>
+              <li>In DNS: <code class="mono">A</code> records → 185.199.108.153 / .109 / .110 / .111 (or <code class="mono">CNAME</code> → &lt;user&gt;.github.io).</li>
+              <li>Back in Settings → Pages: set the custom domain, then tick <b>Enforce HTTPS</b>.</li>
+            </ul></span>
+            <span class="fa-only"><ul>
+              <li>دامنه را بخرید و فایل <b>CNAME</b> (شامل فقط نام دامنه) داخل <b>docs/</b> بگذارید.</li>
+              <li>در DNS چهار رکورد <code class="mono">A</code> به 185.199.108.153 تا 185.199.111.153 یا یک <code class="mono">CNAME</code> به &lt;user&gt;.github.io تنظیم کنید.</li>
+              <li>در Settings → Pages دامنه را ثبت و تیک <b>Enforce HTTPS</b> را بزنید.</li>
+            </ul></span>
+          </div>
+        </details>
+      </div>
+
+      <div class="dstep reveal"><span class="dnum">6</span>
+        <details>
+          <summary><span class="en-only">SEO & sharing cards (do this once)</span><span class="fa-only">سئو و کارت‌های اشتراک‌گذاری (یک‌بار برای همیشه)</span><span class="chev">▾</span></summary>
+          <div class="dbody">
+            <span class="en-only"><ul>
+              <li>This site already ships meta/OG/Twitter tags, JSON-LD, sitemap.xml and robots.txt.</li>
+              <li>Register the URL in <b>Google Search Console</b> and <b>Bing Webmaster</b>; submit <code class="mono">sitemap.xml</code>.</li>
+              <li>Repo → Settings → Social preview: upload <b>docs/assets/og-image.png</b>.</li>
+              <li>Pick 10–15 topics: <code class="mono">bash cli llm chatgpt claude developer-tools prompt context-window</code>.</li>
+            </ul></span>
+            <span class="fa-only"><ul>
+              <li>این سایت همین حالا متاتگ‌های OG/Twitter، JSON-LD، sitemap و robots.txt دارد.</li>
+              <li>نشانی سایت را در <b>Google Search Console</b> و <b>Bing Webmaster</b> ثبت و فایل <code class="mono">sitemap.xml</code> را معرفی کنید.</li>
+              <li>در تنظیمات مخزن، Social preview را با <b>docs/assets/og-image.png</b> آپلود کنید.</li>
+              <li>۱۰ تا ۱۵ تاپیک اضافه کنید: <code class="mono">bash cli llm chatgpt claude developer-tools prompt</code>.</li>
+            </ul></span>
+          </div>
+        </details>
+      </div>
+
+      <div class="dstep reveal"><span class="dnum">7</span>
+        <details>
+          <summary><span class="en-only">Growth playbook — getting traffic 🚀</span><span class="fa-only">کتاب‌بازی رشد — جذب بازدید 🚀</span><span class="chev">▾</span></summary>
+          <div class="dbody">
+            <span class="en-only"><ul>
+              <li><b>Show, don't tell:</b> a 20-second GIF of the terminal beats a paragraph. Post it with the repo link.</li>
+              <li><b>Hacker News:</b> title “Show HN: Projdump – dump a codebase into one file for LLMs”, Tue–Thu morning US time.</li>
+              <li><b>Reddit:</b> r/commandline, r/bash, r/LocalLLaMA, r/ChatGPTCoding — lead with the problem, link in the body.</li>
+              <li><b>Write an article:</b> dev.to / Medium / Hashnode: “I built a tool that fits any repo into one prompt”.</li>
+              <li><b>Awesome lists:</b> PR into awesome-bash, awesome-chatgpt-prompts, awesome-llm-tools…</li>
+              <li><b>Product Hunt</b> launch with the OG image and a short demo video.</li>
+              <li><b>Answer questions</b> on Stack Overflow / Quora about “how to paste a repo into ChatGPT” — link naturally.</li>
+              <li><b>GitHub Trending</b> rewards: clean README (✓), badges (✓), GIF demo, topics, releases with notes, first-week stars.</li>
+            </ul></span>
+            <span class="fa-only"><ul>
+              <li><b>نشان بده، تعریف نکن:</b> یک گیف ۲۰ ثانیه‌ای از ترمینال از یک پاراگراف قوی‌تر است؛ همراه لینک مخزن منتشرش کن.</li>
+              <li><b>هکر نیوز:</b> عنوان «Show HN» بهترین زمان سه‌شنبه تا پنجشنبه صبح به وقت آمریکاست.</li>
+              <li><b>ردیت:</b> در r/commandline، r/bash، r/LocalLLaMA و r/ChatGPTCoding اول مشکل را مطرح کن، لینک را در متن بگذار.</li>
+              <li><b>مقاله بنویس:</b> dev.to / Medium با عنوان «ابزاری ساختم که هر مخزنی را در یک پرامپت جا می‌دهد».</li>
+              <li><b>لیست‌های Awesome:</b> برای awesome-bash و awesome-llm-tools پول‌ریکوئست بزن.</li>
+              <li><b>Product Hunt:</b> لانچ با تصویر OG و یک ویدیوی کوتاه دمو.</li>
+              <li><b>پاسخ به سؤال‌ها</b> در Stack Overflow دربارهٔ «ارسال مخزن به ChatGPT» با معرفی طبیعی ابزار.</li>
+              <li><b>ترند گیت‌هاب:</b> README تمیز ✓، بج‌ها ✓، دمو، تاپیک‌ها، ریلیز با توضیحات و استارهای هفتهٔ اول.</li>
+            </ul></span>
+          </div>
+        </details>
+      </div>
+
+      <div class="dstep reveal"><span class="dnum">8</span>
+        <details>
+          <summary><span class="en-only">Measure & iterate</span><span class="fa-only">اندازه‌گیری و بهبود</span><span class="chev">▾</span></summary>
+          <div class="dbody">
+            <span class="en-only"><ul>
+              <li>Add a privacy-friendly counter (GoatCounter / Plausible / Umami) with one script tag.</li>
+              <li>Watch stars, forks, referrers (repo → Insights → Traffic) and clone counts.</li>
+              <li>Pin an issue titled “Roadmap” — contributors arrive when they see direction.</li>
+              <li>Release often with notes; each release is another excuse for people to look.</li>
+            </ul></span>
+            <span class="fa-only"><ul>
+              <li>یک شمارندهٔ محترمانهٔ حریم خصوصی (GoatCounter / Plausible / Umami) با یک تگ اسکریپت اضافه کنید.</li>
+              <li>ستاره‌ها، فورک‌ها، Referrers و تعداد کلون‌ها را در Insights → Traffic دنبال کنید.</li>
+              <li>یک ایسو با عنوان «Roadmap» پین کنید؛ مسیرِ روشن، مشارکت‌کننده می‌آورد.</li>
+              <li>مرتب با توضیحات ریلیز بدهید؛ هر ریلیز بهانه‌ای تازه برای دیده‌شدن است.</li>
+            </ul></span>
+          </div>
+        </details>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ COMPARE ═══════════ -->
+<section id="compare" aria-labelledby="compareTitle" style="background:var(--bg-soft);border-block:1px solid var(--border)">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="tag" data-i18n="compare.tag">Why projdump</span>
+      <h2 id="compareTitle" data-i18n="compare.title">How it stacks up</h2>
+      <p data-i18n="compare.sub">The honest matrix — what you get here that you would otherwise wire up yourself.</p>
+    </div>
+    <div class="table-wrap reveal">
+      <table class="cmp">
+        <thead><tr>
+          <th data-i18n="compare.h1">Feature</th>
+          <th class="c-pd" style="text-align:center">projdump</th>
+          <th data-i18n="compare.h2" style="text-align:center">Copy-paste</th>
+          <th data-i18n="compare.h3" style="text-align:center">Typical tools</th>
+        </tr></thead>
+        <tbody>
+          <tr><td><span class="en-only">Whole project → one file, one command</span><span class="fa-only">کل پروژه ← یک فایل، یک دستور</span></td><td class="sym yes">✓</td><td class="sym no">✗</td><td class="sym mid">~</td></tr>
+          <tr><td><span class="en-only">Token budgeting (‎--tokens-budget)</span><span class="fa-only">بودجه‌بندی توکن (‎--tokens-budget)</span></td><td class="sym yes">✓</td><td class="sym no">✗</td><td class="sym mid">~</td></tr>
+          <tr><td><span class="en-only">Dump only recent changes (‎--since)</span><span class="fa-only">فقط تغییرات اخیر (‎--since)</span></td><td class="sym yes">✓</td><td class="sym no">✗</td><td class="sym no">✗</td></tr>
+          <tr><td><span class="en-only">.gitignore honoured automatically</span><span class="fa-only">رعایت خودکار .gitignore</span></td><td class="sym yes">✓</td><td class="sym no">✗</td><td class="sym mid">~</td></tr>
+          <tr><td><span class="en-only">md + xml + json from one tool</span><span class="fa-only">md + xml + json از یک ابزار</span></td><td class="sym yes">✓</td><td class="sym no">✗</td><td class="sym mid">~</td></tr>
+          <tr><td><span class="en-only">Auto-clipboard on every platform</span><span class="fa-only">کپی خودکار در همهٔ پلتفرم‌ها</span></td><td class="sym yes">✓</td><td class="sym mid">~</td><td class="sym mid">~</td></tr>
+          <tr><td><span class="en-only">84 green tests, shellcheck-clean</span><span class="fa-only">۸۴ تست سبز، بدون خطای ShellCheck</span></td><td class="sym yes">✓</td><td class="sym na">—</td><td class="sym mid">~</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ CHANGELOG ═══════════ -->
+<section id="changelog" aria-labelledby="changelogTitle">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="tag" data-i18n="changelog.tag">Changelog</span>
+      <h2 id="changelogTitle" data-i18n="changelog.title">What's new</h2>
+      <p data-i18n="changelog.sub">Two releases so far — both obsessively tested. Details in CHANGELOG.md.</p>
+    </div>
+    <div class="cl-grid">
+      <article class="cl-card reveal">
+        <header><span class="cl-ver">v1.1.0</span><time datetime="2026-10-08">2026-10-08</time></header>
+        <h3 data-i18n="cl.v11.t">The productivity release</h3>
+        <ul>
+          <li><span class="en-only"><code class="mono">‎--since</code>, <code class="mono">‎--tokens-budget</code>, <code class="mono">‎--list</code>, <code class="mono">-i/‎--include</code>, <code class="mono">‎--sort</code>, <code class="mono">‎--note</code>, <code class="mono">-v</code></span><span class="fa-only"><code class="mono">‎--since</code>، <code class="mono">‎--tokens-budget</code>، <code class="mono">‎--list</code>، <code class="mono">-i/‎--include</code>، <code class="mono">‎--sort</code>، <code class="mono">‎--note</code>، <code class="mono">-v</code></span></li>
+          <li><span class="en-only">Git header (branch @ sha), language breakdown, largest-files table</span><span class="fa-only">هدر گیت (branch @ sha)، تفکیک زبان‌ها، جدول بزرگ‌ترین فایل‌ها</span></li>
+          <li><span class="en-only">WSL (clip.exe) + Cygwin (putclip) clipboard support</span><span class="fa-only">پشتیبانی کلیپ‌بورد WSL (clip.exe) و Cygwin (putclip)</span></li>
+          <li><span class="en-only">Fixed: bash 5.2 escaping corruption, byte-accurate ‎--max-size, JSON trailing newlines</span><span class="fa-only">رفع اشکال: خرابیِ escaping در بش ۵٫۲، ‎--max-size دقیق در بایت، خطوط پایانی JSON</span></li>
+        </ul>
+      </article>
+      <article class="cl-card reveal">
+        <header><span class="cl-ver">v1.0.0</span><time datetime="2026-10-04">2026-10-04</time></header>
+        <h3 data-i18n="cl.v10.t">The beginning</h3>
+        <ul>
+          <li><span class="en-only">Three formats (md / xml / json), directory tree, 90+ language tags</span><span class="fa-only">سه قالب (md / xml / json)، درخت دایرکتوری، تگ ۹۰+ زبان</span></li>
+          <li><span class="en-only">Filtering (‎--ext-only, ‎--exclude, ‎--max-size) + clipboard auto-copy</span><span class="fa-only">فیلترها (‎--ext-only، ‎--exclude، ‎--max-size) + کپی خودکار در کلیپ‌بورد</span></li>
+          <li><span class="en-only">bash/zsh completions, bats test suite and GitHub Actions CI</span><span class="fa-only">تکمیل خودکار bash/zsh، مجموعهٔ تست bats و CI گیت‌هاب</span></li>
+        </ul>
+      </article>
+    </div>
+    <p class="cl-link reveal"><a href="https://github.com/CheginiSoroush/projdump/blob/main/CHANGELOG.md" target="_blank" rel="noopener" data-i18n="changelog.all">Full changelog →</a></p>
+  </div>
+</section>
+
+<!-- ═══════════ FAQ ═══════════ -->
+<section id="faq" aria-labelledby="faqTitle">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="tag" data-i18n="faq.tag">FAQ</span>
+      <h2 id="faqTitle" data-i18n="faq.title">Questions people actually ask</h2>
+    </div>
+    <div class="faq">
+      <details class="reveal"><summary><span class="q">Q1</span><span class="en-only">Is my code uploaded anywhere?</span><span class="fa-only">آیا کدم جایی آپلود می‌شود؟</span><span class="chev">▾</span></summary>
+        <div class="a"><span class="en-only">No. projdump runs 100% locally — it only reads files and writes one output file. Whatever happens next (pasting into a chatbot) is entirely your choice. That's also why there is no telemetry, ever.</span><span class="fa-only">نه. پروج‌دامپ ۱۰۰٪ لوکال اجرا می‌شود؛ فقط فایل‌ها را می‌خواند و یک فایل خروجی می‌سازد. هر اتفاقی بعدش بیفتد (چسباندن در چت‌بات) کاملاً انتخاب خود شماست. به همین دلیل هیچ تلمتری هم وجود ندارد.</span></div>
+      </details>
+      <details class="reveal"><summary><span class="q">Q2</span><span class="en-only">Does it work on Windows?</span><span class="fa-only">روی ویندوز کار می‌کند؟</span><span class="chev">▾</span></summary>
+        <div class="a"><span class="en-only">Yes — via Git Bash or WSL. Clipboard support includes clip.exe (WSL) and putclip (Cygwin). Completions are generated for bash and zsh.</span><span class="fa-only">بله — از طریق Git Bash یا WSL. پشتیبانی کلیپ‌بورد شامل clip.exe (WSL) و putclip (Cygwin) است. تکمیل خودکار برای bash و zsh تولید می‌شود.</span></div>
+      </details>
+      <details class="reveal"><summary><span class="q">Q3</span><span class="en-only">Why is XML recommended for Claude?</span><span class="fa-only">چرا XML برای Claude توصیه می‌شود؟</span><span class="chev">▾</span></summary>
+        <div class="a"><span class="en-only">Claude's training makes it respond well to explicit <b>&lt;file&gt;</b> boundaries. projdump emits stable attributes plus CDATA — even a source file containing <b>]]&gt;</b> cannot corrupt the dump.</span><span class="fa-only">مدل Claude با مرزهای صریح <b>&lt;file&gt;</b> بهتر کار می‌کند. پروج‌دامپ attributeهای پایدار به‌همراه CDATA تولید می‌کند؛ حتی فایلی که <b>]]&gt;</b> دارد هم خروجی را خراب نمی‌کند.</span></div>
+      </details>
+      <details class="reveal"><summary><span class="q">Q4</span><span class="en-only">How accurate is the token estimate?</span><span class="fa-only">تخمین توکن چقدر دقیق است؟</span><span class="chev">▾</span></summary>
+        <div class="a"><span class="en-only">It's bytes ÷ 3.5 — a deliberately rough, dependency-free heuristic. Good enough for budgeting a context window with ‎--tokens-budget; don't use it for billing.</span><span class="fa-only">فرمول سادهٔ «بایت ÷ ۳٫۵» است — یک تخمین عمداً سریع و بدون وابستگی. برای بودجه‌بندی پنجرهٔ کانتکست با ‎--tokens-budget کافی است؛ برای محاسبهٔ هزینه استفاده نکنید.</span></div>
+      </details>
+      <details class="reveal"><summary><span class="q">Q5</span><span class="en-only">Does it respect .gitignore?</span><span class="fa-only">به .gitignore احترام می‌گذارد؟</span><span class="chev">▾</span></summary>
+        <div class="a"><span class="en-only">Inside a git repository it collects files with <b>git ls-files</b>, so ignored paths never enter the dump. Outside a repo it walks the tree itself and prunes known junk directories (node_modules, .next, __pycache__, …).</span><span class="fa-only">داخل مخزن گیت فایل‌ها با <b>git ls-files</b> جمع می‌شوند؛ پس مسیرهای نادیده‌گرفته هرگز وارد خروجی نمی‌شوند. بیرون از مخزن، خود درخت را می‌پیماید و پوشه‌های آشغالِ معروف (node_modules، .next، __pycache__ و…) را حذف می‌کند.</span></div>
+      </details>
+      <details class="reveal"><summary><span class="q">Q6</span><span class="en-only">A file I dumped disappeared from the next dump — why?</span><span class="fa-only">فایلی که دامپ کردم از دامپ بعدی غایب است — چرا؟</span><span class="chev">▾</span></summary>
+        <div class="a"><span class="en-only">If you dumped to a custom name (e.g. <b>projdump notes.md</b>), that file becomes a normal project file and is included next time. Add it to .gitignore, or pass <b>‎--exclude 'notes.md'</b>. The default <b>*_dump.*</b> name is always protected.</span><span class="fa-only">اگر با نام سفارشی دامپ گرفته‌اید (مثل <b>projdump notes.md</b>)، آن فایل جزو فایل‌های معمولی پروژه حساب و دفعهٔ بعد وارد خروجی می‌شود. آن را به .gitignore اضافه کنید یا از <b>‎--exclude 'notes.md'</b> استفاده کنید. نام پیش‌فرض <b>*_dump.*</b> همیشه محافظت می‌شود.</span></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ CTA ═══════════ -->
+<section style="padding-top:0">
+  <div class="container">
+    <div class="cta-band reveal">
+      <h2 data-i18n="cta.title">Stop pasting folders. Start shipping.</h2>
+      <p data-i18n="cta.sub">Give your AI the whole picture — in one command, in one file, right now.</p>
+      <a class="btn btn-primary" href="https://github.com/CheginiSoroush/projdump" target="_blank" rel="noopener">⭐ <span data-i18n="cta.btn">Star projdump on GitHub</span></a>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand"><img src="assets/logo.png" alt=""> projdump<span style="color:var(--accent)">_</span></div>
+        <p style="color:var(--muted);font-size:.88rem;max-width:34ch;margin-top:10px" data-i18n="footer.tag">Your whole codebase. One file. AI-ready.</p>
+      </div>
+      <div class="fcol">
+        <b data-i18n="footer.docs">Documentation</b>
+        <a href="#features" data-i18n="nav.features">Features</a>
+        <a href="#install" data-i18n="nav.install">Install</a>
+        <a href="#options" data-i18n="nav.options">Options</a>
+        <a href="#cookbook" data-i18n="nav.cookbook">Recipes</a>
+        <a href="#deploy" data-i18n="nav.deploy">Go live</a>
+      </div>
+      <div class="fcol">
+        <b data-i18n="footer.project">Project</b>
+        <a href="https://github.com/CheginiSoroush/projdump" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/CheginiSoroush/projdump/issues" target="_blank" rel="noopener" data-i18n="footer.issues">Issues</a>
+        <a href="https://github.com/CheginiSoroush/projdump/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener" data-i18n="footer.contrib">Contributing</a>
+        <a href="https://github.com/CheginiSoroush/projdump/releases" target="_blank" rel="noopener" data-i18n="footer.releases">Releases</a>
+        <a href="https://github.com/CheginiSoroush/projdump/blob/main/CHANGELOG.md" target="_blank" rel="noopener" data-i18n="footer.chlog">Changelog</a>
+      </div>
+      <div class="fcol">
+        <b data-i18n="footer.readme">READMEs</b>
+        <a href="https://github.com/CheginiSoroush/projdump#readme">English</a>
+        <a href="https://github.com/CheginiSoroush/projdump/blob/main/README.fa.md">فارسی</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>MIT © 2026 Soroush Chegini — <span data-i18n="footer.made">built with bash and stubbornness</span></span>
+      <span data-i18n="footer.local">🔒 runs 100% locally — no telemetry</span>
+    </div>
+  </div>
+</footer>
+
+<button id="toTop" aria-label="Back to top">↑</button>
+
+<div id="progressBar" aria-hidden="true"></div>
+
+<!-- ═══════════ SEARCH PALETTE ═══════════ -->
+<div class="pal-overlay" id="palOverlay" role="dialog" aria-modal="true">
+  <div class="palette">
+    <div class="pal-input">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="palInput" type="text" role="combobox" aria-expanded="false" aria-controls="palResults" autocomplete="off" spellcheck="false" placeholder="Search…">
+      <span class="kbd" aria-hidden="true">esc</span>
+    </div>
+    <div class="pal-results scrollbar-lite" id="palResults" role="listbox"></div>
+    <div class="pal-foot" aria-hidden="true">
+      <span><span class="kbd">↑</span><span class="kbd">↓</span> <span data-i18n="pal.nav">navigate</span></span>
+      <span><span class="kbd">↵</span> <span data-i18n="pal.open">open</span></span>
+      <span class="run-hint"><span class="kbd">⇥</span> <span data-i18n="pal.runhint">run</span></span>
+      <span><span class="kbd">esc</span> <span data-i18n="pal.close">close</span></span>
+      <span class="foot-more" role="button" tabindex="0"><span class="kbd">?</span> <span data-i18n="pal.kbd">shortcuts</span></span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ KEYBOARD SHORTCUTS ═══════════ -->
+<div class="pal-overlay" id="kbdOverlay" role="dialog" aria-modal="true">
+  <div class="palette kbd-sheet" tabindex="-1">
+    <div class="kbd-head">
+      <span class="tag" data-i18n="kb.tag">Keyboard shortcuts</span>
+      <span class="kbd" aria-hidden="true">esc</span>
+    </div>
+    <div class="kbd-grid scrollbar-lite">
+      <div class="k-group" data-i18n="kb.g1">Everywhere</div>
+      <div class="kbd-row"><span class="kbd">Ctrl</span><span class="kbd">K</span><span class="k-what" data-i18n="kb.pal">Search sections, flags, FAQ, recipes</span></div>
+      <div class="kbd-row"><span class="kbd">/</span><span class="k-what" data-i18n="kb.slash">Open search</span></div>
+      <div class="kbd-row"><span class="kbd">?</span><span class="k-what" data-i18n="kb.q">Show this cheat sheet</span></div>
+      <div class="kbd-row"><span class="kbd">↑</span><span class="kbd">↓</span><span class="k-what" data-i18n="kb.nav">Move through results</span></div>
+      <div class="kbd-row"><span class="kbd">↵</span><span class="k-what" data-i18n="kb.open">Open the selected result</span></div>
+      <div class="kbd-row"><span class="kbd">⇥</span><span class="k-what" data-i18n="kb.run">Run the selected recipe</span></div>
+      <div class="kbd-row"><span class="kbd">esc</span><span class="k-what" data-i18n="kb.esc">Close the overlay</span></div>
+      <div class="k-group" data-i18n="kb.g2">In the playground input</div>
+      <div class="kbd-row"><span class="kbd">↑</span><span class="kbd">↓</span><span class="k-what" data-i18n="kb.hist">Walk the command history</span></div>
+      <div class="kbd-row"><span class="kbd">Tab</span><span class="k-what" data-i18n="kb.tab">Complete the flag</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   projdump docs — site behaviour
+   i18n · theme · terminal demo · command builder · micro-interactions
+   ═══════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+
+  /* ─── i18n dictionary ─────────────────────────────────────── */
+  var I18N = {
+    en: {
+      'skip': 'Skip to content',
+      'nav.features': 'Features', 'nav.install': 'Install', 'nav.builder': 'Builder',
+      'nav.formats': 'Formats', 'nav.options': 'Options', 'nav.deploy': 'Go live',
+      'nav.faq': 'FAQ', 'nav.star': 'Star',
+      'hero.kicker': 'v1.1.0 · pure bash · MIT',
+      'hero.title1': 'Your whole codebase.', 'hero.title2': 'One file. AI-ready.',
+      'hero.lead': 'projdump packs any project — directory tree, sources, stats — into a single Markdown, XML or JSON file that drops straight into Claude, ChatGPT, DeepSeek or Gemini. No dependencies. One command.',
+      'hero.cta1': 'Get started', 'hero.cta2': 'Star on GitHub',
+      'hero.m1': 'Linux · macOS · WSL',
+      'hero.m2': '100% local — your code never leaves the machine',
+      'hero.m3': 'zero hard dependencies',
+      'stats.tests': 'tests, all green', 'stats.langs': 'languages tagged',
+      'stats.formats': 'output formats', 'stats.deps': 'hard dependencies',
+      'features.tag': 'Features',
+      'features.title': 'Everything you need to brief an AI',
+      'features.sub': 'One dependency-free script, obsessively polished: 10+ bugs squashed, 84 tests, shellcheck-clean.',
+      'f1.t': 'Directory tree', 'f1.d': 'Uses tree(1) when installed, falls back to a built-in renderer so the AI always sees the project layout.',
+      'f2.t': '120+ language tags', 'f2.d': 'Every fenced block gets the right language tag, so Markdown and XML dumps render with proper highlighting.',
+      'f3.t': 'Precision filters', 'f3.d': 'repeatable globs, byte-accurate --max-size, .gitignore respected in git repos.',
+      'f4.t': 'Dump only what changed', 'f4.d': 'diff-driven file list plus untracked files, validated up-front.',
+      'f5.t': 'Token budget', 'f5.d': 'stop adding files once the estimate hits your context window.',
+      'f6.t': 'Three formats', 'f6.d': 'Markdown for humans, XML &lt;file&gt; blocks for Claude, JSON for jq and scripts.',
+      'f7.t': 'Dry-run preview', 'f7.d': 'see exactly which files would be dumped, with sizes, lines and tokens.',
+      'f8.t': 'Note for the AI', 'f8.d': 'inject your task at the top of every dump.',
+      'f9.t': 'Clipboard everywhere', 'f9.d': 'Auto-copies via pbcopy, wl-copy, xclip/xsel, clip.exe (WSL) and putclip (Cygwin).',
+      'f10.t': 'Git-aware', 'f10.d': 'Header carries branch @ sha (dirty?), scope line for --since, and language breakdown.',
+      'f11.t': "Can't break itself", 'f11.d': 'Safe fence growth, CDATA splitting, XML escaping — adversarial filenames survive all three formats.',
+      'f12.t': 'Explains itself', 'f12.d': 'verbose mode reports every skipped file and why.',
+      'install.tag': 'Install', 'install.title': 'Up and running in 30 seconds',
+      'install.sub': "Requires bash 5.0+. Optional helpers picked up automatically: tree, jq, python3, file.",
+      'i1.t': 'Clone', 'i1.d': "Grab the repo — it's tiny and dependency-free.",
+      'i2.t': 'Install', 'i2.d': 'Symlinks the binary and adds bash + zsh completions. git pull keeps it fresh.',
+      'i3.t': 'Dump', 'i3.d': 'Run it inside any project. The dump lands on your clipboard automatically.',
+      'builder.tag': 'Playground', 'builder.title': 'Build your perfect command',
+      'builder.sub': 'Toggle the options, copy the command, paste it in your terminal.',
+      'b.format': 'Output format', 'b.default': 'default (name)', 'b.flags': 'Switches',
+      'b.hint': '💡 Start inside your project folder. The command updates live as you toggle options.',
+      'b.hint2': 'Pro tip: combine --sort size-desc with --tokens-budget to pack the most important (largest) files into a tight context window.',
+      'formats.tag': 'Output', 'formats.title': 'One project, three shapes',
+      'formats.sub': 'Same content, three serialisations — pick the one your model (or pipeline) loves.',
+      'options.tag': 'Reference', 'options.title': 'Every flag, explained',
+      'options.sub': 'Type to filter — the table searches both flag names and descriptions.',
+      'options.flag': 'Flag', 'options.desc': 'Description',
+      'cookbook.tag': 'Cookbook', 'cookbook.title': 'Six recipes for real work',
+      'cookbook.sub': 'Copy, paste, done — the six workflows projdump was built for.',
+      'r1.t': 'Brief an AI on a bug', 'r1.d': 'XML file blocks are Claude-friendly, and the note pins your task to the very top of the dump.',
+      'r2.t': 'Fit a big repo in a context window', 'r2.d': 'Stop at 60k estimated tokens, biggest files first, skip anything over 200 KB.',
+      'r3.t': 'Review only what changed', 'r3.d': 'Feed the diff since a ref — plus untracked files — straight into a code review.',
+      'r4.t': 'Audit the language mix', 'r4.d': 'A dry run sorted by extension shows sizes and token estimates per file — nothing is written.',
+      'r5.t': 'Pipe it into jq', 'r5.d': '--stdout skips the file and the clipboard; JSON out means jq, python or curl can chew on it.',
+      'r6.t': 'Frontend-only snapshot', 'r6.d': 'Two include globs and one exclude — the whole UI story in one tidy file.',
+      'nav.cookbook': 'Recipes',
+      'pal.recipes': 'Recipes',
+      'pg.tag': 'Playground', 'pg.title': 'Try it — no install needed',
+      'pg.sub': 'A faithful simulation of the CLI on a small sample project. Type a command or press a chip — history works with ↑/↓, flags complete with Tab.',
+      'pg.badge': 'simulated',
+      'pg.banner1': 'playground: sample project "my-project" — 10 files, git repo, branch main',
+      'pg.banner2': 'Same flags, same output shapes as the real CLI — nothing to install.',
+      'pg.hint': 'Try: projdump --list · help · clear  —  ↑/↓ history · Tab completes flags',
+      'pg.try': 'Try', 'pg.trytitle': 'Run this command in the playground',
+      'pal.runhint': 'run recipe', 'dl.run': 'Running {n} in the playground…',
+      'pal.playground': 'Playground presets', 'pal.kbd': 'shortcuts',
+      'kb.tag': 'Keyboard shortcuts', 'kb.g1': 'Everywhere', 'kb.g2': 'In the playground input',
+      'kb.pal': 'Search sections, flags, FAQ, recipes', 'kb.slash': 'Open search',
+      'kb.q': 'Show this cheat sheet', 'kb.nav': 'Move through results',
+      'kb.open': 'Open the selected result', 'kb.run': 'Run the selected recipe',
+      'kb.esc': 'Close the overlay', 'kb.hist': 'Walk the command history', 'kb.tab': 'Complete the flag',
+      'r.sharetitle': 'Copy a link that runs this recipe', 'link.copied': 'Recipe link copied ✓',
+      'pg.dl': 'transcript', 'pg.dltitle': "Save this session's output as a text file",
+      'b.try': 'Try it in the playground',
+      'pg.demo': 'demo', 'pg.demo.stop': 'stop',
+      'pg.demotitle': 'Watch a hands-free run of the budget recipe',
+      'cook.verified': 'Every recipe is <b>verified against the real CLI</b>.',
+      'cook.copyall': 'Copy all', 'cook.dl': 'Download .sh', 'cook.dled': 'Downloaded ✓',
+      'cook.shheader': 'projdump — six recipes, ready to run',
+      'deploy.tag': 'Zero → 100',
+      'deploy.title': 'Ship this site to GitHub Pages — and get seen',
+      'deploy.sub': "The docs you're reading live in /docs — GitHub Pages serves them with zero configuration. Follow the steps; then use the growth playbook.",
+      'faq.tag': 'FAQ', 'faq.title': 'Questions people actually ask',
+      'cta.title': 'Stop pasting folders. Start shipping.',
+      'cta.sub': 'Give your AI the whole picture — in one command, in one file, right now.',
+      'cta.btn': 'Star projdump on GitHub',
+      'footer.tag': 'Your whole codebase. One file. AI-ready.',
+      'footer.docs': 'Documentation', 'footer.project': 'Project', 'footer.issues': 'Issues',
+      'footer.contrib': 'Contributing', 'footer.releases': 'Releases', 'footer.readme': 'READMEs',
+      'footer.made': 'built with bash and stubbornness',
+      'footer.local': '🔒 runs 100% locally — no telemetry',
+      'pipeline.tag': 'Workflow',
+      'pipeline.title': 'From folder to context in four moves',
+      'pipeline.sub': 'No daemons, no config files, no network — one clean pipeline, start to finish.',
+      'p1.t': 'Scan', 'p1.d': 'Walks the repo, reading git ls-files so .gitignore is honoured.',
+      'p2.t': 'Filter', 'p2.d': 'Applies --include/--exclude, --ext-only, --max-size and the token budget.',
+      'p3.t': 'Write', 'p3.d': 'Streams every surviving file into one Markdown, XML or JSON document.',
+      'p4.t': 'Copy & report', 'p4.d': 'Drops the dump on your clipboard and prints the summary + token estimate.',
+      'est.kb': 'Total project size (KB)',
+      'est.hint': 'Estimate = bytes ÷ 3.5 — the same heuristic projdump prints in its summary.',
+      'est.tokens': '≈ estimated tokens',
+      'est.suggest': 'Suggested flag:',
+      'compare.tag': 'Why projdump',
+      'compare.title': 'How it stacks up',
+      'compare.sub': 'The honest matrix — what you get here that you would otherwise wire up yourself.',
+      'compare.h1': 'Feature', 'compare.h2': 'Copy-paste', 'compare.h3': 'Typical tools',
+      'changelog.tag': 'Changelog',
+      'changelog.title': "What's new",
+      'changelog.sub': 'Two releases so far — both obsessively tested. Details in CHANGELOG.md.',
+      'changelog.all': 'Full changelog →',
+      'cl.v11.t': 'The productivity release',
+      'cl.v10.t': 'The beginning',
+      'footer.chlog': 'Changelog',
+      'search.open': 'Search', 'pal.ph': 'Search sections, flags, FAQ…',
+      'pal.sections': 'Sections', 'pal.flags': 'Flags', 'pal.faq': 'FAQ',
+      'pal.nav': 'navigate', 'pal.open': 'open', 'pal.close': 'close',
+      'pal.none': 'No results — try "--since" or "install"',
+      'pal.title': 'Search documentation',
+      'options.cheat': 'Cheat sheet', 'cheat.ok': 'Cheat sheet downloaded ✓',
+      'anchor.copied': 'Link copied ✓',
+      'copied': 'Copied to clipboard ✓', 'lang.label': 'فارسی'
+    },
+    fa: {
+      'skip': 'پرش به محتوا',
+      'nav.features': 'امکانات', 'nav.install': 'نصب', 'nav.builder': 'سازندهٔ دستور',
+      'nav.formats': 'قالب‌ها', 'nav.options': 'گزینه‌ها', 'nav.deploy': 'انتشار',
+      'nav.faq': 'سؤالات', 'nav.star': 'ستاره',
+      'hero.kicker': 'نسخهٔ ۱٫۱٫۰ · بش خالص · MIT',
+      'hero.title1': 'کل کدبیز شما.', 'hero.title2': 'یک فایل. آمادهٔ هوش مصنوعی.',
+      'hero.lead': 'پروج‌دامپ هر پروژه‌ای — درخت دایرکتوری، سورس‌ها و آمار — را در یک فایل Markdown، XML یا JSON بسته‌بندی می‌کند تا مستقیم در Claude، ChatGPT، DeepSeek یا Gemini بیندازید. بدون وابستگی. با یک دستور.',
+      'hero.cta1': 'شروع کنید', 'hero.cta2': 'ستاره در گیت‌هاب',
+      'hero.m1': 'لینوکس · مک · WSL',
+      'hero.m2': '۱۰۰٪ لوکال — کد شما هرگز از دستگاه خارج نمی‌شود',
+      'hero.m3': 'بدون وابستگی اجباری',
+      'stats.tests': 'تست، همگی سبز', 'stats.langs': 'زبان با تگ',
+      'stats.formats': 'قالب خروجی', 'stats.deps': 'وابستگی اجباری',
+      'features.tag': 'امکانات',
+      'features.title': 'هر آنچه برای آماده‌سازی هوش مصنوعی لازم دارید',
+      'features.sub': 'یک اسکریپت بدون وابستگی، وسواس‌گونه صیقل‌خورده: بیش از ۱۰ باگ ریشه‌کن‌شده، ۸۴ تست، بدون خطای ShellCheck.',
+      'f1.t': 'درخت دایرکتوری', 'f1.d': 'اگر tree نصب باشد از آن استفاده می‌کند؛ وگرنه رندرکنندهٔ داخلی دارد تا هوش مصنوعی همیشه ساختار پروژه را ببیند.',
+      'f2.t': 'تگ برای ۱۲۰+ زبان', 'f2.d': 'هر بلوک کد تگ زبان درست را می‌گیرد تا هایلایت Markdown و XML تمیز باشد.',
+      'f3.t': 'فیلترهای دقیق', 'f3.d': 'گلوب‌های قابل تکرار، ‎--max-size دقیق در سطح بایت و احترام به .gitignore در مخازن گیت.',
+      'f4.t': 'فقط تغییرات را دامپ کن', 'f4.d': 'فهرست فایل‌ها بر اساس diff به‌همراه فایل‌های untracked، با اعتبارسنجی زودهنگام.',
+      'f5.t': 'بودجهٔ توکن', 'f5.d': 'پس از رسیدن تخمین به پنجرهٔ کانتکست شما، افزودن فایل متوقف می‌شود.',
+      'f6.t': 'سه قالب', 'f6.d': 'Markdown برای انسان، بلوک‌های <file> برای Claude و JSON برای jq و اسکریپت‌ها.',
+      'f7.t': 'پیش‌نمایش خشک', 'f7.d': 'دقیقاً ببینید کدام فایل‌ها دامپ می‌شدند — با حجم، خطوط و توکن.',
+      'f8.t': 'یادداشت برای هوش مصنوعی', 'f8.d': 'وظیفهٔ خود را در ابتدای هر دامپ تزریق کنید.',
+      'f9.t': 'کلیپ‌بورد همه‌جا', 'f9.d': 'کپی خودکار با pbcopy، wl-copy، xclip/xsel، clip.exe (WSL) و putclip (Cygwin).',
+      'f10.t': 'متعهد به گیت', 'f10.d': 'هدر شامل branch @ sha (کثیف؟)، خط Scope برای ‎--since و تفکیک زبان‌هاست.',
+      'f11.t': 'خودش را خراب نمی‌کند', 'f11.d': 'رشد امن فنس، شکستن CDATA و escape مناسب XML — نام‌های فایلِ متخاصم در هر سه قالب سالم می‌مانند.',
+      'f12.t': 'خودش را توضیح می‌دهد', 'f12.d': 'حالت Verbose دلیل ردشدن هر فایل را گزارش می‌کند.',
+      'install.tag': 'نصب', 'install.title': 'راه‌اندازی در ۳۰ ثانیه',
+      'install.sub': 'فقط بش ۵٫۰+ لازم است. ابزارهای اختیاری (tree، jq، python3، file) خودکار شناسایی می‌شوند.',
+      'i1.t': 'کلون', 'i1.d': 'مخزن را بگیرید — کوچک و بدون وابستگی.',
+      'i2.t': 'نصب', 'i2.d': 'باینری را symlink می‌کند و تکمیل خودکار bash + zsh اضافه می‌کند. با git pull همیشه به‌روز.',
+      'i3.t': 'دامپ', 'i3.d': 'داخل هر پروژه‌ای اجرا کنید. خروجی خودکار روی کلیپ‌بورد می‌رود.',
+      'builder.tag': 'زمین بازی', 'builder.title': 'دستورِ کامل خودت را بساز',
+      'builder.sub': 'گزینه‌ها را روشن کنید، دستور را کپی کنید و در ترمینال بچسبانید.',
+      'b.format': 'قالب خروجی', 'b.default': 'پیش‌فرض (name)', 'b.flags': 'کلیدها',
+      'b.hint': '💡 از داخل پوشهٔ پروژه شروع کنید. دستور همراه با تغییر گزینه‌ها، زنده به‌روز می‌شود.',
+      'b.hint2': 'ترفند حرفه‌ای: ‎--sort size-desc را با ‎--tokens-budget ترکیب کنید تا مهم‌ترین (بزرگ‌ترین) فایل‌ها در پنجرهٔ کانتکست کوچک جا شوند.',
+      'formats.tag': 'خروجی', 'formats.title': 'یک پروژه، سه شکل',
+      'formats.sub': 'محتوای واحد، سه سریال‌سازی — هرچه که مدل (یا پایپ‌لاین) شما دوست دارد.',
+      'options.tag': 'مرجع', 'options.title': 'هر فلگ، با توضیح',
+      'options.sub': 'برای فیلتر تایپ کنید — جدول هم نام فلگ‌ها هم توضیحات را جست‌وجو می‌کند.',
+      'options.flag': 'فلگ', 'options.desc': 'توضیح',
+      'cookbook.tag': 'کتاب دستورها', 'cookbook.title': 'شش دستورکار برای کار واقعی',
+      'cookbook.sub': 'کپی، پیست، تمام — شش گردش‌کاری‌ای که پروج‌دامپ برایشان ساخته شده است.',
+      'r1.t': 'گزارش باگ به هوش مصنوعی', 'r1.d': 'بلوک‌های XML برای Claude مناسب‌اند و یادداشت، وظیفهٔ شما را درست بالای دامپ می‌نشاند.',
+      'r2.t': 'جا دادن مخزن بزرگ در پنجرهٔ کانتکست', 'r2.d': 'توقف در ۶۰ هزار توکن تخمینی، بزرگ‌ترین فایل‌ها اول، و رد شدن از هر فایل بالای ۲۰۰ کیلوبایت.',
+      'r3.t': 'بازبینی فقط تغییرات', 'r3.d': 'تفاوت با یک رفرنس گیت — به‌همراه فایل‌های untracked — مستقیم به بازبینی کد می‌رود.',
+      'r4.t': 'ممیزی ترکیب زبان‌ها', 'r4.d': 'اجرای خشکِ مرتب‌شده بر اساس پسوند، حجم و تخمین توکن هر فایل را نشان می‌دهد — هیچ فایلی نوشته نمی‌شود.',
+      'r5.t': 'پایپ به jq', 'r5.d': '‎--stdout نه فایلی می‌سازد نه کلیپ‌بوردی؛ خروجی JSON یعنی jq و python و curl هم می‌توانند بخورندش.',
+      'r6.t': 'اسنپ‌شات فقط-فرانت‌اند', 'r6.d': 'دو گلوب include و یک exclude — کل داستان رابط کاربری در یک فایل مرتب.',
+      'nav.cookbook': 'دستورکارها',
+      'pal.recipes': 'دستورکارها',
+      'pg.tag': 'زمین بازی', 'pg.title': 'امتحانش کن — بدون نصب',
+      'pg.sub': 'شبیه‌سازی وفادار به CLI روی یک پروژهٔ نمونهٔ کوچک. دستور تایپ کنید یا یک چیپ را بزنید — تاریخچه با ↑/↓ و تکمیل فلگ با Tab کار می‌کند.',
+      'pg.badge': 'شبیه‌سازی‌شده',
+      'pg.banner1': 'زمین بازی: پروژهٔ نمونهٔ my-project — ۱۰ فایل، مخزن گیت، شاخهٔ main',
+      'pg.banner2': 'همان فلگ‌ها، همان شکل خروجی مثل CLI واقعی — بدون هیچ نصبی.',
+      'pg.hint': 'امتحان کنید: ‎projdump --list · ‎help · ‎clear — تاریخچه با ↑/↓، تکمیل فلگ با Tab',
+      'pg.try': 'امتحان', 'pg.trytitle': 'اجرای این دستور در زمین بازی',
+      'pal.runhint': 'اجرای دستورکار', 'dl.run': 'اجرای {n} در زمین بازی…',
+      'pal.playground': 'پیش‌تنظیم‌های زمین بازی', 'pal.kbd': 'میان‌برها',
+      'kb.tag': 'میان‌برهای صفحه‌کلید', 'kb.g1': 'همه‌جا', 'kb.g2': 'در ورودی زمین بازی',
+      'kb.pal': 'جست‌وجوی بخش‌ها، فلگ‌ها، سؤالات، دستورکارها', 'kb.slash': 'باز کردن جست‌وجو',
+      'kb.q': 'نمایش همین برگهٔ میان‌برها', 'kb.nav': 'حرکت میان نتایج',
+      'kb.open': 'باز کردن نتیجهٔ انتخاب‌شده', 'kb.run': 'اجرای دستورکار انتخاب‌شده',
+      'kb.esc': 'بستن پنجره', 'kb.hist': 'گشتن در تاریخچهٔ دستورها', 'kb.tab': 'تکمیل فلگ',
+      'r.sharetitle': 'لینکی که این دستورکار را اجرا می‌کند را کپی کنید', 'link.copied': 'لینک دستورکار کپی شد ✓',
+      'pg.dl': 'گزارش', 'pg.dltitle': 'ذخیرهٔ خروجی این نشست به‌صورت پروندهٔ متنی',
+      'b.try': 'امتحان در زمین بازی',
+      'pg.demo': 'نمایش', 'pg.demo.stop': 'توقف',
+      'pg.demotitle': 'اجرای دست‌آزاد دستور بودجه‌بندی را ببینید',
+      'cook.verified': 'هر دستورکار روی <b>CLI واقعی آزمایش شده است</b>.',
+      'cook.copyall': 'کپی همه', 'cook.dl': 'دانلود ‎.sh', 'cook.dled': 'دانلود شد ✓',
+      'cook.shheader': 'پروج‌دامپ — شش دستورکار، آمادهٔ اجرا',
+      'deploy.tag': 'صفر تا صد',
+      'deploy.title': 'این سایت را در GitHub Pages منتشر کنید — و دیده شوید',
+      'deploy.sub': 'مستندی که می‌خوانید در پوشهٔ docs است — GitHub Pages بدون هیچ تنظیمی آن را سرو می‌کند. مراحل را بروید؛ سپس کتاب‌بازی رشد را اجرا کنید.',
+      'faq.tag': 'سؤالات متداول', 'faq.title': 'سؤال‌هایی که واقعاً پرسیده می‌شود',
+      'cta.title': 'کپی‌کردن پوشه را کنار بگذار. شروع به تحویل کن.',
+      'cta.sub': 'کل تصویر را به هوش مصنوعی‌ات بده — با یک دستور، در یک فایل، همین حالا.',
+      'cta.btn': 'پروج‌دامپ را در گیت‌هاب ستاره کنید',
+      'footer.tag': 'کل کدبیز شما. یک فایل. آمادهٔ هوش مصنوعی.',
+      'footer.docs': 'مستندات', 'footer.project': 'پروژه', 'footer.issues': 'ایسوها',
+      'footer.contrib': 'مشارکت', 'footer.releases': 'انتشارها', 'footer.readme': 'راهنماها',
+      'footer.made': 'ساخته‌شده با بش و لجبازی',
+      'footer.local': '🔒 ۱۰۰٪ لوکال اجرا می‌شود — بدون تلمتری',
+      'pipeline.tag': 'فرایند',
+      'pipeline.title': 'از پوشه تا کانتکست، در چهار حرکت',
+      'pipeline.sub': 'بدون دیمن، بدون فایل تنظیمات، بدون شبکه — یک خط لولهٔ تمیز از اول تا آخر.',
+      'p1.t': 'پویش', 'p1.d': 'مخزن را می‌پیماید و از git ls-files می‌خواند تا .gitignore رعایت شود.',
+      'p2.t': 'پالایش', 'p2.d': '‎--include/‎--exclude، ‎--ext-only، ‎--max-size و بودجهٔ توکن را اعمال می‌کند.',
+      'p3.t': 'نوشتن', 'p3.d': 'هر فایل بازمانده را در یک سند Markdown، XML یا JSON می‌نویسد.',
+      'p4.t': 'کپی و گزارش', 'p4.d': 'خروجی را روی کلیپ‌بورد می‌گذارد و خلاصه و تخمین توکن را چاپ می‌کند.',
+      'est.kb': 'حجم کل پروژه (کیلوبایت)',
+      'est.hint': 'تخمین = بایت ÷ ۳٫۵ — همان قاعده‌ای که projdump در خلاصه چاپ می‌کند.',
+      'est.tokens': '≈ توکن تخمینی',
+      'est.suggest': 'فلگ پیشنهادی:',
+      'compare.tag': 'چرا پروج‌دامپ',
+      'compare.title': 'مقایسه با بقیه',
+      'compare.sub': 'جدول صادقانه — چیزهایی که اینجا می‌گیرید و گرنه باید خودتان بسازید.',
+      'compare.h1': 'ویژگی', 'compare.h2': 'کپی دستی', 'compare.h3': 'ابزارهای معمول',
+      'changelog.tag': 'تاریخچهٔ نسخه‌ها',
+      'changelog.title': 'چه چیزهایی تازه است',
+      'changelog.sub': 'تا حالا دو انتشار — هر دو با وسواس تست‌شده. جزئیات در CHANGELOG.md.',
+      'changelog.all': 'تاریخچهٔ کامل ←',
+      'cl.v11.t': 'انتشار بهره‌وری',
+      'cl.v10.t': 'شروع ماجرا',
+      'footer.chlog': 'تاریخچه',
+      'search.open': 'جست‌وجو', 'pal.ph': 'بخش‌ها، فلگ‌ها، سؤالات…',
+      'pal.sections': 'بخش‌ها', 'pal.flags': 'فلگ‌ها', 'pal.faq': 'سؤالات',
+      'pal.nav': 'حرکت', 'pal.open': 'بازکردن', 'pal.close': 'بستن',
+      'pal.none': 'نتیجه‌ای پیدا نشد — از ‎--since یا install امتحان کنید',
+      'pal.title': 'جست‌وجو در مستندات',
+      'options.cheat': 'برگهٔ تقلب', 'cheat.ok': 'برگهٔ تقلب دانلود شد ✓',
+      'anchor.copied': 'لینک کپی شد ✓',
+      'copied': 'در کلیپ‌بورد کپی شد ✓', 'lang.label': 'English'
+    }
+  };
+
+  var lang = 'en';
+  try { lang = localStorage.getItem('pd-lang') || ((navigator.language || '').toLowerCase().indexOf('fa') === 0 ? 'fa' : 'en'); } catch (e) {}
+  lang = (lang === 'fa') ? 'fa' : 'en';
+
+  function applyLang() {
+    var html = document.documentElement;
+    html.setAttribute('lang', lang);
+    html.setAttribute('dir', lang === 'fa' ? 'rtl' : 'ltr');
+    var dict = I18N[lang];
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n');
+      if (dict[key] !== undefined) el.innerHTML = dict[key];
+    });
+    var label = document.getElementById('langLabel');
+    if (label) label.textContent = I18N[lang]['lang.label'];
+    mountAnchors();
+    var palPh = document.getElementById('palInput');
+    if (palPh) palPh.placeholder = I18N[lang]['pal.ph'];
+    var palOvLang = document.getElementById('palOverlay');
+    if (palOvLang) palOvLang.setAttribute('aria-label', I18N[lang]['pal.title']);
+    try { localStorage.setItem('pd-lang', lang); } catch (e) {}
+  }
+
+  document.getElementById('langBtn').addEventListener('click', function () {
+    lang = (lang === 'fa') ? 'en' : 'fa';
+    applyLang();
+  });
+
+  /* ─── theme ───────────────────────────────────────────────── */
+  var themeBtn = document.getElementById('themeBtn');
+  function applyTheme(t) {
+    document.documentElement.setAttribute('data-theme', t);
+    themeBtn.textContent = t === 'light' ? '☀️' : '🌙';
+    try { localStorage.setItem('pd-theme', t); } catch (e) {}
+  }
+  var savedTheme = 'dark';
+  try { savedTheme = localStorage.getItem('pd-theme') || 'dark'; } catch (e) {}
+  applyTheme(savedTheme);
+  themeBtn.addEventListener('click', function () {
+    applyTheme(document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+  });
+
+  /* ─── mobile menu ─────────────────────────────────────────── */
+  var burger = document.getElementById('hamburger');
+  var menu = document.getElementById('mobileMenu');
+  burger.addEventListener('click', function () {
+    var open = menu.classList.toggle('open');
+    burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    burger.textContent = open ? '✕' : '☰';
+  });
+  menu.addEventListener('click', function (e) {
+    if (e.target.tagName === 'A') { menu.classList.remove('open'); burger.textContent = '☰'; }
+  });
+
+  /* ─── hero terminal typing ────────────────────────────────── */
+  var SEQ = [
+    { type: 'cmd', text: 'cd ~/my-project' },
+    { type: 'cmd', text: 'projdump' },
+    { type: 'out', cls: 't-dim', text: 'Scanning project…' },
+    { type: 'out', cls: 't-ok',  text: '✓ 128 files · 4,213 lines → my-project_dump.md' },
+    { type: 'out', cls: 't-warn', text: '📋 Copied to clipboard' },
+    { type: 'cmd', text: 'projdump --since HEAD~3 --format xml' },
+    { type: 'out', cls: 't-ok',  text: '✓ 17 changed files → my-project_dump.xml' },
+    { type: 'cmd', text: 'projdump --tokens-budget 60000 --sort size-desc' },
+    { type: 'out', cls: 't-ok',  text: '✓ 42 files within budget (12,881 / 60,000 tokens)' }
+  ];
+  var term = document.getElementById('heroTerm');
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function renderStatic() {
+    SEQ.forEach(function (s) {
+      if (s.type === 'cmd') {
+        term.insertAdjacentHTML('beforeend',
+          '<div><span class="t-prompt">$ </span><span class="t-cmd"></span></div>');
+        term.lastChild.querySelector('.t-cmd').textContent = s.text;
+      } else {
+        var d = document.createElement('div');
+        d.className = s.cls; d.textContent = s.text;
+        term.appendChild(d);
+      }
+    });
+    term.insertAdjacentHTML('beforeend', '<div><span class="t-prompt">$ </span><span class="caret"></span></div>');
+  }
+
+  function typeLoop() {
+    term.innerHTML = '';
+    var i = 0;
+    function nextLine() {
+      if (i >= SEQ.length) {
+        setTimeout(function () { typeLoop(); }, 3200);
+        return;
+      }
+      var s = SEQ[i++];
+      if (s.type === 'cmd') {
+        var row = document.createElement('div');
+        row.innerHTML = '<span class="t-prompt">$ </span><span class="t-cmd"></span><span class="caret"></span>';
+        term.appendChild(row);
+        var target = row.querySelector('.t-cmd');
+        var caret = row.querySelector('.caret');
+        var c = 0;
+        (function tick() {
+          if (c <= s.text.length) {
+            target.textContent = s.text.slice(0, c++);
+            setTimeout(tick, 26 + Math.random() * 34);
+          } else {
+            if (caret && caret.parentNode) caret.remove();
+            setTimeout(nextLine, 300);
+          }
+        })();
+      } else {
+        var d = document.createElement('div');
+        d.className = s.cls; d.textContent = s.text;
+        term.appendChild(d);
+        setTimeout(nextLine, s.cls === 't-dim' ? 500 : 620);
+      }
+    }
+    nextLine();
+  }
+  if (reduced) { renderStatic(); } else { typeLoop(); }
+
+  /* ─── command builder ─────────────────────────────────────── */
+  var fmt = 'md';
+  document.querySelectorAll('.seg button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('.seg button').forEach(function (x) { x.classList.remove('on'); });
+      b.classList.add('on');
+      fmt = b.getAttribute('data-fmt');
+      buildCmd();
+    });
+  });
+  function shQuote(v) {
+    return "'" + String(v).replace(/'/g, "'\\''") + "'";
+  }
+  function buildCmd() {
+    var p = ['projdump'];
+    var v = function (id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; };
+    var on = function (id) { var el = document.getElementById(id); return !!(el && el.checked); };
+    if (fmt !== 'md') p.push('-f ' + fmt);
+    if (v('bOut')) p.push('-o ' + shQuote(v('bOut')));
+    if (v('bExt')) p.push('-e ' + shQuote(v('bExt').replace(/\s*,\s*/g, ',')));
+    v('bInc').split(',').forEach(function (g) { if (g.trim()) p.push('-i ' + shQuote(g.trim())); });
+    v('bExc').split(',').forEach(function (g) { if (g.trim()) p.push('-x ' + shQuote(g.trim())); });
+    if (v('bSince')) p.push('--since ' + shQuote(v('bSince')));
+    if (v('bSort')) p.push('--sort ' + v('bSort'));
+    if (v('bBudget') && Number(v('bBudget')) > 0) p.push('--tokens-budget ' + parseInt(v('bBudget'), 10));
+    if (v('bMax') && Number(v('bMax')) > 0) p.push('--max-size ' + parseInt(v('bMax'), 10));
+    if (v('bNote')) p.push('--note ' + shQuote(v('bNote')));
+    if (on('bNoTree')) p.push('--no-tree');
+    if (on('bList')) p.push('--list');
+    if (on('bStdout')) p.push('--stdout');
+    if (on('bCopy')) p.push('--copy');
+    if (on('bV')) p.push('-v');
+    if (on('bQ')) p.push('-q');
+    document.getElementById('cmdPreview').textContent = p.join(' \\\n  ');
+  }
+  ['bOut', 'bExt', 'bInc', 'bExc', 'bSince', 'bSort', 'bBudget', 'bMax', 'bNote',
+   'bNoTree', 'bList', 'bStdout', 'bCopy', 'bV', 'bQ'].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) { el.addEventListener('input', buildCmd); el.addEventListener('change', buildCmd); }
+  });
+  buildCmd();
+
+  /* ─── format tabs ─────────────────────────────────────────── */
+  document.querySelectorAll('.tab-btn').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('.tab-btn').forEach(function (x) { x.classList.remove('on'); x.setAttribute('aria-selected', 'false'); });
+      document.querySelectorAll('.tab-pane').forEach(function (p) { p.classList.remove('on'); });
+      b.classList.add('on'); b.setAttribute('aria-selected', 'true');
+      var pane = document.getElementById('pane-' + b.getAttribute('data-tab'));
+      if (pane) pane.classList.add('on');
+    });
+  });
+
+  /* ─── copy buttons + toast ────────────────────────────────── */
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 1800);
+  }
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('.copy');
+    if (!btn) return;
+    var pre = btn.parentNode.querySelector('pre');
+    if (!pre) return;
+    var text = pre.textContent;
+    (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(text) : Promise.reject())
+      .catch(function () {
+        var ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (err) {}
+        ta.remove();
+      })
+      .finally(function () {
+        btn.classList.add('done'); btn.textContent = '✓';
+        showToast(I18N[lang]['copied']);
+        setTimeout(function () { btn.classList.remove('done'); btn.textContent = '⧉'; }, 1400);
+      });
+  });
+
+  /* ─── cookbook tools: copy all + download .sh ─────────────── */
+  var cookCopyAll = document.getElementById('cookCopyAll');
+  var cookDl = document.getElementById('cookDl');
+  function cookBlock() {
+    var out = ['# ' + (I18N[lang]['cook.shheader'] || 'projdump — recipes')];
+    document.querySelectorAll('#cookbook .recipe').forEach(function (card, i) {
+      var h = card.querySelector('h3'), pre = card.querySelector('.codeblock pre');
+      if (!h || !pre) return;
+      out.push('# R' + (i + 1) + ' — ' + h.textContent.trim());
+      out.push(pre.textContent.replace(/\\\n\s*/g, ' ').replace(/\s+/g, ' ').trim());
+    });
+    return out.join('\n') + '\n';
+  }
+  function cookCopyText(t) {
+    return (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(t) : Promise.reject())
+      .catch(function () {
+        var ta = document.createElement('textarea');
+        ta.value = t; document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (err) {}
+        ta.remove();
+      });
+  }
+  if (cookCopyAll) cookCopyAll.addEventListener('click', function () {
+    cookCopyText(cookBlock()).finally(function () { showToast(I18N[lang]['copied']); });
+  });
+  if (cookDl) cookDl.addEventListener('click', function () {
+    var blob = new Blob(['#!/usr/bin/env bash\nset -euo pipefail\n\n' + cookBlock()], { type: 'text/x-shellscript' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'projdump-recipes.sh';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+    showToast(I18N[lang]['cook.dled'] || 'Downloaded ✓');
+  });
+
+  /* ─── options filter ──────────────────────────────────────── */
+  var filter = document.getElementById('optFilter');
+  var rows = Array.prototype.slice.call(document.querySelectorAll('#optsTable tbody tr'));
+  var countEl = document.getElementById('optCount');
+  function countVisible() {
+    var n = rows.filter(function (r) { return r.style.display !== 'none'; }).length;
+    countEl.textContent = n + ' / ' + rows.length;
+  }
+  if (filter) {
+    filter.addEventListener('input', function () {
+      var q = filter.value.toLowerCase();
+      rows.forEach(function (r) {
+        r.style.display = r.textContent.toLowerCase().indexOf(q) !== -1 ? '' : 'none';
+      });
+      countVisible();
+    });
+    countVisible();
+  }
+
+  /* ─── reveal on scroll ────────────────────────────────────── */
+  if ('IntersectionObserver' in window && !reduced) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(function (el, i) {
+      el.style.transitionDelay = (Math.min(i % 4, 3) * 60) + 'ms';
+      io.observe(el);
+    });
+  } else {
+    document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('in'); });
+  }
+
+  /* ─── active nav link ─────────────────────────────────────── */
+  var navAnchors = Array.prototype.slice.call(document.querySelectorAll('.nav-links a'));
+  var sections = navAnchors.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+  if ('IntersectionObserver' in window) {
+    var nio = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          navAnchors.forEach(function (a) {
+            a.classList.toggle('active', a.getAttribute('href') === '#' + en.target.id);
+          });
+        }
+      });
+    }, { rootMargin: '-40% 0px -55% 0px' });
+    sections.forEach(function (s) { if (s) nio.observe(s); });
+  }
+
+  /* ─── star count (best effort) ────────────────────────────── */
+  fetch('https://api.github.com/repos/CheginiSoroush/projdump')
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) {
+      if (d && typeof d.stargazers_count === 'number') {
+        var sc = document.getElementById('starCount');
+        sc.hidden = false;
+        sc.textContent = '★ ' + d.stargazers_count;
+      }
+    })
+    .catch(function () {});
+
+  /* ─── back to top ─────────────────────────────────────────── */
+  var toTop = document.getElementById('toTop');
+  window.addEventListener('scroll', function () {
+    toTop.classList.toggle('show', window.scrollY > 700);
+  }, { passive: true });
+  toTop.addEventListener('click', function () {
+    window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+  });
+
+  /* ─── token estimator ─────────────────────────────────────── */
+  var estKb = document.getElementById('estKb');
+  function fmtNum(n) { return n.toLocaleString('en-US'); }
+  function estCalc() {
+    var out = document.getElementById('estTokens');
+    var chips = document.querySelectorAll('#estChips .fit-chip');
+    var flag = document.getElementById('estBudget');
+    var kb = parseFloat(estKb && estKb.value);
+    var tokens = isFinite(kb) && kb > 0 ? Math.round(kb * 1024 / 3.5) : 0;
+    if (!tokens) {
+      out.textContent = '—';
+      chips.forEach(function (c) { c.classList.remove('ok'); });
+      flag.textContent = '--tokens-budget …';
+      return;
+    }
+    out.textContent = '≈ ' + fmtNum(tokens);
+    chips.forEach(function (c) {
+      c.classList.toggle('ok', tokens <= Number(c.getAttribute('data-win')));
+    });
+    var budget = Math.max(1000, Math.ceil(tokens / 1000) * 1000);
+    flag.textContent = '--tokens-budget ' + budget; /* plain digits: safe to paste into the CLI */
+  }
+  if (estKb) {
+    estKb.addEventListener('input', estCalc);
+    estCalc();
+  }
+  var estFlagBtn = document.getElementById('estBudget');
+  if (estFlagBtn) {
+    estFlagBtn.addEventListener('click', function () {
+      var t = estFlagBtn.textContent;
+      (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(t) : Promise.reject())
+        .catch(function () {})
+        .finally(function () { showToast(I18N[lang]['copied']); });
+    });
+  }
+
+  /* ─── hero stat count-up ──────────────────────────────────── */
+  var statsEl = document.getElementById('stats');
+  function countUp() {
+    if (reduced || !statsEl || statsEl.dataset.done) return;
+    statsEl.dataset.done = '1';
+    statsEl.querySelectorAll('b[data-count]').forEach(function (b) {
+      var target = parseInt(b.getAttribute('data-count'), 10);
+      var suffix = b.getAttribute('data-suffix') || '';
+      if (!target) return; /* 0 → nothing to animate */
+      var t0 = null;
+      function frame(t) {
+        if (!t0) t0 = t;
+        var k = Math.min((t - t0) / 1100, 1);
+        var eased = 1 - Math.pow(1 - k, 3);
+        b.textContent = Math.round(target * eased) + suffix;
+        if (k < 1) requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    });
+  }
+  if ('IntersectionObserver' in window && statsEl && !reduced) {
+    var sio = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { countUp(); sio.disconnect(); }
+      });
+    }, { threshold: 0.4 });
+    sio.observe(statsEl);
+  }
+
+  /* ─── reading progress bar ────────────────────────────────── */
+  var pBar = document.getElementById('progressBar');
+  var pTick = false;
+  function updProgress() {
+    pTick = false;
+    var h = document.documentElement;
+    var max = h.scrollHeight - h.clientHeight;
+    var y = window.scrollY || h.scrollTop || 0;
+    pBar.style.transform = 'scaleX(' + (max > 0 ? Math.min(y / max, 1) : 0) + ')';
+  }
+  window.addEventListener('scroll', function () {
+    if (!pTick) { pTick = true; requestAnimationFrame(updProgress); }
+  }, { passive: true });
+  window.addEventListener('resize', updProgress);
+  updProgress();
+
+  /* ─── copy-anchor buttons on section headings ─────────────── */
+  function mountAnchors() {
+    document.querySelectorAll('main section[id] .section-head h2').forEach(function (h2) {
+      if (h2.querySelector('.anchor-btn')) return;
+      var sec = h2.closest('section');
+      if (!sec || !sec.id) return;
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'anchor-btn';
+      b.textContent = '#';
+      b.title = '#' + sec.id;
+      b.setAttribute('aria-label', 'Copy link to this section');
+      b.addEventListener('click', function () {
+        var url = location.origin + location.pathname + '#' + sec.id;
+        try { history.replaceState(null, '', '#' + sec.id); } catch (e) {}
+        (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(url) : Promise.reject())
+          .catch(function () {})
+          .finally(function () { showToast(I18N[lang]['anchor.copied']); });
+      });
+      h2.appendChild(b);
+    });
+  }
+
+  /* ─── cheat-sheet download ─────────────────────────────────── */
+  var cheatBtn = document.getElementById('cheatBtn');
+  if (cheatBtn) {
+    cheatBtn.addEventListener('click', function () {
+      var d = I18N[lang];
+      var clean = function (s) { return String(s).replace(/[\u200e\u200f]/g, '').replace(/\|/g, '\\|').replace(/\s+/g, ' ').trim(); };
+      var lines = [
+        '# projdump — cheat sheet', '',
+        '> Your whole codebase. One file. AI-ready.  ',
+        '> Docs: https://cheginisoroush.github.io/projdump/ · Repo: https://github.com/CheginiSoroush/projdump', '',
+        '## Install', '',
+        '```bash',
+        'git clone https://github.com/CheginiSoroush/projdump && cd projdump',
+        'sudo ./install.sh          # or: ./install.sh --prefix ~/.local',
+        'cd ~/your-project && projdump',
+        '```', '',
+        '## Recipes', '',
+        '```bash',
+        'projdump                                      # dump → clipboard',
+        'projdump --list                              # dry-run: files, lines, tokens',
+        'projdump --since HEAD~3 --format xml         # only what changed',
+        'projdump --tokens-budget 60000 --sort size-desc',
+        'projdump -e "ts,tsx" -i "src/*" --stdout     # filter + pipe',
+        'projdump --note "Review auth for XSS"        # brief the AI first',
+        '```', '',
+        '## All options', '',
+        '| ' + d['options.flag'] + ' | ' + d['options.desc'] + ' |',
+        '|---|---|'
+      ];
+      document.querySelectorAll('#optsTable tbody tr').forEach(function (tr) {
+        var tds = tr.querySelectorAll('td');
+        var pick = lang === 'fa' ? (tds[1].querySelector('.fa-only') || tds[1]) : (tds[1].querySelector('.en-only') || tds[1]);
+        lines.push('| `' + clean(tds[0].textContent) + '` | ' + clean(pick.textContent) + ' |');
+      });
+      lines.push('', '---', '', 'MIT © Soroush Chegini — projdump v1.1.0');
+      var blob = new Blob([lines.join('\n')], { type: 'text/markdown;charset=utf-8' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'projdump-cheatsheet.md';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+      showToast(I18N[lang]['cheat.ok']);
+    });
+  }
+
+  /* ─── search palette (Ctrl/⌘+K, /) ────────────────────────── */
+  var palOv = document.getElementById('palOverlay');
+  var palIn = document.getElementById('palInput');
+  var palRes = document.getElementById('palResults');
+  var palSel = -1, palList = [], lastFocus = null;
+  var SEC_META = [
+    ['pipeline', '🧭'], ['features', '✨'], ['install', '⬇️'], ['builder', '🛠️'],
+    ['formats', '🧱'], ['options', '📇'], ['cookbook', '🍳'], ['deploy', '🚀'], ['compare', '⚖️'],
+    ['changelog', '🕘'], ['faq', '❓']
+  ];
+  var GROUP_KEY = { sections: 'pal.sections', flags: 'pal.flags', faq: 'pal.faq', recipes: 'pal.recipes', pg: 'pal.playground' };
+  /* bridge so the palette can trigger playground runs (assigned by the playground block) */
+  var PG_BRIDGE = { ready: false, run: null };
+  function runRecipe(it) {
+    if (!PG_BRIDGE.ready || !it || !it.n) return;
+    palClose();
+    PG_BRIDGE.run(it.n);
+  }
+  function runPreset(cmd) {
+    if (!PG_BRIDGE.ready || !cmd) return;
+    palClose();
+    PG_BRIDGE.exec(cmd);
+  }
+  /* ─── keyboard shortcuts sheet (?) ─── */
+  var kbdOv = document.getElementById('kbdOverlay');
+  var kbdLastFocus = null;
+  function kbdOpen() {
+    if (!kbdOv || kbdOv.classList.contains('open')) return;
+    if (palOv.classList.contains('open')) palClose();
+    kbdLastFocus = document.activeElement;
+    kbdOv.classList.add('open');
+    kbdOv.setAttribute('aria-label', I18N[lang]['kb.tag'] || 'Keyboard shortcuts');
+    document.body.style.overflow = 'hidden';
+    setTimeout(function () { kbdOv.querySelector('.kbd-sheet').focus(); }, 30);
+  }
+  function kbdClose() {
+    if (!kbdOv || !kbdOv.classList.contains('open')) return;
+    kbdOv.classList.remove('open');
+    document.body.style.overflow = '';
+    if (kbdLastFocus && kbdLastFocus.focus) kbdLastFocus.focus();
+  }
+
+  function buildPalIndex() {
+    var idx = [];
+    SEC_META.forEach(function (sm) {
+      var el = document.getElementById(sm[0]);
+      var h2 = el ? el.querySelector('h2') : null;
+      var label = h2 ? h2.textContent.replace(/#\s*$/, '').trim() : sm[0];
+      idx.push({ g: 'sections', ic: sm[1], main: label, sub: '#' + sm[0], sec: sm[0],
+        hay: (label + ' #' + sm[0]).toLowerCase() });
+    });
+    document.querySelectorAll('#optsTable tbody tr').forEach(function (tr, i) {
+      var tds = tr.querySelectorAll('td');
+      var flag = tds[0].textContent.replace(/[\u200e\u200f]/g, '').trim();
+      var en = tr.querySelector('.en-only'), fa = tr.querySelector('.fa-only');
+      idx.push({ g: 'flags', ic: '⚡', main: flag, flag: true,
+        sub: (lang === 'fa' && fa ? fa : en).textContent.trim(),
+        hay: (flag + ' ' + (en ? en.textContent : '') + ' ' + (fa ? fa.textContent : '')).toLowerCase(),
+        row: i });
+    });
+    document.querySelectorAll('#faq details').forEach(function (dt, i) {
+      var en = dt.querySelector('.en-only'), fa = dt.querySelector('.fa-only');
+      var qEn = en ? en.textContent.trim() : '', qFa = fa ? fa.textContent.trim() : '';
+      idx.push({ g: 'faq', ic: '❓', main: (lang === 'fa' && qFa ? qFa : qEn), sub: 'Q' + (i + 1),
+        hay: (qEn + ' ' + qFa).toLowerCase(), dt: dt });
+    });
+    document.querySelectorAll('#cookbook .recipe').forEach(function (card, i) {
+      var h3 = card.querySelector('h3');
+      if (!h3) return;
+      idx.push({ g: 'recipes', ic: '🍳', main: h3.textContent.trim(), sub: 'R' + (i + 1), n: i + 1,
+        hay: (h3.textContent.trim() + ' recipe cookbook r' + (i + 1)).toLowerCase(), card: card });
+    });
+    document.querySelectorAll('.pg-chip:not(.pg-demo)').forEach(function (ch) {
+      var cmd = ch.getAttribute('data-cmd') || '';
+      if (!cmd) return;
+      var label = ch.textContent.trim();
+      idx.push({ g: 'pg', ic: '⚡', main: label, sub: cmd,
+        hay: (label + ' preset playground ' + cmd).toLowerCase(), cmd: cmd });
+    });
+    return idx;
+  }
+  function palEsc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function palHl(text, q) {
+    var e = palEsc(text);
+    if (!q) return e;
+    var i = e.toLowerCase().indexOf(q.toLowerCase());
+    if (i < 0) return e;
+    return e.slice(0, i) + '<mark>' + e.slice(i, i + q.length) + '</mark>' + e.slice(i + q.length);
+  }
+  function palRender() {
+    var q = palIn.value.trim();
+    var ql = q.toLowerCase();
+    palList = buildPalIndex().filter(function (it) {
+      return !ql || it.hay.indexOf(ql) !== -1;
+    });
+    palSel = palList.length ? 0 : -1;
+    if (!palList.length) {
+      palRes.innerHTML = '<div class="pal-empty">' + palEsc(I18N[lang]['pal.none']) + '</div>';
+      return;
+    }
+    var html = '', lastG = '';
+    palList.forEach(function (it, i) {
+      if (it.g !== lastG) {
+        lastG = it.g;
+        html += '<div class="p-group">' + palEsc(I18N[lang][GROUP_KEY[it.g]]) + '</div>';
+      }
+      var main = it.flag ? '<b class="p-flag">' + palHl(it.main, q) + '</b>'
+                         : '<span class="p-main">' + palHl(it.main, q) + '</span>';
+      var sub = it.sub ? '<span class="p-sub">' + palHl(it.sub, q) + '</span>' : '';
+      var run = it.g === 'recipes'
+        ? '<button type="button" class="p-run" title="' + palEsc(I18N[lang]['pg.trytitle'] || '') + '" aria-label="' + palEsc(I18N[lang]['pg.trytitle'] || '') + '">▶</button>'
+        : '';
+      html += '<div class="p-item' + (i === palSel ? ' sel' : '') + '" role="option" aria-selected="' + (i === palSel) + '" data-i="' + i + '">' +
+        '<span class="p-ic" aria-hidden="true">' + it.ic + '</span>' +
+        '<span class="p-txt">' + main + sub + '</span>' + run + '</div>';
+    });
+    palRes.innerHTML = html;
+    var sel = palRes.querySelector('.p-item.sel');
+    if (sel) sel.scrollIntoView({ block: 'nearest' });
+    palFootHint();
+  }
+  var palFoot = document.querySelector('.pal-foot');
+  function palFootHint() {
+    if (palFoot) palFoot.classList.toggle('runnable', !!(palList[palSel] && palList[palSel].g === 'recipes'));
+  }
+  function palFlash(el) {
+    el.classList.remove('flash-row');
+    void el.offsetWidth;
+    el.classList.add('flash-row');
+  }
+  function palGo(it) {
+    palClose();
+    var smooth = reduced ? 'auto' : 'smooth';
+    if (it.g === 'sections') {
+      var el = document.getElementById(it.sec);
+      if (el) {
+        el.scrollIntoView({ behavior: smooth, block: 'start' });
+        try { history.replaceState(null, '', '#' + it.sec); } catch (e) {}
+      }
+      return;
+    }
+    if (it.g === 'flags') {
+      var fi = document.getElementById('optFilter');
+      if (fi && fi.value) { fi.value = ''; fi.dispatchEvent(new Event('input')); }
+      var row = document.querySelectorAll('#optsTable tbody tr')[it.row];
+      if (row) {
+        row.scrollIntoView({ behavior: smooth, block: 'center' });
+        palFlash(row);
+      }
+      try { history.replaceState(null, '', '#options'); } catch (e) {}
+      return;
+    }
+    if (it.g === 'recipes' && it.card) {
+      it.card.scrollIntoView({ behavior: smooth, block: 'center' });
+      palFlash(it.card);
+      try { history.replaceState(null, '', '#cookbook'); } catch (e) {}
+      return;
+    }
+    if (it.g === 'pg' && it.cmd) {
+      runPreset(it.cmd);
+      return;
+    }
+    if (it.g === 'faq' && it.dt) {
+      it.dt.open = true;
+      it.dt.scrollIntoView({ behavior: smooth, block: 'center' });
+      palFlash(it.dt);
+      try { history.replaceState(null, '', '#faq'); } catch (e) {}
+    }
+  }
+  function palOpen() {
+    lastFocus = document.activeElement;
+    palOv.classList.add('open');
+    palOv.setAttribute('aria-label', I18N[lang]['pal.title']);
+    document.body.style.overflow = 'hidden';
+    palIn.value = '';
+    palRender();
+    setTimeout(function () { palIn.focus(); }, 30);
+  }
+  function palClose() {
+    palOv.classList.remove('open');
+    document.body.style.overflow = '';
+    palIn.setAttribute('aria-expanded', 'false');
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  var searchBtn = document.getElementById('searchBtn');
+  if (searchBtn) searchBtn.addEventListener('click', palOpen);
+  palOv.addEventListener('mousedown', function (e) { if (e.target === palOv) palClose(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && kbdOv.classList.contains('open')) {
+      e.preventDefault();
+      kbdClose();
+      return;
+    }
+    if ((e.ctrlKey || e.metaKey) && String(e.key).toLowerCase() === 'k') {
+      e.preventDefault();
+      kbdClose();
+      if (palOv.classList.contains('open')) palClose(); else palOpen();
+      return;
+    }
+    if (e.key === '?' && !palOv.classList.contains('open')) {
+      var t = e.target;
+      if (t && ((t.matches && t.matches('input,textarea,select')) || t.isContentEditable)) return;
+      e.preventDefault();
+      if (kbdOv.classList.contains('open')) kbdClose(); else kbdOpen();
+    } else if (e.key === '/' && !palOv.classList.contains('open') && !kbdOv.classList.contains('open')) {
+      var t2 = e.target;
+      if (t2 && ((t2.matches && t2.matches('input,textarea,select')) || t2.isContentEditable)) return;
+      e.preventDefault();
+      palOpen();
+    }
+  });
+  palIn.addEventListener('input', palRender);
+  palIn.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { e.preventDefault(); palClose(); return; }
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      if (palSel >= 0 && palList[palSel] && palList[palSel].g === 'recipes') runRecipe(palList[palSel]);
+      return;
+    }
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (!palList.length) return;
+      palSel = e.key === 'ArrowDown' ? (palSel + 1) % palList.length : (palSel - 1 + palList.length) % palList.length;
+      palRes.querySelectorAll('.p-item').forEach(function (n) {
+        var on = Number(n.getAttribute('data-i')) === palSel;
+        n.classList.toggle('sel', on);
+        n.setAttribute('aria-selected', on ? 'true' : 'false');
+        if (on) n.scrollIntoView({ block: 'nearest' });
+      });
+      palFootHint();
+      return;
+    }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (palSel >= 0 && palList[palSel]) palGo(palList[palSel]);
+    }
+  });
+  palRes.addEventListener('click', function (e) {
+    var item = e.target.closest('.p-item');
+    if (!item) return;
+    var it = palList[Number(item.getAttribute('data-i'))];
+    if (!it) return;
+    if (e.target.closest('.p-run')) { runRecipe(it); return; }
+    palGo(it);
+  });
+  palRes.addEventListener('mousemove', function (e) {
+    var item = e.target.closest('.p-item');
+    if (!item) return;
+    var i = Number(item.getAttribute('data-i'));
+    if (i !== palSel) {
+      palSel = i;
+      palRes.querySelectorAll('.p-item').forEach(function (n) {
+        var on = Number(n.getAttribute('data-i')) === palSel;
+        n.classList.toggle('sel', on);
+        n.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      palFootHint();
+    }
+  });
+  kbdOv.addEventListener('mousedown', function (e) { if (e.target === kbdOv) kbdClose(); });
+  var footMore = document.querySelector('.pal-foot .foot-more');
+  if (footMore) {
+    footMore.addEventListener('click', kbdOpen);
+    footMore.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); kbdOpen(); }
+    });
+  }
+
+  /* ─── playground: simulated projdump terminal ─────────────── */
+  var pgOut = document.getElementById('pgOut');
+  var pgIn = document.getElementById('pgIn');
+  var pgRunBtn = document.getElementById('pgRun');
+  if (pgOut && pgIn) {
+    var PG_SHA = '4f2a91c';
+    var PG_FILES = [
+      { p: 'assets/logo.png',  lang: 'binary',     lines: 0,   bytes: 1228800, since: false, binary: true,
+        head: [] },
+      { p: 'data.json',        lang: 'json',       lines: 9,   bytes: 407,  since: false,
+        head: ['{', '  "version": "1.1.0",', '  "ok": true'] },
+      { p: 'dist/bundle.js',   lang: 'javascript', lines: 802, bytes: 28900, since: false,
+        head: ['/*! bundle v1.1.0 */', '(function(){', '  "use strict";'] },
+      { p: 'logo.svg',         lang: 'xml',        lines: 112, bytes: 3404, since: false,
+        head: ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">', '  <path d="M4 4h24v24H4z"/>', '</svg>'] },
+      { p: 'notes.txt',        lang: 'text',       lines: 6,   bytes: 198,  since: true,
+        head: ['todo: profile the parser', '', 'note: keep dumps under budget'] },
+      { p: 'README.md',        lang: 'markdown',   lines: 18,  bytes: 612,  since: true,
+        head: ['# my-project', 'A tiny demo project used by the projdump playground.', ''] },
+      { p: 'src/api.ts',       lang: 'typescript', lines: 63,  bytes: 2098, since: true,
+        head: ['export interface Req { id: string }', '', 'export async function handle(req: Req) {'] },
+      { p: 'src/app.py',       lang: 'python',     lines: 48,  bytes: 1610, since: true,
+        head: ['import json', 'from utils import clamp', '', 'def run(event):'] },
+      { p: 'src/utils.py',     lang: 'python',     lines: 21,  bytes: 704,  since: false,
+        head: ['def clamp(v, lo, hi):', '    return max(lo, min(hi, v))', ''] },
+      { p: 'styles/main.css',  lang: 'css',        lines: 34,  bytes: 1122, since: false,
+        head: [':root { --brand: #10b981; }', '', '.card { border-radius: 12px; }'] }
+    ];
+    var PG_TREE = 'my-project\n├── assets/\n│   └── logo.png\n├── dist/\n│   └── bundle.js\n├── src/\n│   ├── api.ts\n│   ├── app.py\n│   └── utils.py\n├── styles/\n│   └── main.css\n├── data.json\n├── logo.svg\n├── notes.txt\n└── README.md';
+    var PG_NOW = '2026-10-08T19:12:00Z';
+    var PG_HIST = [], PG_HIST_I = -1, PG_RAN = false;
+
+    function pgEsc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+    function pgLine(cls, text) {
+      var d = document.createElement('div');
+      if (cls) d.className = cls;
+      d.textContent = text;
+      pgOut.appendChild(d);
+    }
+    function pgHtml(html) {
+      var d = document.createElement('div');
+      d.innerHTML = html;
+      pgOut.appendChild(d);
+    }
+    function pgBottom() { pgOut.scrollTop = pgOut.scrollHeight; }
+    function pgFmt(bytes) {
+      return bytes < 1024 ? bytes + 'B' : (bytes / 1024).toFixed(1) + 'K';
+    }
+    function pgTok(bytes) { return Math.round(bytes / 3.5); }
+    function pgComma(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+    function pgTokens(s) {
+      var out = [], cur = '', q = null, i, ch;
+      for (i = 0; i < s.length; i++) {
+        ch = s.charAt(i);
+        if (q) { if (ch === q) q = null; else cur += ch; }
+        else if (ch === '"' || ch === "'") q = ch;
+        else if (/\s/.test(ch)) { if (cur) { out.push(cur); cur = ''; } }
+        else cur += ch;
+      }
+      if (cur) out.push(cur);
+      return out;
+    }
+    function pgGlob(p, g) {
+      if (g === '*' || g === '*/*') return true;
+      if (g.slice(-2) === '/*') return p.slice(0, g.length - 1) === g.slice(0, -1);
+      if (g.charAt(0) === '*') return p.slice(-(g.length - 1)) === g.slice(1);
+      return p === g;
+    }
+
+    function pgBanner() {
+      pgOut.innerHTML = '';
+      pgHtml('<span class="c-ok">projdump</span> <span class="c-dim">v1.1.0 — playground</span>');
+      pgLine('c-dim', I18N[lang]['pg.banner1']);
+      pgLine('c-dim', I18N[lang]['pg.banner2']);
+      pgLine('c-amber', I18N[lang]['pg.hint']);
+    }
+
+    function pgHelp() {
+      var t = 'projdump v1.1.0 — dump an entire project into one file for AI\n\n' +
+        'Usage: projdump [output] [options]\n\n' +
+        '  -f, --format md|xml|json   output format (default md)\n' +
+        '  -e, --ext-only LIST        only these extensions\n' +
+        '  -x, --exclude GLOB         skip paths (repeatable)\n' +
+        '  -i, --include GLOB         only these paths (repeatable)\n' +
+        '      --since REF            only files changed since a git ref\n' +
+        '      --sort KEY             name | size | size-desc | ext\n' +
+        '      --tokens-budget N      stop once ~N tokens are reached\n' +
+        '      --max-size N           skip files larger than N KB\n' +
+        '      --no-tree              omit the directory tree\n' +
+        '      --note TEXT            add a "note for the AI" block\n' +
+        '      --list                 dry run: print the file list\n' +
+        '      --stdout               write to stdout instead of a file\n' +
+        '  -v, --verbose              explain skipped files\n' +
+        '  -q, --quiet                no summary line\n' +
+        '  -h, --help                 show this help';
+      t.split('\n').forEach(function (l) { pgLine('', l); });
+    }
+
+    function pgSelect(cands, o, errs) {
+      var files = cands.slice(), skips = [];
+      if (o.since !== null) files = files.filter(function (f) { return f.since; });
+      if (o.ext) {
+        var exts = o.ext.split(',').map(function (s) { return s.trim().toLowerCase(); });
+        files = files.filter(function (f) {
+          var e = f.p.split('.').pop().toLowerCase();
+          var ok = f.lang !== 'binary' && exts.indexOf(e) !== -1;
+          if (!ok && o.verbose) skips.push('skip ' + f.p + '  (--ext-only ' + o.ext + ')');
+          return ok;
+        });
+      }
+      if (o.inc.length) {
+        files = files.filter(function (f) {
+          var ok = o.inc.some(function (g) { return pgGlob(f.p, g); });
+          if (!ok && o.verbose) skips.push('skip ' + f.p + '  (--include ' + o.inc.join(' ') + ')');
+          return ok;
+        });
+      }
+      files = files.filter(function (f) {
+        var hit = o.exc.some(function (g) { return pgGlob(f.p, g); });
+        if (hit && o.verbose) skips.push('skip ' + f.p + '  (--exclude ' + o.exc.join(' ') + ')');
+        return !hit;
+      });
+      files = files.filter(function (f) {
+        if (f.binary) { if (o.verbose) skips.push('skip ' + f.p + '  (binary file)'); return false; }
+        return true;
+      });
+      if (o.max !== null) {
+        files = files.filter(function (f) {
+          if (f.bytes > o.max * 1024) { if (o.verbose) skips.push('skip ' + f.p + '  (' + pgFmt(f.bytes) + ' > --max-size ' + o.max + 'K)'); return false; }
+          return true;
+        });
+      }
+      if (o.sort === 'size') files.sort(function (a, b) { return a.bytes - b.bytes; });
+      else if (o.sort === 'size-desc') files.sort(function (a, b) { return b.bytes - a.bytes; });
+      else if (o.sort === 'ext') files.sort(function (a, b) {
+        var ea = a.p.split('.').pop(), eb = b.p.split('.').pop();
+        return ea === eb ? (a.p < b.p ? -1 : 1) : (ea < eb ? -1 : 1);
+      });
+      else files.sort(function (a, b) { return a.p < b.p ? -1 : (a.p > b.p ? 1 : 0); });
+      errs.skips = skips;
+      return files;
+    }
+
+    function pgDump(files, o) {
+      var budgetStop = -1, tot = 0, acc = 0, i;
+      if (o.budget !== null) {
+        for (i = 0; i < files.length; i++) {
+          if (i > 0 && acc + pgTok(files[i].bytes) > o.budget) { budgetStop = i; break; }
+          acc += pgTok(files[i].bytes); tot = i + 1;
+        }
+        if (budgetStop === -1) tot = files.length;
+      } else tot = files.length;
+      var kept = files.slice(0, tot);
+      var lines = kept.reduce(function (a, f) { return a + f.lines; }, 0);
+      var bytes = kept.reduce(function (a, f) { return a + f.bytes; }, 0);
+      var SHOW = kept.slice(0, 2);
+      if (o.list) {
+        files.forEach(function (f) { pgLine('', '  ' + pgFmt(f.bytes).padStart(6) + '  ' + String(f.lines).padStart(5) + '  ' + f.p); });
+        pgLine('c-dim', '  (' + files.length + ' files, ~' + pgComma(files.reduce(function (a, f) { return a + pgTok(f.bytes); }, 0)) + ' tokens)');
+        return { kept: files, lines: 0, bytes: 0, budgetStop: -1 };
+      }
+      if (o.fmt === 'xml') {
+        pgLine('', '<?xml version="1.0" encoding="UTF-8"?>');
+        pgLine('', '<project name="my-project" path="/home/you/my-project" generated="' + PG_NOW + '" tool="projdump v1.1.0">');
+        if (o.note) pgLine('', '  <note>' + pgEsc(o.note) + '</note>');
+        pgLine('c-dim', '  <tree><![CDATA[');
+        pgLine('c-dim', PG_TREE.split('\n').slice(0, 4).join('\n') + '\n  …]]></tree>');
+        SHOW.forEach(function (f) {
+          pgLine('', '  <file path="' + f.p + '" lang="' + f.lang + '" lines="' + f.lines + '" bytes="' + f.bytes + '">');
+          pgLine('c-dim', '    <![CDATA[' + (f.head[0] || '') + (f.head[1] ? '\n' + f.head[1] : '') + ' …]]>');
+          pgLine('', '  </file>');
+        });
+        if (kept.length > SHOW.length) pgLine('c-dim', '  … ' + (kept.length - SHOW.length) + ' more <file> elements (truncated in the playground)');
+        pgLine('', '</project>');
+      } else if (o.fmt === 'json') {
+        pgLine('', '{');
+        pgLine('', '  "tool": "projdump v1.1.0", "project": "my-project",');
+        if (o.note) pgLine('', '  "note": ' + JSON.stringify(o.note) + ',');
+        pgLine('', '  "stats": { "files": ' + kept.length + ', "lines": ' + lines + ', "bytes": ' + bytes + ', "tokens": ' + pgTok(bytes) + ' },');
+        pgLine('', '  "files": [');
+        SHOW.forEach(function (f, ix) {
+          pgLine('', '    { "path": ' + JSON.stringify(f.p) + ', "lang": "' + f.lang + '", "lines": ' + f.lines + ', "bytes": ' + f.bytes + ',');
+          pgLine('c-dim', '      "content": ' + JSON.stringify(f.head.join('\n')).slice(0, 58) + '…" }' + (ix < SHOW.length - 1 ? ',' : ''));
+        });
+        if (kept.length > SHOW.length) pgLine('c-dim', '    … ' + (kept.length - SHOW.length) + ' more entries (truncated in the playground)');
+        pgLine('', '  ]');
+        pgLine('', '}');
+      } else {
+        pgLine('c-dim', '<!-- projdump v1.1.0 · my-project · main @ ' + PG_SHA + ' (clean) · ' + PG_NOW + ' -->');
+        if (o.since !== null) pgLine('c-dim', '<!-- scope: changes since ' + o.since + ' -->');
+        if (o.note) { pgLine('', ''); pgMdLine('## Note for the AI'); pgLine('', '> ' + o.note); }
+        pgLine('', '');
+        if (!o.noTree) {
+          pgMdLine('## Directory tree');
+          pgMdLine('```text');
+          PG_TREE.split('\n').forEach(function (l) { pgMdLine(l); });
+          pgMdLine('```');
+          pgLine('', '');
+        }
+        SHOW.forEach(function (f) {
+          pgMdLine('## ' + f.p);
+          pgMdLine('```' + f.lang);
+          f.head.forEach(function (l) { pgMdLine(l); });
+          pgLine('c-dim', '… (' + (f.lines - f.head.filter(function (l) { return l !== ''; }).length) + ' more lines in the real dump)');
+          pgMdLine('```');
+          pgLine('', '');
+        });
+        if (kept.length > SHOW.length) pgLine('c-dim', '… ' + (kept.length - SHOW.length) + ' more files (truncated in the playground)');
+        pgMdLine('## Summary');
+        pgLine('', '');
+        pgLine('', '| files | lines | bytes | ≈ tokens |');
+        pgLine('', '|---|---|---|---|');
+        pgLine('', '| ' + kept.length + ' | ' + lines + ' | ' + pgFmt(bytes) + ' | ' + pgComma(pgTok(bytes)) + ' |');
+      }
+      return { kept: kept, lines: lines, bytes: bytes, budgetStop: budgetStop };
+    }
+
+    function pgSummary(res, o, allCount) {
+      if (o.list || o.quiet) return;
+      pgLine('', '');
+      var dest = o.stdout ? 'stdout' : (o.out || 'my-project_dump.' + o.fmt);
+      var extra = res.budgetStop !== -1 ? ' · stopped early: budget ' + pgComma(o.budget) + ' reached' : '';
+      pgHtml('<span class="c-ok">✔ ' + res.kept.length + ' files</span> · ' + res.lines + ' lines · ' + pgFmt(res.bytes) +
+        ' · ≈ ' + pgComma(pgTok(res.bytes)) + ' tokens → <b>' + pgEsc(dest) + '</b>' + pgEsc(extra));
+      if (o.verbose && res.allSkips.length) res.allSkips.forEach(function (l) { pgLine('c-dim', l); });
+      if (!o.stdout && !o.noCopy) pgLine('c-dim', 'clipboard: simulated — install projdump for the real thing');
+    }
+
+    function pgJsonData(kept) {
+      var langs = {};
+      kept.forEach(function (f) {
+        if (f.binary) return;
+        var l = langs[f.lang] || (langs[f.lang] = { files: 0, lines: 0, bytes: 0 });
+        l.files++; l.lines += f.lines; l.bytes += f.bytes;
+      });
+      var lines = kept.reduce(function (a, f) { return a + f.lines; }, 0);
+      var bytes = kept.reduce(function (a, f) { return a + f.bytes; }, 0);
+      return {
+        tool: 'projdump v1.1.0', project: 'my-project',
+        stats: { files: kept.length, lines: lines, bytes: bytes, tokens: pgTok(bytes), languages: langs },
+        files: kept.map(function (f) { return { path: f.p, lang: f.lang, lines: f.lines, bytes: f.bytes }; })
+      };
+    }
+    function pgPrintJson(obj) {
+      JSON.stringify(obj, null, 2).split('\n').forEach(function (l) { pgLine('', l); });
+    }
+    function pgJq(filter, data) {
+      var f = filter.trim();
+      if (f === '.' || f === '') { pgPrintJson(data); return; }
+      if (f === '.stats') { pgPrintJson(data.stats); return; }
+      if (f === '.stats.languages') { pgPrintJson(data.stats.languages); return; }
+      if (f === '.files | length' || f === '.files|length') { pgLine('', String(data.files.length)); return; }
+      if (f === '.files[].path') { data.files.forEach(function (x) { pgLine('', x.path); }); return; }
+      pgLine('c-err', 'jq: error: unsupported filter in playground');
+      pgLine('c-dim', "try: . · .stats · .stats.languages · '.files | length' · '.files[].path'");
+    }
+    function pgMdLine(text) {
+      var t = String(text);
+      if (t.charAt(0) === '#') { pgLine('c-h', t); return; }
+      if (t.slice(0, 3) === '```') { pgLine('c-dim', t); return; }
+      pgLine('', t);
+    }
+
+    function pgRunCmd(raw) {
+      var cmdline = raw.trim();
+      pgHtml('<span class="c-in"></span>' + pgEsc(cmdline));
+      if (!cmdline) return;
+      var t = pgTokens(cmdline);
+      var pipeAt = t.indexOf('|');
+      var t2 = null;
+      if (pipeAt !== -1) {
+        t2 = t.slice(pipeAt + 1);
+        t = t.slice(0, pipeAt);
+        if (t.indexOf('|') !== -1) { pgLine('c-err', 'playground: only one pipe stage is supported'); return; }
+      }
+      var cmd = t[0], args = t.slice(1);
+      if (cmd === 'clear') { pgOut.innerHTML = ''; return; }
+      if (cmd === 'help' || cmd === '?') { pgHelp(); return; }
+      if (cmd === 'ls') { pgLine('c-dim', PG_FILES.map(function (f) { return f.p; }).join('\n')); return; }
+      if (cmd === 'pwd') { pgLine('', '/home/you/my-project'); return; }
+      if (cmd === 'echo') { pgLine('', args.join(' ')); return; }
+      if (cmd === 'git') {
+        pgLine('', 'On branch main');
+        pgLine('c-dim', 'nothing to commit, working tree clean');
+        return;
+      }
+      if (cmd !== 'projdump') {
+        pgLine('c-err', 'bash: ' + cmd + ': command not found');
+        pgLine('c-dim', 'try: projdump --list · help · clear');
+        return;
+      }
+      var jqFilter = null;
+      if (pipeAt !== -1) {
+        if (!t2.length || t2[0] !== 'jq') {
+          pgLine('c-err', 'bash: ' + (t2.length ? t2[0] : '|') + ': command not found');
+          pgLine('c-dim', 'playground pipes support: | jq FILTER');
+          return;
+        }
+        jqFilter = t2.slice(1).join(' ');
+      }
+      /* flags */
+      var o = { fmt: 'md', ext: '', inc: [], exc: [], since: null, sort: 'name', budget: null,
+        max: null, noTree: false, note: '', list: false, stdout: false, noCopy: false,
+        verbose: false, quiet: false, out: '' };
+      var errs = [], skipsAll = [];
+      for (var i = 0; i < args.length; i++) {
+        var a = args[i], val = function () {
+          if (i + 1 >= args.length) { errs.push('projdump: option \'' + a + '\' requires an argument'); return ''; }
+          return args[++i];
+        };
+        if (a === '-f' || a === '--format') { var f = val(); if (['md', 'xml', 'json'].indexOf(f) === -1) errs.push("projdump: unknown format '" + f + "' — expected md|xml|json"); else o.fmt = f; }
+        else if (a === '-e' || a === '--ext-only') o.ext = val();
+        else if (a === '-x' || a === '--exclude') o.exc.push(val());
+        else if (a === '-i' || a === '--include') o.inc.push(val());
+        else if (a === '--since') o.since = val();
+        else if (a === '--sort') { var s = val(); if (['name', 'size', 'size-desc', 'ext'].indexOf(s) === -1) errs.push("projdump: invalid sort key '" + s + "'"); else o.sort = s; }
+        else if (a === '--tokens-budget') { var n = Number(val()); if (!n || n < 1) errs.push('projdump: --tokens-budget needs a positive number'); else o.budget = n; }
+        else if (a === '--max-size') { var m = Number(val()); if (!m || m < 1) errs.push('projdump: --max-size needs a positive number'); else o.max = m; }
+        else if (a === '--note') o.note = val();
+        else if (a === '-o' || a === '--output') o.out = val();
+        else if (a === '--no-tree') o.noTree = true;
+        else if (a === '--list' || a === '--dry-run') o.list = true;
+        else if (a === '--stdout') o.stdout = true;
+        else if (a === '--no-copy') o.noCopy = true;
+        else if (a === '-v' || a === '--verbose') o.verbose = true;
+        else if (a === '-q' || a === '--quiet') o.quiet = true;
+        else if (a === '--version') { pgLine('', 'projdump v1.1.0'); return; }
+        else if (a === '-h' || a === '--help') { pgHelp(); return; }
+        else errs.push("projdump: unrecognized option '" + a + "'");
+      }
+      if (errs.length) {
+        errs.forEach(function (e) { pgLine('c-err', e); });
+        pgLine('c-dim', 'try: projdump --help');
+        return;
+      }
+      if (o.since !== null && ['main', 'HEAD', 'HEAD~1', 'HEAD~2', 'HEAD~3', 'v1.0.0', 'v1.1.0'].indexOf(o.since) === -1) {
+        pgLine('c-err', "fatal: bad revision '" + o.since + "'");
+        pgLine('c-dim', 'projdump: --since REF is invalid — try main, HEAD~2, v1.0.0…');
+        return;
+      }
+      var files = pgSelect(PG_FILES, o, errs);
+      skipsAll = errs.skips || [];
+      if (jqFilter !== null) { pgJq(jqFilter, pgJsonData(files)); return; }
+      var res = pgDump(files, o);
+      res.allSkips = skipsAll;
+      pgSummary(res, o, PG_FILES.length);
+    }
+
+    function pgExec(raw) {
+      PG_HIST.push(raw);
+      PG_HIST_I = PG_HIST.length;
+      PG_RAN = true;
+      pgRunCmd(raw);
+      pgBottom();
+    }
+    var PG_FLAGS = ['-f', '--format', '-e', '--ext-only', '-x', '--exclude', '-i', '--include',
+      '--since', '--sort', '--tokens-budget', '--max-size', '--no-tree', '--note',
+      '--list', '--dry-run', '--stdout', '--no-copy', '-o', '--output', '-v', '--verbose',
+      '-q', '--quiet', '--version', '--help'];
+    pgIn.addEventListener('keydown', function (e) {
+      stopDemo();
+      if (e.key === 'Enter') { pgExec(pgIn.value); pgIn.value = ''; }
+      else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (PG_HIST_I > 0) { PG_HIST_I--; pgIn.value = PG_HIST[PG_HIST_I] || ''; }
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (PG_HIST_I < PG_HIST.length) { PG_HIST_I++; pgIn.value = PG_HIST[PG_HIST_I] || ''; }
+      } else if (e.key === 'Tab') {
+        e.preventDefault();
+        var v = pgIn.value, m = v.match(/(^|[\s"])(-{1,2}[a-z-]*)$/i);
+        if (!m) return;
+        var frag = m[2], hits = PG_FLAGS.filter(function (f) { return f.indexOf(frag) === 0; });
+        if (hits.length === 1) pgIn.value = v.slice(0, v.length - frag.length) + hits[0] + ' ';
+        else if (hits.length > 1) { pgLine('c-dim', hits.join('  ')); pgBottom(); }
+      }
+    });
+    pgRunBtn.addEventListener('click', function () { stopDemo(); pgExec(pgIn.value); pgIn.value = ''; pgIn.focus(); });
+    document.querySelectorAll('.pg-chip:not(.pg-demo)').forEach(function (ch) {
+      ch.addEventListener('click', function () {
+        stopDemo();
+        pgIn.value = ch.getAttribute('data-cmd');
+        pgExec(pgIn.value); pgIn.value = ''; pgIn.focus();
+      });
+    });
+    /* ─── demo replay: hands-free asciinema-style run ─── */
+    var pgDemoBtn = document.getElementById('pgDemo');
+    var DEMO_CMD = 'projdump --tokens-budget 200 --sort size-desc';
+    var demoTimer = null, demoRunning = false;
+    function stopDemo() {
+      if (demoTimer) { clearTimeout(demoTimer); demoTimer = null; }
+      if (demoRunning) { demoRunning = false; pgMountDemo(); }
+    }
+    function pgMountDemo() {
+      if (!pgDemoBtn) return;
+      pgDemoBtn.classList.remove('running');
+      pgDemoBtn.innerHTML = '▶ <span>' + (I18N[lang]['pg.demo'] || 'demo') + '</span>';
+      pgDemoBtn.title = I18N[lang]['pg.demotitle'] || 'Watch a hands-free run';
+    }
+    function endDemo() {
+      demoRunning = false; demoTimer = null;
+      pgMountDemo();
+      pgIn.value = '';
+    }
+    function pgRunDemo() {
+      if (demoRunning) { stopDemo(); return; }
+      demoRunning = true;
+      pgDemoBtn.classList.add('running');
+      pgDemoBtn.innerHTML = '■ <span>' + (I18N[lang]['pg.demo.stop'] || 'stop') + '</span>';
+      pgIn.value = ''; pgIn.focus();
+      var i = 0;
+      if (reduced) { pgExec(DEMO_CMD); endDemo(); return; }
+      (function tick() {
+        if (!demoRunning) return;
+        if (i <= DEMO_CMD.length) {
+          pgIn.value = DEMO_CMD.slice(0, i); i++;
+          demoTimer = setTimeout(tick, 30 + Math.random() * 48);
+        } else {
+          demoTimer = setTimeout(function () {
+            if (!demoRunning) return;
+            pgExec(DEMO_CMD); endDemo();
+          }, 420);
+        }
+      })();
+    }
+    if (pgDemoBtn) pgDemoBtn.addEventListener('click', pgRunDemo);
+    /* transcript download: honest text export of the current session */
+    var pgDlBtn = document.getElementById('pgDl');
+    if (pgDlBtn) pgDlBtn.addEventListener('click', function () {
+      var text = 'projdump playground transcript — SIMULATED output, not a real dump\n' +
+        'site: ' + location.href + '\n\n' + pgOut.innerText;
+      try {
+        var blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url; a.download = 'projdump-playground.txt';
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 800);
+      } catch (e) {}
+      showToast(I18N[lang]['cook.dled'] || 'Downloaded ✓');
+    });
+    function pgRecipeCmd(n) {
+      var card = document.querySelectorAll('#cookbook .recipe')[n - 1];
+      var pre = card && card.querySelector('.codeblock pre');
+      return pre ? pre.textContent.replace(/\\\n/g, ' ').replace(/\s+/g, ' ').trim() : '';
+    }
+    function pgShare(n) {
+      try {
+        var w = window.parent && window.parent !== window ? window.parent : window;
+        w.history.replaceState(null, '', w.location.pathname + '?recipe=R' + n);
+      } catch (e) {}
+    }
+    function pgShareUrl(n) {
+      try {
+        var w = window.parent && window.parent !== window ? window.parent : window;
+        return w.location.origin + w.location.pathname + '?recipe=R' + n;
+      } catch (e) { return location.origin + location.pathname + '?recipe=R' + n; }
+    }
+    function pgCopyLink(n, btn) {
+      var url = pgShareUrl(n);
+      (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(url) : Promise.reject())
+        .catch(function () {
+          var ta = document.createElement('textarea');
+          ta.value = url; document.body.appendChild(ta); ta.select();
+          try { document.execCommand('copy'); } catch (err) {}
+          ta.remove();
+        })
+        .finally(function () {
+          btn.classList.add('done'); btn.textContent = '✓';
+          showToast(I18N[lang]['link.copied'] || 'Recipe link copied ✓');
+          setTimeout(function () { btn.classList.remove('done'); btn.textContent = '🔗'; }, 1300);
+        });
+    }
+    function pgMountTry() {
+      document.querySelectorAll('#cookbook .recipe').forEach(function (card, i) {
+        var old = card.querySelector('.try-btn');
+        if (old) old.remove();
+        var oldS = card.querySelector('.share-btn');
+        if (oldS) oldS.remove();
+        var pre = card.querySelector('.codeblock pre');
+        var top = card.querySelector('.recipe-top');
+        if (!pre || !top) return;
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'try-btn';
+        b.textContent = '▶ ' + (I18N[lang]['pg.try'] || 'Try');
+        b.title = I18N[lang]['pg.trytitle'] || 'Run this command in the playground';
+        b.addEventListener('click', function () {
+          pgShare(i + 1);
+          document.getElementById('playground').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+          pgExec(pgRecipeCmd(i + 1));
+          pgIn.value = '';
+          pgIn.focus();
+        });
+        var s = document.createElement('button');
+        s.type = 'button';
+        s.className = 'share-btn';
+        s.textContent = '🔗';
+        s.setAttribute('aria-label', I18N[lang]['r.sharetitle'] || 'Copy a link that runs this recipe');
+        s.title = I18N[lang]['r.sharetitle'] || 'Copy a link that runs this recipe';
+        s.addEventListener('click', function () { pgCopyLink(i + 1, s); });
+        top.appendChild(b);
+        top.appendChild(s);
+      });
+    }
+    pgMountTry();
+    pgMountDemo();
+    /* bridge for palette rows + deep links */
+    PG_BRIDGE.ready = true;
+    PG_BRIDGE.exec = function (cmd) {
+      document.getElementById('playground').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+      pgExec(cmd);
+      pgIn.value = '';
+      pgIn.focus();
+    };
+    PG_BRIDGE.run = function (n) {
+      var card = document.querySelectorAll('#cookbook .recipe')[n - 1];
+      var cmd = pgRecipeCmd(n);
+      if (!card || !cmd) return;
+      pgShare(n);
+      card.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' });
+      card.classList.remove('flash-row'); void card.offsetWidth; card.classList.add('flash-row');
+      showToast((I18N[lang]['dl.run'] || 'Running {n} in the playground…').replace('{n}', 'R' + n));
+      setTimeout(function () {
+        document.getElementById('playground').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+        pgExec(cmd);
+        pgIn.value = '';
+        pgIn.focus();
+      }, reduced ? 320 : 980);
+    };
+    /* deep link: ?recipe=RX or #recipe=RX on the site url (or this file) auto-runs the recipe */
+    var dlSrc = '';
+    try {
+      if (window.parent && window.parent !== window) {
+        dlSrc = (window.parent.location.search || '') + (window.parent.location.hash || '');
+      }
+    } catch (e) {}
+    dlSrc += (location.search || '') + (location.hash || '');
+    var dlm = dlSrc.match(/[?&#]recipe=r?(\d)/i);
+    if (dlm) {
+      var dlN = Number(dlm[1]);
+      var dlCard = document.querySelectorAll('#cookbook .recipe')[dlN - 1];
+      if (dlCard) {
+        dlCard.classList.add('in', 'deeplink');
+        setTimeout(function () { dlCard.classList.remove('deeplink'); }, 3200);
+        PG_BRIDGE.run(dlN);
+      }
+    }
+    document.getElementById('langBtn').addEventListener('click', function () {
+      setTimeout(function () {
+        if (!PG_RAN) pgBanner();
+        pgMountTry(); stopDemo(); pgMountDemo();
+        var pd = document.getElementById('pgDl');
+        if (pd) pd.title = I18N[lang]['pg.dltitle'] || "Save this session's output as a text file";
+      }, 60);
+    });
+    pgBanner();
+  }
+
+  /* ─── boot ────────────────────────────────────────────────── */
+  /* keep inline flag chips unbreakable: word-joiner around hyphens
+     kills the soft-wrap opportunity after '-' while spaces stay breakable */
+  document.querySelectorAll('.feature code, .dbody code, .cl-card code').forEach(function (c) {
+    if (c.dataset.wj) return;
+    c.dataset.wj = '1';
+    c.textContent = c.textContent.replace(/-/g, '\u2060-\u2060');
+  });
+  applyLang();
+})();
+</script>
+</body>
+</html>

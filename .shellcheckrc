@@ -1,0 +1,7 @@
+shell=bash
+external-sources=true
+
+# SC1090/SC1091 — dynamic `source` of lib/*.sh cannot be resolved statically
+# SC2254 — glob expansion inside a `case` pattern is intentional (--exclude)
+disable=SC1090,SC1091,SC2254
+
