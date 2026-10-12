@@ -15,11 +15,15 @@ _projdump() {
     prev="${COMP_WORDS[COMP_CWORD-1]}"
   fi
 
-  local opts="-o --output -f --format -e --ext-only -x --exclude -i --include \
---since --sort --tokens-budget --max-size --no-tree --note --list --dry-run \
---stdout --copy --no-copy -v --verbose -q --quiet --version --help"
+  local opts="-o --output -f --format --split -e --ext-only -x --exclude \
+-i --include --since --sort --tokens-budget --model --list-models --max-size \
+--no-tree --tree-depth --note --git-log -j --jobs --config --no-config \
+--list --dry-run --stdout --copy --no-copy -v --verbose -q --quiet \
+--version --help"
   local exts="sh bash bats py js ts tsx go rs c cpp java rb php html css md json yml yaml toml sql xml"
   local sizes="10 50 100 200 500 1000 2000"
+  local models="gpt-4o gpt-4.1 o3 claude-sonnet claude-opus gemini-2.5-pro deepseek-v3 llama-3.1"
+  local splits="30k 60k 100k 200k 400k 1m"
 
   case "$prev" in
     -o|--output)
@@ -34,8 +38,20 @@ _projdump() {
     --max-size|--tokens-budget)
       mapfile -t COMPREPLY < <(compgen -W "$sizes" -- "$cur")
       return ;;
+    --model)
+      mapfile -t COMPREPLY < <(compgen -W "$models" -- "$cur")
+      return ;;
+    --split)
+      mapfile -t COMPREPLY < <(compgen -W "$splits" -- "$cur")
+      return ;;
     --sort)
       mapfile -t COMPREPLY < <(compgen -W "name size size-desc ext" -- "$cur")
+      return ;;
+    --tree-depth|--git-log|-j|--jobs)
+      mapfile -t COMPREPLY < <(compgen -W "1 2 3 5 10 20" -- "$cur")
+      return ;;
+    --config)
+      mapfile -t COMPREPLY < <(compgen -f -- "$cur")
       return ;;
     -x|--exclude|-i|--include)
       mapfile -t COMPREPLY < <(compgen -d -- "$cur")

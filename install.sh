@@ -12,7 +12,7 @@
 #      ./install.sh --help             show this help
 #
 #  What it does:
-#    * verifies projdump.sh and lib/*.sh (bash -n) before touching anything
+#    * verifies projdump.sh (bash -n) before touching anything
 #    * symlinks projdump.sh into $PREFIX/bin — a later `git pull` keeps the
 #      installation current, nothing is copied except completion files
 #    * appends the bin directory to PATH in ~/.bashrc / ~/.zshrc (only if
@@ -70,10 +70,6 @@ echo
 # ─── Verify ──────────────────────────────────────────────────────────────────
 [[ -f "$SCRIPT_DIR/projdump.sh" ]] || fail "projdump.sh not found in $SCRIPT_DIR"
 bash -n "$SCRIPT_DIR/projdump.sh" || fail "syntax error in projdump.sh"
-for lib in "$SCRIPT_DIR"/lib/*.sh; do
-  [[ -e "$lib" ]] || continue
-  bash -n "$lib" || fail "syntax error in ${lib##*/}"
-done
 
 # ─── Install ─────────────────────────────────────────────────────────────────
 mkdir -p "$BIN_DIR"

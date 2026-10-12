@@ -13,7 +13,7 @@ Markdown، XML یا JSON می‌ریزد تا مستقیم در **Claude**، **C
 [![CI](https://github.com/CheginiSoroush/projdump/actions/workflows/ci.yml/badge.svg)](https://github.com/CheginiSoroush/projdump/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![bash](https://img.shields.io/badge/bash-5.0%2B-4EAA25?logo=gnu-bash&logoColor=white)](https://www.gnu.org/software/bash/)
-[![tests](https://img.shields.io/badge/tests-84%20passing-2EA043)](test/)
+[![tests](https://img.shields.io/badge/tests-68%20passing-2EA043)](test/)
 [![shellcheck](https://img.shields.io/badge/shellcheck-clean-2EA043?logo=shell&logoColor=white)](.shellcheckrc)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Docs](https://img.shields.io/badge/docs-live%20site-34D399?logo=githubpages&logoColor=white)](https://cheginisoroush.github.io/projdump/)
@@ -45,29 +45,36 @@ Markdown، XML یا JSON می‌ریزد تا مستقیم در **Claude**، **C
 - در **یک فایل** به اندازهٔ **بودجهٔ توکن** شما، در قالبی که مدل‌تان دوست دارد؛
 - تولیدشده **۱۰۰٪ لوکال** — کد شما هرگز به سرور کسی نمی‌رود.
 
-هیچ وابستگی‌ای فراتر از `bash`، `find` و `git` ندارد. ابزارهای `file`، `tree`، `jq` و
-`python3` اگر نصب باشند استفاده و در نبودشان بی‌صدا رد می‌شوند.
+هیچ وابستگی‌ای فراتر از `bash 5+`، `find` و `git` ندارد. `python3` (اسکنر دسته‌ای) و
+`jq` (کوت‌کردن سریع‌تر JSON) اگر نصب باشند استفاده و در نبودشان بی‌صدا رد می‌شوند.
+**نسخهٔ ۲ بین ۷ تا ۲۵ برابر سریع‌تر است** — به‌جای فراخوانی ~۶ فرایند کمکی برای هر
+فایل، یک فرایند python3 کل درخت را در یک گذر اسکن می‌کند.
 
 ## ✨ امکانات
 
-- 🌳 درخت دایرکتوری — اگر `tree(1)` نصب باشد از آن، وگرنه از رندرکنندهٔ داخلی
+- ⚡ **اسکنر دسته‌ای v2** — یک گذر python3 برای کل درخت (بدون فراخوانی به ازای هر فایل)، ۷ تا ۲۵ برابر سریع‌تر روی مخازن بزرگ
+- 🌳 رندرکنندهٔ درخت دایرکتوری داخلی — بدون نیاز به `tree(1)`، همراه با `--tree-depth N`
 - 🎨 تگ زبان برای بیش از ۱۲۰ پسوند فایل (هایلایت Markdown / XML)
 - 🧩 `--ext-only sh,py` و `--exclude` و **`--include`** — هر دو قابل تکرار
 - 📏 `--max-size` با مقایسهٔ دقیق در سطح بایت
 - 🚫 تشخیص فایل باینری با مسیر سریع پسوندی (بدون فراخوانی `file(1)` برای رسانه‌ها)
 - 🎯 سه قالب: **Markdown**، **XML** (بلوک‌های `<file>` مناسب Claude)، **JSON**
-- 🔍 اجرای خشک با `--list` — دقیقاً ببینید چه چیزی دامپ می‌شد
 - ✂️ `--since REF` — فقط تغییرات بعد از یک رفرنس گیت را دامپ کن
-- 💰 `--tokens-budget N` — با رسیدن تخمین توکن به بودجه، افزودن فایل متوقف می‌شود
+- 💰 `--tokens-budget N` **یا `--model NAME`** — جا شدن در پنجرهٔ کانتکست (پیش‌تنظیم برای gpt-4o، claude-sonnet، gemini-2.5-pro، …)
+- 📚 `--split 60k` — تقسیم دامپ به بخش‌هایی به اندازهٔ چت‌های طولانی
+- ⚖️ **تخمین وزنی توکن** — به تفکیک کلاس زبان، نه تقسیم مسطح بر ۳٫۵
+- ⚙️ فایل تنظیمات `.projdumprc` برای پیش‌فرض‌های همیشگی شما (`--config`، `--no-config`)
+- 📜 `--git-log N` — افزودن N کامیت آخر به دامپ
 - 🔀 `--sort name|size|size-desc|ext` — کنترل ترتیب فایل‌ها
 - 📝 `--note` — درج بلوک «یادداشت برای هوش مصنوعی» در ابتدای خروجی
 - 🗂️ تفکیک زبان‌ها + جدول بزرگ‌ترین فایل‌ها در خلاصه
 - 🌿 فرادادهٔ گیت در هدر (`main @ a1b2c3d (dirty)`)
 - 📋 کپی خودکار در کلیپ‌بورد (`pbcopy` / `wl-copy` / `clip.exe` / `putclip` / `xclip` / `xsel`)
-- 📊 خلاصه با تعداد فایل، خط، حجم و تخمین تقریبی توکن
+- 📊 خلاصه با تعداد فایل، خط، حجم و تخمین (وزنی) توکن
 - 🛡️ فنس امن و escape صحیح CDATA — دامپ هرگز خودش را خراب نمی‌کند
-- ⚡ در مخازن گیت از `git ls-files` استفاده می‌کند؛ پس `.gitignore` رعایت می‌شود
+- ⚡ در مخازن گیت از `git ls-files` استفاده می‌کند؛ پس `.gitignore` رعایت می‌شود — بیرون مخازن هم به‌صورت best-effort رعایت می‌شود
 - 🩺 `--verbose` — دلیل ردشدن هر فایل را دقیق توضیح می‌دهد
+- 🔍 اجرای خشک با `--list` — دقیقاً ببینید چه چیزی دامپ می‌شد
 - 🌐 [سایت مستندات دوزبانه](https://cheginisoroush.github.io/projdump/) — سازندهٔ تعاملی دستور، جست‌وجوی ⌘/Ctrl+K (۴۹ نتیجه شامل همهٔ فلگ‌ها، دستورکارها و پیش‌تنظیم‌ها)، کتاب دستورکارهای آمادهٔ کپی (با دکمه‌های *کپی همه* و *دانلود ‎.sh*، دکمهٔ 🔗 کپی لینک برای هر دستورکار و لینک‌های عمیق ‎`?recipe=RX`‎ / ‎`#recipe=RX`‎ که دستورکار را هنگام باز شدن خودکار اجرا می‌کنند)، **زمین بازی با ترمینال شبیه‌سازی‌شده** (CLI را همین‌جا در مرورگر امتحان کنید، بدون نصب — **▶ نمایش** برای اجرای دست‌آزاد یا **⬇ گزارش** برای ذخیرهٔ نشست)، برگهٔ میان‌برهای صفحه‌کلید با ‎`?`‎، دانلود برگهٔ تقلب و ابزار تخمین توکن (انگلیسی + فارسی، تم تاریک/روشن)
 
 ## 🚀 شروع سریع
@@ -92,12 +99,15 @@ exec $SHELL          # یا: source ~/.bashrc
 cd ~/my-project
 
 projdump                              # → my-project_dump.md
+projdump --model claude-sonnet        # جا شدن در کانتکست ۲۰۰k
+projdump --split 60k                  # بخش‌های تکه‌ای برای چت‌های طولانی
 projdump -o out.md                    # نام دلخواه خروجی
 projdump --no-tree                    # بدون درخت دایرکتوری
+projdump --tree-depth 2               # درخت فشرده
 projdump -e sh,bats                   # فقط فایل‌های شل
 projdump -x 'test/*' -x '*.min.js'    # ردکردن مسیرها (قابل تکرار)
 projdump -i 'src/*' -i 'docs/*'       # فقط این مسیرها
-projdump --since HEAD~5               # فقط تغییرات اخیر
+projdump --since HEAD~5 --git-log 10  # تغییرات اخیر + تاریخچه
 projdump --tokens-budget 60000        # جا شدن در پنجرهٔ کانتکست
 projdump --sort size-desc             # بزرگ‌ترین فایل‌ها اول
 projdump --list                       # پیش‌نمایش فهرست فایل‌ها
@@ -123,15 +133,23 @@ projdump -q                           # بی‌صدا: بدون خط خلاصه
 |---|---|
 | `[output]`، `-o, --output FILE` | فایل خروجی (پیش‌فرض: `<project>_dump.<ext>`) |
 | `-f, --format md\|xml\|json` | قالب خروجی (پیش‌فرض `md`) |
+| `--split N[k\|m]` | نوشتن چند بخش، هر کدام ≤ N توکن (مثلاً `--split 60k`) |
 | `-e, --ext-only sh,md` | فقط این پسوندها (بی‌توجه به بزرگی/کوچکی حروف) |
 | `-x, --exclude GLOB` | ردکردن مسیرهای منطبق، قابل تکرار |
 | `-i, --include GLOB` | فقط مسیرهای منطبق، قابل تکرار |
 | `--since REF` | فقط فایل‌های تغییرکرده از یک رفرنس گیت (+ فایل‌های untracked) |
 | `--sort KEY` | `name` (پیش‌فرض)، `size`، `size-desc`، `ext` |
 | `--tokens-budget N` | توقف افزودن فایل پس از رسیدن به ~N توکن |
+| `--model NAME` | بودجهٔ پیش‌تنظیم برای یک مدل (ببینید: `--list-models`) |
+| `--list-models` | نمایش پیش‌تنظیم‌های موجود و خروج |
 | `--max-size N` | ردکردن فایل‌های بزرگ‌تر از N کیلوبایت (پیش‌فرض `500`) |
 | `--no-tree` | عدم درج درخت دایرکتوری |
+| `--tree-depth N` | محدودکردن عمق درخت (پیش‌فرض: نامحدود) |
 | `--note TEXT` | افزودن بلوک «یادداشت برای هوش مصنوعی» در ابتدای خروجی |
+| `--git-log N` | درج N کامیت آخر در دامپ |
+| `-j, --jobs N` | workerهای موازی برای probing بازگشتی (پیش‌فرض: خودکار) |
+| `--config FILE` | استفاده از این فایل تنظیمات (پیش‌فرض: `.projdumprc`، سپس XDG) |
+| `--no-config` | نادیده‌گرفتن همهٔ فایل‌های تنظیمات |
 | `--list` | اجرای خشک: چاپ فهرست و خروج |
 | `--stdout` | نوشتن به stdout به‌جای فایل |
 | `--copy` / `--no-copy` | اجبار / غیرفعال‌سازی کپی در کلیپ‌بورد |
@@ -173,7 +191,7 @@ print("hello")
 |---:|---:|---:|
 | 1 | 1 | 19B |
 
-> Roughly 5 tokens (bytes ÷ 3.5)
+> Roughly 5 tokens (weighted per language)
 
 ### 🗂️ Languages
 
@@ -185,7 +203,7 @@ print("hello")
 **XML** — بلوک‌های `<file>` مناسب Claude همراه با CDATA:
 
 ```xml
-<project name="my-project" path="/home/you/my-project" generated="2026-10-08T12:00:00Z" tool="projdump v1.1.0" git="main @ a1b2c3d (clean)">
+<project name="my-project" path="/home/you/my-project" generated="2026-10-08T12:00:00Z" tool="projdump v2.0.0" git="main @ a1b2c3d (clean)">
   <file path="src/main.py" lang="python" lines="1" bytes="19">
     <![CDATA[
 print("hello")
@@ -205,6 +223,22 @@ print("hello")
 
 </details>
 
+## ⚡ نسخهٔ ۲ — نسخهٔ سریع
+
+نسخهٔ ۱ برای هر فایل ~۶ فرایند کمکی اجرا می‌کرد (~۴۰ ثانیه برای مخزنی با ۲۰۰۰ فایل).
+نسخهٔ ۲ همه را دسته‌ای انجام می‌دهد: **یک فرایند python3** همهٔ فایل‌ها را (حجم، خط،
+تشخیص باینری، بک‌تیک، CDATA) در یک گذر اسکن می‌کند، درخت با bash خالص رندر می‌شود و
+تگ‌های زبان کش می‌شوند — هیچ فراخوانی به ازای فایل:
+
+| دامپ ۲۰۰۰ فایل | v1.1.0 | v2.0.0 | سرعت |
+|---|---:|---:|---:|
+| `--format md`   | 40.6 s | 5.5 s | **7.3×** |
+| `--format xml`  | 40.6 s | 2.4 s | **17×** |
+| `--format json` | 40.6 s | 1.6 s | **25×** |
+
+بدون python3، نسخهٔ ۲ به یک دستهٔ GNU `stat` و سپس به probing تک‌فایلی شبیه v1 عقب‌نشینی
+می‌کند — همه‌جا درست کار می‌کند (از جمله BSD/macOS؛ بدون `sort -z` یا `numfmt` مخصوص GNU).
+
 ## ⚠️ نکته دربارهٔ فایل‌های خروجی
 
 فایلی که در حال نوشته‌شدن است همیشه کنار گذاشته می‌شود (حتی در زیرپوشه‌ها) و
@@ -216,11 +250,12 @@ print("hello")
 
 ```bash
 git clone --depth 1 https://github.com/bats-core/bats-core.git
-bats-core/bin/bats test/          # لازم است: file (اختیاری: tree، jq، shellcheck)
+bats-core/bin/bats test/          # اختیاری: jq، shellcheck
 ```
 
-**۸۴ تست کاربردی** هر سه قالب، نام‌های فایل متخاصم (گیومه، خط جدید، بک‌تیک، `<>&`)،
-حالت مرزی escaping در بش ۵٫۲ و دقت بایتیِ همهٔ فیلترها را پوشش می‌دهد.
+**۶۸ تست کاربردی** هر سه قالب، نام‌های فایل متخاصم (گیومه، خط جدید، بک‌تیک، `<>&`)،
+فایل تنظیمات، پیش‌تنظیم مدل‌ها، بخش‌های `--split`، توکن‌های وزنی و دقت بایتیِ همهٔ
+فیلترها را پوشش می‌دهد.
 
 ## 🤝 مشارکت
 

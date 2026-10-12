@@ -14,7 +14,7 @@ bats-core/bin/bats test/
 
 # linter (Linux)
 sudo apt install shellcheck          # or: pip install shellcheck-py
-shellcheck -x projdump.sh install.sh uninstall.sh lib/*.sh completions/projdump
+shellcheck -x projdump.sh install.sh uninstall.sh completions/projdump
 ```
 
 ## Before you open a PR

@@ -9,6 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+## [2.0.0] - 2026-10-12 — THE FAST ONE
+
+### ⚡ Performance (the headline)
+
+- **Batch scanner: 7–25× faster dumps on large repos.** v1 forked ~6 helper processes per file (~40 s for a 2000-file repository); v2 batches everything:
+  - **ONE python3 process** scans every file (size, lines, binary probe, backtick fences, CDATA markers — and JSON-encoded content in json mode) over a NUL-delimited, sentinel-verified stream
+  - without python3: one GNU `stat(1)` batch, then lazy per-file probes as a last resort (v1 behaviour)
+  - **pure-bash tree renderer** — `tree(1)` is no longer a dependency, and `--tree-depth N` is supported
+  - pure-bash `human_size` (numfmt-exact) and cached language tags — **zero subshells per file**
+- Benchmarks (2000-file repo, linux): md 40.6 s → 5.5 s (7.3×), xml → 2.4 s (17×), json → 1.6 s (25×); the scanner alone takes 0.07 s
+
+### Added
+
+- `.projdumprc` config file — sourced for defaults; lookup order `--config FILE` → `./.projdumprc` → `$XDG_CONFIG_HOME/projdump/config`; `--no-config` skips all
+- `--split N[k|m]` — write the dump in parts of ≤ N estimated tokens (`<stem>_dump.part1.md`, `part2.md`, …) for long chats
+- `--model NAME` / `--list-models` — preset token budgets at ~90 % of a model's context (gpt-4o, gpt-4.1, o3, claude-sonnet, claude-opus, gemini-2.5-pro, deepseek-v3, llama-3.1)
+- `--tree-depth N` — limit the directory tree depth (`…` marks truncated levels)
+- `--git-log N` — include the last N commits (📜 Recent commits) in the dump
+- `-j, --jobs N` — parallel workers for fallback probing (default: nproc, capped at 8)
+- **Weighted token estimates** — tokens are now estimated per class (minified ≈ 23, data ≈ 32, code ≈ 35, prose ≈ 40 bytes per token) instead of a flat ÷ 3.5, so the budget bar matches reality much closer
+- Best-effort `.gitignore` respect **outside** git repositories (comments, `!` negation, trailing `/` dir prefixes, anchored `/` patterns, globs)
+- SVG files are now included as text (they usually are)
 - Documentation website (`docs/`) — bilingual English/فارسی with full RTL support, dark/light theme, animated terminal demo, interactive **command builder**, searchable options reference, GitHub Pages deployment guide and FAQ. Ships as a finished static site (no build step) so GitHub Pages can serve it straight from `/docs`
 - Docs site: **⌘/Ctrl+K search palette** — fuzzy-free instant search across all sections, every CLI flag (searching English *and* Persian descriptions) and the FAQ; full keyboard navigation (↑/↓/↵/esc, `/` shortcut), bilingual labels, ARIA combobox semantics, jumping to a flag scrolls to its table row and flashes it
 - Docs site: **reading-progress bar** under the nav (rAF-throttled, RTL-aware gradient) and **copy-anchor `#` buttons** on every section heading (copies a shareable URL, updates the hash)
@@ -35,8 +57,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Man-page-style header documentation for every shell script (synopsis, design rules, exit codes, environment, examples)
 - `install.sh --prefix=DIR` form, matching the existing `uninstall.sh` behaviour
 
+### Changed
+
+- **Single file**: `lib/common.sh` + `lib/lang.sh` are merged into `projump.sh` — no more `lib/` to install or keep in sync
+- The directory tree is rendered by the built-in renderer (dirs first, case-insensitive alphabetical) instead of `tree(1)` where available
+- Markdown header no longer prints `**Host:**`; `**Path:**` shows `local-project` for non-git folders
+- Zero hard dependencies beyond **bash 5.0+** and `find`/`git`; all optional helpers (python3, jq) are detected and skipped gracefully — portable to BSD/macOS (no `sort -z`, no `numfmt`, BSD `stat` supported)
+
 ### Fixed
 
+- CI now actually passes: the test suite is committed (`test/`, 4 bats files), the macOS smoke job installs bash 5 (stock `/bin/bash` is 3.2) and no longer trips on GNU-only `sort -z`
+- Release workflow: the source tarball is written outside the tree — `tar` no longer fails with "file changed as we read it"
 - Docs site: left-to-right mark characters (U+200E) had leaked into inline `style` attributes, silently invalidating `var(--bg-soft)` / `var(--border)` and stripping the alternating background from the Install, Formats, Deploy and Compare sections; attributes are now clean while Persian text keeps its bidi marks
 - `install.sh --help` printed the script's own `set -euo pipefail` line at the end of the help text; the help range now matches the header block exactly. `uninstall.sh --help` now prints the full usage header instead of a single line
 - Docs site: the nav links and the search-trigger `Ctrl K` hint could wrap onto two lines once the Recipes link and version pill joined the nav — links and kbd chips are now `white-space:nowrap` and the hamburger/mobile menu takes over below 1120px
