@@ -98,10 +98,18 @@ case ":$PATH:" in
 esac
 
 # ─── Completions ─────────────────────────────────────────────────────────────
-if [[ -f "$SCRIPT_DIR/completions/projdump" ]]; then
-  mkdir -p "$BASH_COMP_DIR" "$ZSH_COMP_DIR"
-  cp -f "$SCRIPT_DIR/completions/projdump" "$BASH_COMP_DIR/projdump"
-  cp -f "$SCRIPT_DIR/completions/projdump" "$ZSH_COMP_DIR/_projdump"
+comp_installed=0
+if [[ -f "$SCRIPT_DIR/completions/projdump.bash" ]]; then
+  mkdir -p "$BASH_COMP_DIR"
+  cp -f "$SCRIPT_DIR/completions/projdump.bash" "$BASH_COMP_DIR/projdump"
+  comp_installed=1
+fi
+if [[ -f "$SCRIPT_DIR/completions/_projdump" ]]; then
+  mkdir -p "$ZSH_COMP_DIR"
+  cp -f "$SCRIPT_DIR/completions/_projdump" "$ZSH_COMP_DIR/_projdump"
+  comp_installed=1
+fi
+if (( comp_installed )); then
   say "Bash + zsh completions installed"
 fi
 

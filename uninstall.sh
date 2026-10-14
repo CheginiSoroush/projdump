@@ -31,7 +31,14 @@ while [[ $# -gt 0 ]]; do
         exit 1
       fi
       PREFIX="$2"; shift 2 ;;
-    --prefix=*) PREFIX="${1#*=}"; shift ;;
+    --prefix=*)
+      # FIX (2.0.1): `--prefix=` (empty value) used to resolve to /bin and
+      # /share silently; the space form already rejected it, mirror that.
+      if [[ -z "${1#--prefix=}" ]]; then
+        echo "uninstall.sh: --prefix needs a directory" >&2
+        exit 1
+      fi
+      PREFIX="${1#*=}"; shift ;;
     -h|--help)
       # Print the header comment block above (lines 2..18) as the help text.
       sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//'
