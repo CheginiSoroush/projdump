@@ -12,7 +12,7 @@ ready to paste into **Claude**, **ChatGPT**, **DeepSeek**, **Gemini** or any LLM
 [![CI](https://github.com/CheginiSoroush/projdump/actions/workflows/ci.yml/badge.svg)](https://github.com/CheginiSoroush/projdump/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![bash](https://img.shields.io/badge/bash-5.0%2B-4EAA25?logo=gnu-bash&logoColor=white)](https://www.gnu.org/software/bash/)
-[![tests](https://img.shields.io/badge/tests-68%20passing-2EA043)](test/)
+[![tests](https://img.shields.io/badge/tests-71%20passing-2EA043)](test/)
 [![shellcheck](https://img.shields.io/badge/shellcheck-clean-2EA043?logo=shell&logoColor=white)](.shellcheckrc)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Docs](https://img.shields.io/badge/docs-live%20site-34D399?logo=githubpages&logoColor=white)](https://cheginisoroush.github.io/projdump/)
@@ -27,7 +27,7 @@ ready to paste into **Claude**, **ChatGPT**, **DeepSeek**, **Gemini** or any LLM
 > [!TIP]
 > 🌐 **Interactive documentation & command builder:** [cheginisoroush.github.io/projdump](https://cheginisoroush.github.io/projdump/)
 >
-> انتشار صفر تا صد و جذب بازدید: [docs/GOING-LIVE.md](docs/GOING-LIVE.md)
+> Zero-to-live launch & promotion checklist: [docs/GOING-LIVE.md](docs/GOING-LIVE.md)
 
 ## 🎬 See it in action
 
@@ -62,7 +62,7 @@ tree in a single pass instead of forking ~6 helpers per file.
 - 💰 `--tokens-budget N` **or `--model NAME`** — fit a context window (presets for gpt-4o, claude-sonnet, gemini-2.5-pro, …)
 - 📚 `--split 60k` — chunk the dump into parts sized for long chats
 - ⚖️ **Weighted token estimates** — per language class, not a flat ÷ 3.5
-- ⚙️ `.projdumprc` config file for your usual defaults (`--config`, `--no-config`)
+- ⚙️ Config file for your usual defaults — auto-loaded from XDG; project-local files only via `--config` (never auto-sourced, so untrusted projects can't run code)
 - 📜 `--git-log N` — append the last N commits to the dump
 - 🔀 `--sort name|size|size-desc|ext` — control the file order
 - 📝 `--note` — inject a "note for the AI" block at the top of the dump
@@ -74,7 +74,7 @@ tree in a single pass instead of forking ~6 helpers per file.
 - ⚡ Uses `git ls-files` in repos, so `.gitignore` is respected; best-effort `.gitignore` handling outside repos too
 - 🩺 `--verbose` — explains exactly why each file was skipped
 - 🔍 `--list` dry run — preview exactly what would be dumped
-- 🌐 [Bilingual docs site](https://cheginisoroush.github.io/projdump/) — interactive command builder, ⌘/Ctrl+K search (49 entries incl. every flag, recipe and playground preset), a cookbook of copy-paste recipes (with *Copy all* / *Download .sh* one-clicks, per-recipe 🔗 copy-link buttons and shareable `?recipe=RX` / `#recipe=RX` deep links that auto-run the recipe on load), a **simulated terminal playground** (try the CLI in your browser, nothing to install — hit **▶ demo** for a hands-free run or **⬇ transcript** to save the session), a `?` keyboard-shortcuts cheat sheet, a downloadable cheat sheet, and a token-estimator widget (English + فارسی, dark/light)
+- 🌐 [Bilingual docs site](https://cheginisoroush.github.io/projdump/) — interactive command builder, ⌘/Ctrl+K search (58 entries incl. every flag, recipe and playground preset), a cookbook of copy-paste recipes (with *Copy all* / *Download .sh* one-clicks, per-recipe 🔗 copy-link buttons and shareable `?recipe=RX` / `#recipe=RX` deep links that auto-run the recipe on load), a **simulated terminal playground** (try the CLI in your browser, nothing to install — hit **▶ demo** for a hands-free run or **⬇ transcript** to save the session), a `?` keyboard-shortcuts cheat sheet, a downloadable cheat sheet, and a token-estimator widget (English + فارسی, dark/light)
 
 ## 🚀 Quick start
 
@@ -147,7 +147,7 @@ projdump -q                           # quiet: no summary line
 | `--note TEXT` | Add a "note for the AI" block at the top |
 | `--git-log N` | Include the last N commits in the dump |
 | `-j, --jobs N` | Parallel workers for fallback probing (default: auto) |
-| `--config FILE` | Use this config file (default: `.projdumprc`, then XDG) |
+| `--config FILE` | Use this config file (default: XDG config; project-local `.projdumprc` is never auto-sourced) |
 | `--no-config` | Ignore all config files |
 | `--list` | Dry run: print what would be dumped, then exit |
 | `--stdout` | Write to stdout instead of a file |
@@ -253,7 +253,7 @@ git clone --depth 1 https://github.com/bats-core/bats-core.git
 bats-core/bin/bats test/          # optional: jq, shellcheck
 ```
 
-**68 functional tests** cover all three formats, adversarial filenames (quotes, newlines,
+**71 functional tests** cover all three formats, adversarial filenames (quotes, newlines,
 backticks, `<>&`), the config file, model presets, `--split` parts, weighted tokens
 and byte-level precision of every filter.
 

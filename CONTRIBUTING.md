@@ -14,7 +14,7 @@ bats-core/bin/bats test/
 
 # linter (Linux)
 sudo apt install shellcheck          # or: pip install shellcheck-py
-shellcheck -x projdump.sh install.sh uninstall.sh completions/projdump
+shellcheck -x projdump.sh install.sh uninstall.sh completions/projdump.bash
 ```
 
 ## Before you open a PR
@@ -22,7 +22,9 @@ shellcheck -x projdump.sh install.sh uninstall.sh completions/projdump
 1. `shellcheck -x` is clean (CI enforces it, `severity: warning`)
 2. `bats test/` passes
 3. `./projdump.sh --stdout` still works on this repo itself
-4. New flags are documented in `README.md`, `README.fa.md`, `usage()` and `completions/projdump`
+4. New flags are documented in `README.md`, `README.fa.md`, `usage()`,
+   `completions/projdump.bash`, `completions/_projdump` **and** the options table in
+   `docs/index.html` (the site's search palette and cheat sheet are generated from it)
 5. Anything user-visible gets a line in `CHANGELOG.md` under `[Unreleased]`
 
 ## Style guide
@@ -58,7 +60,8 @@ Example: `feat: add --exclude glob filter`
 - [x] `--include` as the inverse of `--exclude` (v1.1.0)
 - [x] `--tokens-budget N` — stop adding files once N tokens are reached (v1.1.0)
 - [x] `--diff` — dump only files changed since a git ref (shipped as `--since REF`, v1.1.0)
+- [x] config file — shipped in v2.0.0 (XDG + `.projdumprc`); since v2.0.1 project-local
+  configs are opt-in via `--config` for security (never sourced from untrusted projects)
 - [ ] `--zip` — write a `.zip` instead of a single file
 - [ ] `--format html` — self-contained HTML view with a collapsible file tree
-- [ ] `.projdumprc` — project-local defaults (excludes, budget, sort)
 - [ ] `--stdin` mode — read a file list from stdin instead of scanning

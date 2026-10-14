@@ -43,7 +43,7 @@
   "license": "https://opensource.org/licenses/MIT",
   "url": "https://cheginisoroush.github.io/projdump/",
   "description": "Dump an entire project into a single Markdown, XML or JSON file, ready to paste into AI chatbots.",
-  "softwareVersion": "1.1.0"
+  "softwareVersion": "2.0.1"
 }
 </script>
 <style>
@@ -344,8 +344,8 @@ html[dir="rtl"] .toast.show{transform:translateX(50%) translateY(0)}
 /* ─── token estimator ────────────────────────────────────────── */
 .est{display:grid;grid-template-columns:300px 1fr;gap:24px;margin-top:20px;padding:24px;border:1px solid var(--border-strong);border-radius:var(--radius);background:linear-gradient(135deg,var(--accent-dim),transparent 55%),var(--surface)}
 .est label{display:block;font-size:.8rem;font-weight:700;color:var(--muted);margin-bottom:6px}
-.est input{width:100%;padding:10px 12px;border-radius:9px;border:1px solid var(--border-strong);background:var(--bg-soft);color:var(--text);font-family:var(--font-mono);font-size:.95rem}
-.est input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.est input,.est select{width:100%;padding:10px 12px;border-radius:9px;border:1px solid var(--border-strong);background:var(--bg-soft);color:var(--text);font-family:var(--font-mono);font-size:.95rem}
+.est input:focus,.est select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
 .est .hint{color:var(--faint);font-size:.8rem;margin-top:10px}
 .est-out{display:flex;flex-direction:column;gap:14px;justify-content:center}
 .est-tokens{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
@@ -607,7 +607,7 @@ html[dir="rtl"] .kbd-row{flex-direction:row}
       <a href="#faq" data-i18n="nav.faq">FAQ</a>
     </nav>
     <div class="nav-actions">
-      <a class="ver-pill" href="#changelog" title="Version — see what's new">v1.1.0</a>
+      <a class="ver-pill" href="#changelog" title="Version — see what's new">v2.0.1</a>
       <button id="searchBtn" class="search-trigger" aria-label="Search (Ctrl+K)" aria-haspopup="dialog">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
         <span class="st-label" data-i18n="search.open">Search</span>
@@ -642,7 +642,7 @@ html[dir="rtl"] .kbd-row{flex-direction:row}
   <div class="container">
     <div class="hero-grid">
       <div>
-        <span class="kicker"><span class="pulse"></span><span data-i18n="hero.kicker">v1.1.0 · pure bash · MIT</span></span>
+        <span class="kicker"><span class="pulse"></span><span data-i18n="hero.kicker">v2.0.1 · pure bash · MIT</span></span>
         <h1 id="heroTitle"><span data-i18n="hero.title1">Your whole codebase.</span><br><span class="grad" data-i18n="hero.title2">One file. AI-ready.</span></h1>
         <p class="lead" data-i18n="hero.lead">projdump packs any project — directory tree, sources, stats — into a single Markdown, XML or JSON file that drops straight into Claude, ChatGPT, DeepSeek or Gemini. No dependencies. One command.</p>
         <div class="hero-ctas">
@@ -664,7 +664,7 @@ html[dir="rtl"] .kbd-row{flex-direction:row}
       </div>
     </div>
     <div class="stats reveal" id="stats">
-      <div class="stat"><b data-count="84">84</b><span data-i18n="stats.tests">tests, all green</span></div>
+      <div class="stat"><b data-count="71">71</b><span data-i18n="stats.tests">tests, all green</span></div>
       <div class="stat"><b data-count="120" data-suffix="+">120+</b><span data-i18n="stats.langs">languages tagged</span></div>
       <div class="stat"><b data-count="3">3</b><span data-i18n="stats.formats">output formats</span></div>
       <div class="stat"><b data-count="0">0</b><span data-i18n="stats.deps">hard dependencies</span></div>
@@ -678,7 +678,7 @@ html[dir="rtl"] .kbd-row{flex-direction:row}
     <div class="section-head reveal">
       <span class="tag" data-i18n="pipeline.tag">Workflow</span>
       <h2 id="pipelineTitle" data-i18n="pipeline.title">From folder to context in four moves</h2>
-      <p data-i18n="pipeline.sub">No daemons, no config files, no network — one clean pipeline, start to finish.</p>
+      <p data-i18n="pipeline.sub">No daemons, no network — one clean pipeline, start to finish.</p>
     </div>
     <div class="pipe-wrap reveal">
       <div class="flow">
@@ -717,10 +717,10 @@ html[dir="rtl"] .kbd-row{flex-direction:row}
     <div class="section-head reveal">
       <span class="tag" data-i18n="features.tag">Features</span>
       <h2 id="featuresTitle" data-i18n="features.title">Everything you need to brief an AI</h2>
-      <p data-i18n="features.sub">One binary-free script, obsessively polished: 10+ bugs squashed, 84 tests, shellcheck-clean.</p>
+      <p data-i18n="features.sub">One binary-free script, obsessively polished: 10+ bugs squashed, 71 tests, shellcheck-clean.</p>
     </div>
     <div class="features">
-      <div class="feature reveal"><div class="f-icon">🌳</div><h3 data-i18n="f1.t">Directory tree</h3><p data-i18n="f1.d">Uses tree(1) when installed, falls back to a built-in renderer so the AI always sees the project layout.</p></div>
+      <div class="feature reveal"><div class="f-icon">🌳</div><h3 data-i18n="f1.t">Directory tree</h3><p data-i18n="f1.d">Drawn by a built-in pure-bash renderer — no tree(1) dependency — with --tree-depth support, so the AI always sees the project layout.</p></div>
       <div class="feature reveal"><div class="f-icon">🎨</div><h3 data-i18n="f2.t">120+ language tags</h3><p data-i18n="f2.d">Every fenced block gets the right language tag, so Markdown and XML dumps render with proper highlighting.</p></div>
       <div class="feature reveal"><div class="f-icon">🧩</div><h3 data-i18n="f3.t">Precision filters</h3><p><code>‎--ext-only</code> <code>‎--exclude</code> <code>‎--include</code> — <span data-i18n="f3.d">repeatable globs, byte-accurate ‎--max-size, .gitignore respected in git repos.</span></p></div>
       <div class="feature reveal"><div class="f-icon">✂️</div><h3 data-i18n="f4.t">Dump only what changed</h3><p><code>‎--since HEAD~5</code> — <span data-i18n="f4.d">diff-driven file list plus untracked files, validated up-front.</span></p></div>
@@ -742,7 +742,7 @@ html[dir="rtl"] .kbd-row{flex-direction:row}
     <div class="section-head reveal">
       <span class="tag" data-i18n="install.tag">Install</span>
       <h2 id="installTitle" data-i18n="install.title">Up and running in 30 seconds</h2>
-      <p data-i18n="install.sub">Requires bash 5.0+. Optional helpers picked up automatically: tree, jq, python3, file.</p>
+      <p data-i18n="install.sub">Requires bash 5.0+. Optional helpers picked up automatically when present: python3 (fast batch scanner) and jq (faster JSON quoting) — skipped gracefully if missing.</p>
     </div>
     <div class="install-grid">
       <div class="step-card reveal">
@@ -836,7 +836,14 @@ projdump
       <div class="est-in">
         <label for="estKb" data-i18n="est.kb">Total project size (KB)</label>
         <input type="number" id="estKb" min="0" step="any" placeholder="1500" inputmode="decimal">
-        <p class="hint" data-i18n="est.hint">Estimate = bytes ÷ 3.5 — the same heuristic projdump prints in its summary.</p>
+        <label for="estClass" data-i18n="est.class" style="margin-top:12px">Content class</label>
+        <select id="estClass">
+          <option value="35" data-i18n="est.c_code" selected>Code (default)</option>
+          <option value="23" data-i18n="est.c_min">Minified</option>
+          <option value="32" data-i18n="est.c_data">Data (JSON/CSV)</option>
+          <option value="40" data-i18n="est.c_prose">Prose (Markdown/text)</option>
+        </select>
+        <p class="hint" data-i18n="est.hint">Weighted estimate — minified ≈ 23, data ≈ 32, code ≈ 35, prose ≈ 40 bytes/token. The same heuristic projdump prints in its summary.</p>
       </div>
       <div class="est-out">
         <div class="est-tokens"><span data-i18n="est.tokens">≈ estimated tokens</span><b id="estTokens">—</b></div>
@@ -925,10 +932,10 @@ projdump
 |---:|---:|---:|
 | 128 | 4213 | 96.4KB |
 
-<span class="tok-c">&gt; Roughly 1,204 tokens (bytes ÷ 3.5)</span></pre></div>
+<span class="tok-c">&gt; Roughly 1,204 tokens (weighted per language)</span></pre></div>
     </div>
     <div class="tab-pane" id="pane-xml" role="tabpanel">
-      <div class="codeblock"><button class="copy" aria-label="Copy">⧉</button><pre><span class="tok-k">&lt;project</span> <span class="tok-f">name</span>=<span class="tok-s">"my-project"</span> <span class="tok-f">tool</span>=<span class="tok-s">"projdump v1.1.0"</span> <span class="tok-f">git</span>=<span class="tok-s">"main @ a1b2c3d (clean)"</span><span class="tok-k">&gt;</span>
+      <div class="codeblock"><button class="copy" aria-label="Copy">⧉</button><pre><span class="tok-k">&lt;project</span> <span class="tok-f">name</span>=<span class="tok-s">"my-project"</span> <span class="tok-f">tool</span>=<span class="tok-s">"projdump v2.0.1"</span> <span class="tok-f">git</span>=<span class="tok-s">"main @ a1b2c3d (clean)"</span><span class="tok-k">&gt;</span>
   <span class="tok-k">&lt;file</span> <span class="tok-f">path</span>=<span class="tok-s">"src/main.py"</span> <span class="tok-f">lang</span>=<span class="tok-s">"python"</span> <span class="tok-f">lines</span>=<span class="tok-s">"1"</span> <span class="tok-f">bytes</span>=<span class="tok-s">"19"</span><span class="tok-k">&gt;</span>
     <span class="tok-n">&lt;![CDATA[</span>
 <span class="tok-p">print("hello")</span>
@@ -965,7 +972,7 @@ projdump
     <div class="table-wrap reveal">
       <div class="filter-row">
         <input type="search" id="optFilter" placeholder="⌕ filter options…" aria-label="Filter options">
-        <span class="count" id="optCount">20</span>
+        <span class="count" id="optCount">28</span>
         <button type="button" id="cheatBtn" class="ghost-chip" title="Download a Markdown cheat sheet">⬇ <span data-i18n="options.cheat">Cheat sheet</span></button>
       </div>
       <div class="max-h scrollbar-lite">
@@ -975,15 +982,23 @@ projdump
             <tr><td>[output]</td><td><span class="en-only">Output file (positional). Default: <b>&lt;project&gt;_dump.md|xml|json</b>.</span><span class="fa-only">فایل خروجی (موضعی). پیش‌فرض: <b>&lt;project&gt;_dump.md|xml|json</b>.</span></td></tr>
             <tr><td>-o, ‎--output FILE</td><td><span class="en-only">Explicit output path; missing parent directories are created for you.</span><span class="fa-only">مسیر خروجی صریح؛ پوشه‌های والدِ ناموجود خودکار ساخته می‌شوند.</span></td></tr>
             <tr><td>-f, ‎--format md|xml|json</td><td><span class="en-only">Output format (default <b>md</b>). XML is Claude-friendly, JSON is jq-friendly.</span><span class="fa-only">قالب خروجی (پیش‌فرض <b>md</b>). XML برای Claude و JSON برای jq مناسب است.</span></td></tr>
+            <tr><td>‎--split N[k|m]</td><td><span class="en-only">Write multiple parts, each ≤ N tokens (e.g. ‎--split 60k → <b>&lt;name&gt;_dump.part1.md</b> …).</span><span class="fa-only">نوشتن چند بخش، هر بخش ≤ N توکن (مثلاً ‎--split 60k → <b>&lt;name&gt;_dump.part1.md</b> …).</span></td></tr>
             <tr><td>-e, ‎--ext-only LIST</td><td><span class="en-only">Only files with these extensions, comma-separated, case-insensitive. Spaces around commas are fine.</span><span class="fa-only">فقط فایل‌های با این پسوندها، جداشده با ویرگول؛ بزرگی/کوچکی حروف بی‌اهمیت است.</span></td></tr>
             <tr><td>-x, ‎--exclude GLOB</td><td><span class="en-only">Skip paths matching the glob. Repeatable.</span><span class="fa-only">رد شدن از مسیرهای مطابق با الگو. قابل تکرار.</span></td></tr>
             <tr><td>-i, ‎--include GLOB</td><td><span class="en-only">Only include paths matching at least one glob. Repeatable; the inverse of ‎--exclude.</span><span class="fa-only">فقط مسیرهای منطبق با حداقل یک الگو وارد شوند. قابل تکرار؛ معکوسِ ‎--exclude.</span></td></tr>
             <tr><td>‎--since REF</td><td><span class="en-only">Only files changed since a git ref (working-tree diff + untracked), with early validation.</span><span class="fa-only">فقط فایل‌های تغییرکرده از یک رفرنس گیت (تفاوت با درخت کاری + فایل‌های untracked) با اعتبارسنجی زودهنگام.</span></td></tr>
             <tr><td>‎--sort KEY</td><td><span class="en-only">name (default) · size · size-desc · ext — NUL-safe ordering.</span><span class="fa-only">name (پیش‌فرض) · size · size-desc · ext — مرتب‌سازی امن برای نام فایل‌ها.</span></td></tr>
             <tr><td>‎--tokens-budget N</td><td><span class="en-only">Stop adding files once the estimated token count reaches N. The first file is always kept.</span><span class="fa-only">پس از رسیدن تخمین توکن‌ها به N افزودن فایل متوقف می‌شود. فایل اول همیشه حفظ می‌شود.</span></td></tr>
+            <tr><td>‎--model NAME</td><td><span class="en-only">Preset token budget for a model (see ‎--list-models).</span><span class="fa-only">پیش‌تنظیم بودجهٔ توکن برای یک مدل (‎--list-models را ببینید).</span></td></tr>
+            <tr><td>‎--list-models</td><td><span class="en-only">Show available model presets and exit.</span><span class="fa-only">نمایش پیش‌تنظیم‌های مدل و خروج.</span></td></tr>
             <tr><td>‎--max-size N</td><td><span class="en-only">Skip files larger than N KB (default 500). Byte-accurate comparison.</span><span class="fa-only">رد شدن از فایل‌های بزرگ‌تر از N کیلوبایت (پیش‌فرض ۵۰۰). مقایسه در سطح بایت.</span></td></tr>
             <tr><td>‎--no-tree</td><td><span class="en-only">Omit the directory tree section.</span><span class="fa-only">حذف بخش درخت دایرکتوری.</span></td></tr>
+            <tr><td>‎--tree-depth N</td><td><span class="en-only">Limit tree depth (default: unlimited).</span><span class="fa-only">محدودکردن عمق درخت (پیش‌فرض: نامحدود).</span></td></tr>
             <tr><td>‎--note TEXT</td><td><span class="en-only">Inject a “note for the AI” block at the top of the dump (all three formats).</span><span class="fa-only">درج بلوک «یادداشت برای هوش مصنوعی» در ابتدای خروجی (در هر سه قالب).</span></td></tr>
+            <tr><td>‎--git-log N</td><td><span class="en-only">Include the last N commits in the dump.</span><span class="fa-only">درج N کامیت آخر در دامپ.</span></td></tr>
+            <tr><td>-j, ‎--jobs N</td><td><span class="en-only">Parallel workers for fallback probing (default: auto).</span><span class="fa-only">workerهای موازی برای probing پشتیبان (پیش‌فرض: خودکار).</span></td></tr>
+            <tr><td>‎--config FILE</td><td><span class="en-only">Use this config file (default: XDG config; project-local <b>.projdumprc</b> is never auto-sourced).</span><span class="fa-only">استفاده از این فایل تنظیمات (پیش‌فرض: XDG؛ فایل‌های پروژه فقط با همین فلگ و هرگز به‌خودی‌خود اجرا نمی‌شوند).</span></td></tr>
+            <tr><td>‎--no-config</td><td><span class="en-only">Ignore all config files.</span><span class="fa-only">نادیده‌گرفتن همهٔ فایل‌های تنظیمات.</span></td></tr>
             <tr><td>‎--list</td><td><span class="en-only">Dry run: print the file list with sizes, lines and token totals, then exit.</span><span class="fa-only">اجرای خشک: چاپ فهرست فایل‌ها با حجم، تعداد خط و تخمین توکن، سپس خروج.</span></td></tr>
             <tr><td>‎--stdout</td><td><span class="en-only">Write the dump to stdout instead of a file — perfect for pipes.</span><span class="fa-only">نوشتن خروجی به stdout به‌جای فایل — عالی برای پایپ‌ها.</span></td></tr>
             <tr><td>‎--copy / ‎--no-copy</td><td><span class="en-only">Force or disable the automatic clipboard copy.</span><span class="fa-only">اجبار یا غیرفعال‌سازی کپی خودکار در کلیپ‌بورد.</span></td></tr>
@@ -1101,7 +1116,7 @@ projdump
             <div class="codeblock"><button class="copy" aria-label="Copy">⧉</button><pre>cd projdump
 git init
 git add -A
-git commit -m "feat: v1.1.0 — docs site, bilingual README"
+git commit -m "feat: v2.0.1 — docs sync, bilingual README"
 git branch -M main
 git remote add origin https://github.com/&lt;user&gt;/projdump.git
 git push -u origin main</pre></div>
@@ -1266,7 +1281,7 @@ jobs:
           <tr><td><span class="en-only">.gitignore honoured automatically</span><span class="fa-only">رعایت خودکار .gitignore</span></td><td class="sym yes">✓</td><td class="sym no">✗</td><td class="sym mid">~</td></tr>
           <tr><td><span class="en-only">md + xml + json from one tool</span><span class="fa-only">md + xml + json از یک ابزار</span></td><td class="sym yes">✓</td><td class="sym no">✗</td><td class="sym mid">~</td></tr>
           <tr><td><span class="en-only">Auto-clipboard on every platform</span><span class="fa-only">کپی خودکار در همهٔ پلتفرم‌ها</span></td><td class="sym yes">✓</td><td class="sym mid">~</td><td class="sym mid">~</td></tr>
-          <tr><td><span class="en-only">84 green tests, shellcheck-clean</span><span class="fa-only">۸۴ تست سبز، بدون خطای ShellCheck</span></td><td class="sym yes">✓</td><td class="sym na">—</td><td class="sym mid">~</td></tr>
+          <tr><td><span class="en-only">71 green tests, shellcheck-clean</span><span class="fa-only">۷۱ تست سبز، بدون خطای ShellCheck</span></td><td class="sym yes">✓</td><td class="sym na">—</td><td class="sym mid">~</td></tr>
         </tbody>
       </table>
     </div>
@@ -1279,9 +1294,29 @@ jobs:
     <div class="section-head reveal">
       <span class="tag" data-i18n="changelog.tag">Changelog</span>
       <h2 id="changelogTitle" data-i18n="changelog.title">What's new</h2>
-      <p data-i18n="changelog.sub">Two releases so far — both obsessively tested. Details in CHANGELOG.md.</p>
+      <p data-i18n="changelog.sub">Three releases so far — each obsessively tested. Details in CHANGELOG.md.</p>
     </div>
     <div class="cl-grid">
+      <article class="cl-card reveal">
+        <header><span class="cl-ver">v2.0.1</span><time datetime="2026-10-13">2026-10-13</time></header>
+        <h3 data-i18n="cl.v201.t">The security release</h3>
+        <ul>
+          <li><span class="en-only">Security: project-local configs are no longer auto-sourced — only your own XDG config loads automatically; project configs require explicit <code class="mono">‎--config</code></span><span class="fa-only">امنیت: فایل‌های تنظیمات پروژه دیگر خودکار اجرا نمی‌شوند — فقط تنظیمات XDG خودتان خودکار بارگذاری می‌شود؛ تنظیمات پروژه نیازمند <code class="mono">‎--config</code> صریح است</span></li>
+          <li><span class="en-only">Fixed: <code class="mono">‎--config</code> without a value failed silently</span><span class="fa-only">رفع اشکال: <code class="mono">‎--config</code> بدون مقدار بی‌صدا شکست می‌خورد</span></li>
+          <li><span class="en-only">Native zsh completion; uninstall <code class="mono">‎--prefix=</code> guard</span><span class="fa-only">تکمیل خودکار بومی zsh؛ محافظ <code class="mono">‎--prefix=</code> در uninstall</span></li>
+          <li><span class="en-only">Docs site synced with v2</span><span class="fa-only">همگام‌سازی سایت مستندات با نسخهٔ ۲</span></li>
+        </ul>
+      </article>
+      <article class="cl-card reveal">
+        <header><span class="cl-ver">v2.0.0</span><time datetime="2026-10-12">2026-10-12</time></header>
+        <h3 data-i18n="cl.v200.t">The fast one</h3>
+        <ul>
+          <li><span class="en-only">Batch scanner — dumps 7–25× faster on large repos</span><span class="fa-only">پویشگر دسته‌ای — دامپ ۷ تا ۲۵ برابر سریع‌تر در مخازن بزرگ</span></li>
+          <li><span class="en-only"><code class="mono">‎--split</code> chunked output; weighted token estimates (minified 23 · data 32 · code 35 · prose 40 bytes/token)</span><span class="fa-only">خروجی چندبخشی با <code class="mono">‎--split</code>؛ تخمین توکن وزن‌دار (مینیفای ۲۳ · داده ۳۲ · کد ۳۵ · نثر ۴۰ بایت/توکن)</span></li>
+          <li><span class="en-only"><code class="mono">‎--model</code> / <code class="mono">‎--list-models</code> presets, <code class="mono">‎--tree-depth</code>, <code class="mono">‎--git-log</code>, <code class="mono">-j/‎--jobs</code></span><span class="fa-only">پیش‌تنظیم‌های <code class="mono">‎--model</code> / <code class="mono">‎--list-models</code>، <code class="mono">‎--tree-depth</code>، <code class="mono">‎--git-log</code>، <code class="mono">-j/‎--jobs</code></span></li>
+          <li><span class="en-only">Config files: XDG + project-local .projdumprc (explicit <code class="mono">‎--config</code> only since 2.0.1)</span><span class="fa-only">فایل‌های تنظیمات: XDG و پروژه (‎.projdumprc) — از ۲٫۰٫۱ فقط با <code class="mono">‎--config</code> صریح</span></li>
+        </ul>
+      </article>
       <article class="cl-card reveal">
         <header><span class="cl-ver">v1.1.0</span><time datetime="2026-10-08">2026-10-08</time></header>
         <h3 data-i18n="cl.v11.t">The productivity release</h3>
@@ -1324,13 +1359,16 @@ jobs:
         <div class="a"><span class="en-only">Claude's training makes it respond well to explicit <b>&lt;file&gt;</b> boundaries. projdump emits stable attributes plus CDATA — even a source file containing <b>]]&gt;</b> cannot corrupt the dump.</span><span class="fa-only">مدل Claude با مرزهای صریح <b>&lt;file&gt;</b> بهتر کار می‌کند. پروج‌دامپ attributeهای پایدار به‌همراه CDATA تولید می‌کند؛ حتی فایلی که <b>]]&gt;</b> دارد هم خروجی را خراب نمی‌کند.</span></div>
       </details>
       <details class="reveal"><summary><span class="q">Q4</span><span class="en-only">How accurate is the token estimate?</span><span class="fa-only">تخمین توکن چقدر دقیق است؟</span><span class="chev">▾</span></summary>
-        <div class="a"><span class="en-only">It's bytes ÷ 3.5 — a deliberately rough, dependency-free heuristic. Good enough for budgeting a context window with ‎--tokens-budget; don't use it for billing.</span><span class="fa-only">فرمول سادهٔ «بایت ÷ ۳٫۵» است — یک تخمین عمداً سریع و بدون وابستگی. برای بودجه‌بندی پنجرهٔ کانتکست با ‎--tokens-budget کافی است؛ برای محاسبهٔ هزینه استفاده نکنید.</span></div>
+        <div class="a"><span class="en-only">A weighted estimate by language class — minified ≈ 23, data ≈ 32, code ≈ 35, prose ≈ 40 bytes per token. Deliberately rough and dependency-free: good enough for budgeting a context window with ‎--tokens-budget; don't use it for billing.</span><span class="fa-only">تخمین وزن‌دار بر اساس کلاس زبان — مینیفای ≈ ۲۳، داده ≈ ۳۲، کد ≈ ۳۵ و نثر ≈ ۴۰ بایت به‌ازای هر توکن. عمداً تقریبی و بدون وابستگی: برای بودجه‌بندی پنجرهٔ کانتکست با ‎--tokens-budget کافی است؛ برای محاسبهٔ هزینه استفاده نکنید.</span></div>
       </details>
       <details class="reveal"><summary><span class="q">Q5</span><span class="en-only">Does it respect .gitignore?</span><span class="fa-only">به .gitignore احترام می‌گذارد؟</span><span class="chev">▾</span></summary>
         <div class="a"><span class="en-only">Inside a git repository it collects files with <b>git ls-files</b>, so ignored paths never enter the dump. Outside a repo it walks the tree itself and prunes known junk directories (node_modules, .next, __pycache__, …).</span><span class="fa-only">داخل مخزن گیت فایل‌ها با <b>git ls-files</b> جمع می‌شوند؛ پس مسیرهای نادیده‌گرفته هرگز وارد خروجی نمی‌شوند. بیرون از مخزن، خود درخت را می‌پیماید و پوشه‌های آشغالِ معروف (node_modules، .next، __pycache__ و…) را حذف می‌کند.</span></div>
       </details>
       <details class="reveal"><summary><span class="q">Q6</span><span class="en-only">A file I dumped disappeared from the next dump — why?</span><span class="fa-only">فایلی که دامپ کردم از دامپ بعدی غایب است — چرا؟</span><span class="chev">▾</span></summary>
         <div class="a"><span class="en-only">If you dumped to a custom name (e.g. <b>projdump notes.md</b>), that file becomes a normal project file and is included next time. Add it to .gitignore, or pass <b>‎--exclude 'notes.md'</b>. The default <b>*_dump.*</b> name is always protected.</span><span class="fa-only">اگر با نام سفارشی دامپ گرفته‌اید (مثل <b>projdump notes.md</b>)، آن فایل جزو فایل‌های معمولی پروژه حساب و دفعهٔ بعد وارد خروجی می‌شود. آن را به .gitignore اضافه کنید یا از <b>‎--exclude 'notes.md'</b> استفاده کنید. نام پیش‌فرض <b>*_dump.*</b> همیشه محافظت می‌شود.</span></div>
+      </details>
+      <details class="reveal"><summary><span class="q">Q7</span><span class="en-only">Is it safe to run projdump in an untrusted repository?</span><span class="fa-only">آیا اجرای projdump در مخزن نامطمئن امن است؟</span><span class="chev">▾</span></summary>
+        <div class="a"><span class="en-only">Yes. Since v2.0.1 only your own XDG config is auto-loaded — a project-local <b>.projdumprc</b> is never sourced unless you pass it explicitly with <b>‎--config</b>. projdump makes no network requests, and the dump never executes project code.</span><span class="fa-only">بله. از نسخهٔ ۲٫۰٫۱ فقط تنظیمات XDG خودتان خودکار بارگذاری می‌شود — فایل <b>.projdumprc</b> پروژه هرگز خوانده نمی‌شود مگر اینکه صریحاً با <b>‎--config</b> به آن بدهید. پروج‌دامپ هیچ درخواست شبکه‌ای نمی‌زند و دامپ هرگز کد پروژه را اجرا نمی‌کند.</span></div>
       </details>
     </div>
   </div>
@@ -1447,7 +1485,7 @@ jobs:
       'nav.features': 'Features', 'nav.install': 'Install', 'nav.builder': 'Builder',
       'nav.formats': 'Formats', 'nav.options': 'Options', 'nav.deploy': 'Go live',
       'nav.faq': 'FAQ', 'nav.star': 'Star',
-      'hero.kicker': 'v1.1.0 · pure bash · MIT',
+      'hero.kicker': 'v2.0.1 · pure bash · MIT',
       'hero.title1': 'Your whole codebase.', 'hero.title2': 'One file. AI-ready.',
       'hero.lead': 'projdump packs any project — directory tree, sources, stats — into a single Markdown, XML or JSON file that drops straight into Claude, ChatGPT, DeepSeek or Gemini. No dependencies. One command.',
       'hero.cta1': 'Get started', 'hero.cta2': 'Star on GitHub',
@@ -1458,8 +1496,8 @@ jobs:
       'stats.formats': 'output formats', 'stats.deps': 'hard dependencies',
       'features.tag': 'Features',
       'features.title': 'Everything you need to brief an AI',
-      'features.sub': 'One dependency-free script, obsessively polished: 10+ bugs squashed, 84 tests, shellcheck-clean.',
-      'f1.t': 'Directory tree', 'f1.d': 'Uses tree(1) when installed, falls back to a built-in renderer so the AI always sees the project layout.',
+      'features.sub': 'One dependency-free script, obsessively polished: 10+ bugs squashed, 71 tests, shellcheck-clean.',
+      'f1.t': 'Directory tree', 'f1.d': 'Drawn by a built-in pure-bash renderer — no tree(1) dependency — with --tree-depth support, so the AI always sees the project layout.',
       'f2.t': '120+ language tags', 'f2.d': 'Every fenced block gets the right language tag, so Markdown and XML dumps render with proper highlighting.',
       'f3.t': 'Precision filters', 'f3.d': 'repeatable globs, byte-accurate --max-size, .gitignore respected in git repos.',
       'f4.t': 'Dump only what changed', 'f4.d': 'diff-driven file list plus untracked files, validated up-front.',
@@ -1472,7 +1510,7 @@ jobs:
       'f11.t': "Can't break itself", 'f11.d': 'Safe fence growth, CDATA splitting, XML escaping — adversarial filenames survive all three formats.',
       'f12.t': 'Explains itself', 'f12.d': 'verbose mode reports every skipped file and why.',
       'install.tag': 'Install', 'install.title': 'Up and running in 30 seconds',
-      'install.sub': "Requires bash 5.0+. Optional helpers picked up automatically: tree, jq, python3, file.",
+      'install.sub': "Requires bash 5.0+. Optional helpers picked up automatically when present: python3 (fast batch scanner) and jq (faster JSON quoting) — skipped gracefully if missing.",
       'i1.t': 'Clone', 'i1.d': "Grab the repo — it's tiny and dependency-free.",
       'i2.t': 'Install', 'i2.d': 'Symlinks the binary and adds bash + zsh completions. git pull keeps it fresh.',
       'i3.t': 'Dump', 'i3.d': 'Run it inside any project. The dump lands on your clipboard automatically.',
@@ -1532,24 +1570,27 @@ jobs:
       'footer.local': '🔒 runs 100% locally — no telemetry',
       'pipeline.tag': 'Workflow',
       'pipeline.title': 'From folder to context in four moves',
-      'pipeline.sub': 'No daemons, no config files, no network — one clean pipeline, start to finish.',
+      'pipeline.sub': 'No daemons, no network — one clean pipeline, start to finish.',
       'p1.t': 'Scan', 'p1.d': 'Walks the repo, reading git ls-files so .gitignore is honoured.',
       'p2.t': 'Filter', 'p2.d': 'Applies --include/--exclude, --ext-only, --max-size and the token budget.',
       'p3.t': 'Write', 'p3.d': 'Streams every surviving file into one Markdown, XML or JSON document.',
       'p4.t': 'Copy & report', 'p4.d': 'Drops the dump on your clipboard and prints the summary + token estimate.',
       'est.kb': 'Total project size (KB)',
-      'est.hint': 'Estimate = bytes ÷ 3.5 — the same heuristic projdump prints in its summary.',
+      'est.hint': 'Weighted estimate — minified ≈ 23, data ≈ 32, code ≈ 35, prose ≈ 40 bytes/token. The same heuristic projdump prints in its summary.',
       'est.tokens': '≈ estimated tokens',
       'est.suggest': 'Suggested flag:',
+      'est.class': 'Content class',
+      'est.c_code': 'Code (default)', 'est.c_min': 'Minified', 'est.c_data': 'Data (JSON/CSV)', 'est.c_prose': 'Prose (Markdown/text)',
       'compare.tag': 'Why projdump',
       'compare.title': 'How it stacks up',
       'compare.sub': 'The honest matrix — what you get here that you would otherwise wire up yourself.',
       'compare.h1': 'Feature', 'compare.h2': 'Copy-paste', 'compare.h3': 'Typical tools',
       'changelog.tag': 'Changelog',
       'changelog.title': "What's new",
-      'changelog.sub': 'Two releases so far — both obsessively tested. Details in CHANGELOG.md.',
+      'changelog.sub': 'Three releases so far — each obsessively tested. Details in CHANGELOG.md.',
       'changelog.all': 'Full changelog →',
       'cl.v11.t': 'The productivity release',
+      'cl.v201.t': 'The security release', 'cl.v200.t': 'The fast one',
       'cl.v10.t': 'The beginning',
       'footer.chlog': 'Changelog',
       'search.open': 'Search', 'pal.ph': 'Search sections, flags, FAQ…',
@@ -1566,7 +1607,7 @@ jobs:
       'nav.features': 'امکانات', 'nav.install': 'نصب', 'nav.builder': 'سازندهٔ دستور',
       'nav.formats': 'قالب‌ها', 'nav.options': 'گزینه‌ها', 'nav.deploy': 'انتشار',
       'nav.faq': 'سؤالات', 'nav.star': 'ستاره',
-      'hero.kicker': 'نسخهٔ ۱٫۱٫۰ · بش خالص · MIT',
+      'hero.kicker': 'نسخهٔ ۲٫۰٫۱ · بش خالص · MIT',
       'hero.title1': 'کل کدبیز شما.', 'hero.title2': 'یک فایل. آمادهٔ هوش مصنوعی.',
       'hero.lead': 'پروج‌دامپ هر پروژه‌ای — درخت دایرکتوری، سورس‌ها و آمار — را در یک فایل Markdown، XML یا JSON بسته‌بندی می‌کند تا مستقیم در Claude، ChatGPT، DeepSeek یا Gemini بیندازید. بدون وابستگی. با یک دستور.',
       'hero.cta1': 'شروع کنید', 'hero.cta2': 'ستاره در گیت‌هاب',
@@ -1577,8 +1618,8 @@ jobs:
       'stats.formats': 'قالب خروجی', 'stats.deps': 'وابستگی اجباری',
       'features.tag': 'امکانات',
       'features.title': 'هر آنچه برای آماده‌سازی هوش مصنوعی لازم دارید',
-      'features.sub': 'یک اسکریپت بدون وابستگی، وسواس‌گونه صیقل‌خورده: بیش از ۱۰ باگ ریشه‌کن‌شده، ۸۴ تست، بدون خطای ShellCheck.',
-      'f1.t': 'درخت دایرکتوری', 'f1.d': 'اگر tree نصب باشد از آن استفاده می‌کند؛ وگرنه رندرکنندهٔ داخلی دارد تا هوش مصنوعی همیشه ساختار پروژه را ببیند.',
+      'features.sub': 'یک اسکریپت بدون وابستگی، وسواس‌گونه صیقل‌خورده: بیش از ۱۰ باگ ریشه‌کن‌شده، ۷۱ تست، بدون خطای ShellCheck.',
+      'f1.t': 'درخت دایرکتوری', 'f1.d': 'درخت با رندرکنندهٔ داخلی و تمام‌بش رسم می‌شود — بدون هیچ وابستگی به tree — و ‎--tree-depth هم دارد تا هوش مصنوعی همیشه ساختار پروژه را ببیند.',
       'f2.t': 'تگ برای ۱۲۰+ زبان', 'f2.d': 'هر بلوک کد تگ زبان درست را می‌گیرد تا هایلایت Markdown و XML تمیز باشد.',
       'f3.t': 'فیلترهای دقیق', 'f3.d': 'گلوب‌های قابل تکرار، ‎--max-size دقیق در سطح بایت و احترام به .gitignore در مخازن گیت.',
       'f4.t': 'فقط تغییرات را دامپ کن', 'f4.d': 'فهرست فایل‌ها بر اساس diff به‌همراه فایل‌های untracked، با اعتبارسنجی زودهنگام.',
@@ -1591,7 +1632,7 @@ jobs:
       'f11.t': 'خودش را خراب نمی‌کند', 'f11.d': 'رشد امن فنس، شکستن CDATA و escape مناسب XML — نام‌های فایلِ متخاصم در هر سه قالب سالم می‌مانند.',
       'f12.t': 'خودش را توضیح می‌دهد', 'f12.d': 'حالت Verbose دلیل ردشدن هر فایل را گزارش می‌کند.',
       'install.tag': 'نصب', 'install.title': 'راه‌اندازی در ۳۰ ثانیه',
-      'install.sub': 'فقط بش ۵٫۰+ لازم است. ابزارهای اختیاری (tree، jq، python3، file) خودکار شناسایی می‌شوند.',
+      'install.sub': 'فقط بش ۵٫۰+ لازم است. ابزارهای اختیاری — python3 (پویش دسته‌ای سریع) و jq (کوتیشن سریع‌ترِ JSON) — در صورت حضور خودکار به‌کار می‌روند و در نبودشان بی‌دردسر رد می‌شوند.',
       'i1.t': 'کلون', 'i1.d': 'مخزن را بگیرید — کوچک و بدون وابستگی.',
       'i2.t': 'نصب', 'i2.d': 'باینری را symlink می‌کند و تکمیل خودکار bash + zsh اضافه می‌کند. با git pull همیشه به‌روز.',
       'i3.t': 'دامپ', 'i3.d': 'داخل هر پروژه‌ای اجرا کنید. خروجی خودکار روی کلیپ‌بورد می‌رود.',
@@ -1657,18 +1698,21 @@ jobs:
       'p3.t': 'نوشتن', 'p3.d': 'هر فایل بازمانده را در یک سند Markdown، XML یا JSON می‌نویسد.',
       'p4.t': 'کپی و گزارش', 'p4.d': 'خروجی را روی کلیپ‌بورد می‌گذارد و خلاصه و تخمین توکن را چاپ می‌کند.',
       'est.kb': 'حجم کل پروژه (کیلوبایت)',
-      'est.hint': 'تخمین = بایت ÷ ۳٫۵ — همان قاعده‌ای که projdump در خلاصه چاپ می‌کند.',
+      'est.hint': 'تخمین وزن‌دار — مینیفای ≈ ۲۳، داده ≈ ۳۲، کد ≈ ۳۵ و نثر ≈ ۴۰ بایت به‌ازای هر توکن. همان قاعده‌ای که projdump در خلاصه چاپ می‌کند.',
       'est.tokens': '≈ توکن تخمینی',
       'est.suggest': 'فلگ پیشنهادی:',
+      'est.class': 'کلاس محتوا',
+      'est.c_code': 'کد (پیش‌فرض)', 'est.c_min': 'مینیفای‌شده', 'est.c_data': 'داده (JSON/CSV)', 'est.c_prose': 'نثر (Markdown/متن)',
       'compare.tag': 'چرا پروج‌دامپ',
       'compare.title': 'مقایسه با بقیه',
       'compare.sub': 'جدول صادقانه — چیزهایی که اینجا می‌گیرید و گرنه باید خودتان بسازید.',
       'compare.h1': 'ویژگی', 'compare.h2': 'کپی دستی', 'compare.h3': 'ابزارهای معمول',
       'changelog.tag': 'تاریخچهٔ نسخه‌ها',
       'changelog.title': 'چه چیزهایی تازه است',
-      'changelog.sub': 'تا حالا دو انتشار — هر دو با وسواس تست‌شده. جزئیات در CHANGELOG.md.',
+      'changelog.sub': 'تا حالا سه انتشار — هر کدام با وسواس تست‌شده. جزئیات در CHANGELOG.md.',
       'changelog.all': 'تاریخچهٔ کامل ←',
       'cl.v11.t': 'انتشار بهره‌وری',
+      'cl.v201.t': 'انتشار امنیتی', 'cl.v200.t': 'نسخهٔ سریع',
       'cl.v10.t': 'شروع ماجرا',
       'footer.chlog': 'تاریخچه',
       'search.open': 'جست‌وجو', 'pal.ph': 'بخش‌ها، فلگ‌ها، سؤالات…',
@@ -1998,7 +2042,9 @@ jobs:
     var chips = document.querySelectorAll('#estChips .fit-chip');
     var flag = document.getElementById('estBudget');
     var kb = parseFloat(estKb && estKb.value);
-    var tokens = isFinite(kb) && kb > 0 ? Math.round(kb * 1024 / 3.5) : 0;
+    var cls = parseFloat((document.getElementById('estClass') || {}).value);
+    if (!isFinite(cls) || cls <= 0) cls = 35; /* bytes per token — code class default */
+    var tokens = isFinite(kb) && kb > 0 ? Math.ceil(kb * 1024 * 10 / cls) : 0;
     if (!tokens) {
       out.textContent = '—';
       chips.forEach(function (c) { c.classList.remove('ok'); });
@@ -2014,6 +2060,8 @@ jobs:
   }
   if (estKb) {
     estKb.addEventListener('input', estCalc);
+    var estClass = document.getElementById('estClass');
+    if (estClass) estClass.addEventListener('change', estCalc);
     estCalc();
   }
   var estFlagBtn = document.getElementById('estBudget');
@@ -2128,7 +2176,7 @@ jobs:
         var pick = lang === 'fa' ? (tds[1].querySelector('.fa-only') || tds[1]) : (tds[1].querySelector('.en-only') || tds[1]);
         lines.push('| `' + clean(tds[0].textContent) + '` | ' + clean(pick.textContent) + ' |');
       });
-      lines.push('', '---', '', 'MIT © Soroush Chegini — projdump v1.1.0');
+      lines.push('', '---', '', 'MIT © Soroush Chegini — projdump v2.0.1');
       var blob = new Blob([lines.join('\n')], { type: 'text/markdown;charset=utf-8' });
       var a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
@@ -2315,6 +2363,7 @@ jobs:
   function palOpen() {
     lastFocus = document.activeElement;
     palOv.classList.add('open');
+    palIn.setAttribute('aria-expanded', 'true');
     palOv.setAttribute('aria-label', I18N[lang]['pal.title']);
     document.body.style.overflow = 'hidden';
     palIn.value = '';
@@ -2461,7 +2510,13 @@ jobs:
     function pgFmt(bytes) {
       return bytes < 1024 ? bytes + 'B' : (bytes / 1024).toFixed(1) + 'K';
     }
-    function pgTok(bytes) { return Math.round(bytes / 3.5); }
+    /* v2 weighted estimate: tokens = ceil(bytes × 10 / R), R = 23 minified · 32 data · 35 code · 40 prose */
+    function pgRate(lang) {
+      if (lang === 'json') return 32;                        /* data */
+      if (lang === 'markdown' || lang === 'text') return 40; /* prose */
+      return 35;                                             /* code (default) */
+    }
+    function pgTok(bytes, lang) { return Math.ceil(bytes * 10 / pgRate(lang)); }
     function pgComma(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
     function pgTokens(s) {
       var out = [], cur = '', q = null, i, ch;
@@ -2484,15 +2539,16 @@ jobs:
 
     function pgBanner() {
       pgOut.innerHTML = '';
-      pgHtml('<span class="c-ok">projdump</span> <span class="c-dim">v1.1.0 — playground</span>');
+      pgHtml('<span class="c-ok">projdump</span> <span class="c-dim">v2.0.1 — playground</span>');
       pgLine('c-dim', I18N[lang]['pg.banner1']);
       pgLine('c-dim', I18N[lang]['pg.banner2']);
       pgLine('c-amber', I18N[lang]['pg.hint']);
     }
 
     function pgHelp() {
-      var t = 'projdump v1.1.0 — dump an entire project into one file for AI\n\n' +
+      var t = 'projdump v2.0.1 — dump an entire project into one file for AI\n\n' +
         'Usage: projdump [output] [options]\n\n' +
+        '  -o, --output FILE          output file (default <project>_dump.<ext>)\n' +
         '  -f, --format md|xml|json   output format (default md)\n' +
         '  -e, --ext-only LIST        only these extensions\n' +
         '  -x, --exclude GLOB         skip paths (repeatable)\n' +
@@ -2560,23 +2616,24 @@ jobs:
       var budgetStop = -1, tot = 0, acc = 0, i;
       if (o.budget !== null) {
         for (i = 0; i < files.length; i++) {
-          if (i > 0 && acc + pgTok(files[i].bytes) > o.budget) { budgetStop = i; break; }
-          acc += pgTok(files[i].bytes); tot = i + 1;
+          if (i > 0 && acc + pgTok(files[i].bytes, files[i].lang) > o.budget) { budgetStop = i; break; }
+          acc += pgTok(files[i].bytes, files[i].lang); tot = i + 1;
         }
         if (budgetStop === -1) tot = files.length;
       } else tot = files.length;
       var kept = files.slice(0, tot);
       var lines = kept.reduce(function (a, f) { return a + f.lines; }, 0);
       var bytes = kept.reduce(function (a, f) { return a + f.bytes; }, 0);
+      var toks = kept.reduce(function (a, f) { return a + pgTok(f.bytes, f.lang); }, 0);
       var SHOW = kept.slice(0, 2);
       if (o.list) {
         files.forEach(function (f) { pgLine('', '  ' + pgFmt(f.bytes).padStart(6) + '  ' + String(f.lines).padStart(5) + '  ' + f.p); });
-        pgLine('c-dim', '  (' + files.length + ' files, ~' + pgComma(files.reduce(function (a, f) { return a + pgTok(f.bytes); }, 0)) + ' tokens)');
+        pgLine('c-dim', '  (' + files.length + ' files, ~' + pgComma(files.reduce(function (a, f) { return a + pgTok(f.bytes, f.lang); }, 0)) + ' tokens)');
         return { kept: files, lines: 0, bytes: 0, budgetStop: -1 };
       }
       if (o.fmt === 'xml') {
         pgLine('', '<?xml version="1.0" encoding="UTF-8"?>');
-        pgLine('', '<project name="my-project" path="/home/you/my-project" generated="' + PG_NOW + '" tool="projdump v1.1.0">');
+        pgLine('', '<project name="my-project" path="/home/you/my-project" generated="' + PG_NOW + '" tool="projdump v2.0.1">');
         if (o.note) pgLine('', '  <note>' + pgEsc(o.note) + '</note>');
         pgLine('c-dim', '  <tree><![CDATA[');
         pgLine('c-dim', PG_TREE.split('\n').slice(0, 4).join('\n') + '\n  …]]></tree>');
@@ -2589,19 +2646,19 @@ jobs:
         pgLine('', '</project>');
       } else if (o.fmt === 'json') {
         pgLine('', '{');
-        pgLine('', '  "tool": "projdump v1.1.0", "project": "my-project",');
+        pgLine('', '  "tool": "projdump v2.0.1", "project": "my-project",');
         if (o.note) pgLine('', '  "note": ' + JSON.stringify(o.note) + ',');
-        pgLine('', '  "stats": { "files": ' + kept.length + ', "lines": ' + lines + ', "bytes": ' + bytes + ', "tokens": ' + pgTok(bytes) + ' },');
         pgLine('', '  "files": [');
         SHOW.forEach(function (f, ix) {
           pgLine('', '    { "path": ' + JSON.stringify(f.p) + ', "lang": "' + f.lang + '", "lines": ' + f.lines + ', "bytes": ' + f.bytes + ',');
           pgLine('c-dim', '      "content": ' + JSON.stringify(f.head.join('\n')).slice(0, 58) + '…" }' + (ix < SHOW.length - 1 ? ',' : ''));
         });
         if (kept.length > SHOW.length) pgLine('c-dim', '    … ' + (kept.length - SHOW.length) + ' more entries (truncated in the playground)');
-        pgLine('', '  ]');
+        pgLine('', '  ],');
+        pgLine('', '  "stats": { "files": ' + kept.length + ', "lines": ' + lines + ', "bytes": ' + bytes + ', "tokens": ' + toks + ' }');
         pgLine('', '}');
       } else {
-        pgLine('c-dim', '<!-- projdump v1.1.0 · my-project · main @ ' + PG_SHA + ' (clean) · ' + PG_NOW + ' -->');
+        pgLine('c-dim', '<!-- projdump v2.0.1 · my-project · main @ ' + PG_SHA + ' (clean) · ' + PG_NOW + ' -->');
         if (o.since !== null) pgLine('c-dim', '<!-- scope: changes since ' + o.since + ' -->');
         if (o.note) { pgLine('', ''); pgMdLine('## Note for the AI'); pgLine('', '> ' + o.note); }
         pgLine('', '');
@@ -2625,9 +2682,9 @@ jobs:
         pgLine('', '');
         pgLine('', '| files | lines | bytes | ≈ tokens |');
         pgLine('', '|---|---|---|---|');
-        pgLine('', '| ' + kept.length + ' | ' + lines + ' | ' + pgFmt(bytes) + ' | ' + pgComma(pgTok(bytes)) + ' |');
+        pgLine('', '| ' + kept.length + ' | ' + lines + ' | ' + pgFmt(bytes) + ' | ' + pgComma(toks) + ' |');
       }
-      return { kept: kept, lines: lines, bytes: bytes, budgetStop: budgetStop };
+      return { kept: kept, lines: lines, bytes: bytes, tokens: toks, budgetStop: budgetStop };
     }
 
     function pgSummary(res, o, allCount) {
@@ -2636,7 +2693,7 @@ jobs:
       var dest = o.stdout ? 'stdout' : (o.out || 'my-project_dump.' + o.fmt);
       var extra = res.budgetStop !== -1 ? ' · stopped early: budget ' + pgComma(o.budget) + ' reached' : '';
       pgHtml('<span class="c-ok">✔ ' + res.kept.length + ' files</span> · ' + res.lines + ' lines · ' + pgFmt(res.bytes) +
-        ' · ≈ ' + pgComma(pgTok(res.bytes)) + ' tokens → <b>' + pgEsc(dest) + '</b>' + pgEsc(extra));
+        ' · ≈ ' + pgComma(res.tokens) + ' tokens → <b>' + pgEsc(dest) + '</b>' + pgEsc(extra));
       if (o.verbose && res.allSkips.length) res.allSkips.forEach(function (l) { pgLine('c-dim', l); });
       if (!o.stdout && !o.noCopy) pgLine('c-dim', 'clipboard: simulated — install projdump for the real thing');
     }
@@ -2651,9 +2708,9 @@ jobs:
       var lines = kept.reduce(function (a, f) { return a + f.lines; }, 0);
       var bytes = kept.reduce(function (a, f) { return a + f.bytes; }, 0);
       return {
-        tool: 'projdump v1.1.0', project: 'my-project',
-        stats: { files: kept.length, lines: lines, bytes: bytes, tokens: pgTok(bytes), languages: langs },
-        files: kept.map(function (f) { return { path: f.p, lang: f.lang, lines: f.lines, bytes: f.bytes }; })
+        tool: 'projdump v2.0.1', project: 'my-project',
+        files: kept.map(function (f) { return { path: f.p, lang: f.lang, lines: f.lines, bytes: f.bytes }; }),
+        stats: { files: kept.length, lines: lines, bytes: bytes, tokens: kept.reduce(function (a, f) { return a + pgTok(f.bytes, f.lang); }, 0), languages: langs }
       };
     }
     function pgPrintJson(obj) {
@@ -2737,9 +2794,10 @@ jobs:
         else if (a === '--list' || a === '--dry-run') o.list = true;
         else if (a === '--stdout') o.stdout = true;
         else if (a === '--no-copy') o.noCopy = true;
+        else if (a === '--copy') o.noCopy = false; /* clipboard copy is the default; --copy just cancels --no-copy */
         else if (a === '-v' || a === '--verbose') o.verbose = true;
         else if (a === '-q' || a === '--quiet') o.quiet = true;
-        else if (a === '--version') { pgLine('', 'projdump v1.1.0'); return; }
+        else if (a === '--version') { pgLine('', 'projdump v2.0.1'); return; }
         else if (a === '-h' || a === '--help') { pgHelp(); return; }
         else errs.push("projdump: unrecognized option '" + a + "'");
       }
@@ -2748,7 +2806,7 @@ jobs:
         pgLine('c-dim', 'try: projdump --help');
         return;
       }
-      if (o.since !== null && ['main', 'HEAD', 'HEAD~1', 'HEAD~2', 'HEAD~3', 'v1.0.0', 'v1.1.0'].indexOf(o.since) === -1) {
+      if (o.since !== null && ['main', 'HEAD', 'HEAD~1', 'HEAD~2', 'HEAD~3', 'v1.0.0', 'v1.1.0', 'v2.0.0', 'v2.0.1'].indexOf(o.since) === -1) {
         pgLine('c-err', "fatal: bad revision '" + o.since + "'");
         pgLine('c-dim', 'projdump: --since REF is invalid — try main, HEAD~2, v1.0.0…');
         return;
@@ -2770,7 +2828,7 @@ jobs:
     }
     var PG_FLAGS = ['-f', '--format', '-e', '--ext-only', '-x', '--exclude', '-i', '--include',
       '--since', '--sort', '--tokens-budget', '--max-size', '--no-tree', '--note',
-      '--list', '--dry-run', '--stdout', '--no-copy', '-o', '--output', '-v', '--verbose',
+      '--list', '--dry-run', '--stdout', '--copy', '--no-copy', '-o', '--output', '-v', '--verbose',
       '-q', '--quiet', '--version', '--help'];
     pgIn.addEventListener('keydown', function (e) {
       stopDemo();

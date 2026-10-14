@@ -13,7 +13,7 @@ Markdown، XML یا JSON می‌ریزد تا مستقیم در **Claude**، **C
 [![CI](https://github.com/CheginiSoroush/projdump/actions/workflows/ci.yml/badge.svg)](https://github.com/CheginiSoroush/projdump/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![bash](https://img.shields.io/badge/bash-5.0%2B-4EAA25?logo=gnu-bash&logoColor=white)](https://www.gnu.org/software/bash/)
-[![tests](https://img.shields.io/badge/tests-68%20passing-2EA043)](test/)
+[![tests](https://img.shields.io/badge/tests-71%20passing-2EA043)](test/)
 [![shellcheck](https://img.shields.io/badge/shellcheck-clean-2EA043?logo=shell&logoColor=white)](.shellcheckrc)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Docs](https://img.shields.io/badge/docs-live%20site-34D399?logo=githubpages&logoColor=white)](https://cheginisoroush.github.io/projdump/)
@@ -63,7 +63,7 @@ Markdown، XML یا JSON می‌ریزد تا مستقیم در **Claude**، **C
 - 💰 `--tokens-budget N` **یا `--model NAME`** — جا شدن در پنجرهٔ کانتکست (پیش‌تنظیم برای gpt-4o، claude-sonnet، gemini-2.5-pro، …)
 - 📚 `--split 60k` — تقسیم دامپ به بخش‌هایی به اندازهٔ چت‌های طولانی
 - ⚖️ **تخمین وزنی توکن** — به تفکیک کلاس زبان، نه تقسیم مسطح بر ۳٫۵
-- ⚙️ فایل تنظیمات `.projdumprc` برای پیش‌فرض‌های همیشگی شما (`--config`، `--no-config`)
+- ⚙️ فایل تنظیمات برای پیش‌فرض‌های همیشگی شما — به‌صورت خودکار از XDG خوانده می‌شود؛ فایل‌های پروژه فقط با `--config` (هرگز به‌خودی‌خود اجرا نمی‌شوند، پس پروژه‌های نامطمئن نمی‌توانند کد اجرا کنند)
 - 📜 `--git-log N` — افزودن N کامیت آخر به دامپ
 - 🔀 `--sort name|size|size-desc|ext` — کنترل ترتیب فایل‌ها
 - 📝 `--note` — درج بلوک «یادداشت برای هوش مصنوعی» در ابتدای خروجی
@@ -75,7 +75,7 @@ Markdown، XML یا JSON می‌ریزد تا مستقیم در **Claude**، **C
 - ⚡ در مخازن گیت از `git ls-files` استفاده می‌کند؛ پس `.gitignore` رعایت می‌شود — بیرون مخازن هم به‌صورت best-effort رعایت می‌شود
 - 🩺 `--verbose` — دلیل ردشدن هر فایل را دقیق توضیح می‌دهد
 - 🔍 اجرای خشک با `--list` — دقیقاً ببینید چه چیزی دامپ می‌شد
-- 🌐 [سایت مستندات دوزبانه](https://cheginisoroush.github.io/projdump/) — سازندهٔ تعاملی دستور، جست‌وجوی ⌘/Ctrl+K (۴۹ نتیجه شامل همهٔ فلگ‌ها، دستورکارها و پیش‌تنظیم‌ها)، کتاب دستورکارهای آمادهٔ کپی (با دکمه‌های *کپی همه* و *دانلود ‎.sh*، دکمهٔ 🔗 کپی لینک برای هر دستورکار و لینک‌های عمیق ‎`?recipe=RX`‎ / ‎`#recipe=RX`‎ که دستورکار را هنگام باز شدن خودکار اجرا می‌کنند)، **زمین بازی با ترمینال شبیه‌سازی‌شده** (CLI را همین‌جا در مرورگر امتحان کنید، بدون نصب — **▶ نمایش** برای اجرای دست‌آزاد یا **⬇ گزارش** برای ذخیرهٔ نشست)، برگهٔ میان‌برهای صفحه‌کلید با ‎`?`‎، دانلود برگهٔ تقلب و ابزار تخمین توکن (انگلیسی + فارسی، تم تاریک/روشن)
+- 🌐 [سایت مستندات دوزبانه](https://cheginisoroush.github.io/projdump/) — سازندهٔ تعاملی دستور، جست‌وجوی ⌘/Ctrl+K (۵۸ نتیجه شامل همهٔ فلگ‌ها، دستورکارها و پیش‌تنظیم‌ها)، کتاب دستورکارهای آمادهٔ کپی (با دکمه‌های *کپی همه* و *دانلود ‎.sh*، دکمهٔ 🔗 کپی لینک برای هر دستورکار و لینک‌های عمیق ‎`?recipe=RX`‎ / ‎`#recipe=RX`‎ که دستورکار را هنگام باز شدن خودکار اجرا می‌کنند)، **زمین بازی با ترمینال شبیه‌سازی‌شده** (CLI را همین‌جا در مرورگر امتحان کنید، بدون نصب — **▶ نمایش** برای اجرای دست‌آزاد یا **⬇ گزارش** برای ذخیرهٔ نشست)، برگهٔ میان‌برهای صفحه‌کلید با ‎`?`‎، دانلود برگهٔ تقلب و ابزار تخمین توکن (انگلیسی + فارسی، تم تاریک/روشن)
 
 ## 🚀 شروع سریع
 
@@ -147,8 +147,8 @@ projdump -q                           # بی‌صدا: بدون خط خلاصه
 | `--tree-depth N` | محدودکردن عمق درخت (پیش‌فرض: نامحدود) |
 | `--note TEXT` | افزودن بلوک «یادداشت برای هوش مصنوعی» در ابتدای خروجی |
 | `--git-log N` | درج N کامیت آخر در دامپ |
-| `-j, --jobs N` | workerهای موازی برای probing بازگشتی (پیش‌فرض: خودکار) |
-| `--config FILE` | استفاده از این فایل تنظیمات (پیش‌فرض: `.projdumprc`، سپس XDG) |
+| `-j, --jobs N` | workerهای موازی برای probing پشتیبان (پیش‌فرض: خودکار) |
+| `--config FILE` | استفاده از این فایل تنظیمات (پیش‌فرض: XDG؛ فایل‌های پروژه فقط با همین فلگ و هرگز به‌خودی‌خود اجرا نمی‌شوند) |
 | `--no-config` | نادیده‌گرفتن همهٔ فایل‌های تنظیمات |
 | `--list` | اجرای خشک: چاپ فهرست و خروج |
 | `--stdout` | نوشتن به stdout به‌جای فایل |
@@ -253,7 +253,7 @@ git clone --depth 1 https://github.com/bats-core/bats-core.git
 bats-core/bin/bats test/          # اختیاری: jq، shellcheck
 ```
 
-**۶۸ تست کاربردی** هر سه قالب، نام‌های فایل متخاصم (گیومه، خط جدید، بک‌تیک، `<>&`)،
+**۷۱ تست کاربردی** هر سه قالب، نام‌های فایل متخاصم (گیومه، خط جدید، بک‌تیک، `<>&`)،
 فایل تنظیمات، پیش‌تنظیم مدل‌ها، بخش‌های `--split`، توکن‌های وزنی و دقت بایتیِ همهٔ
 فیلترها را پوشش می‌دهد.
 
