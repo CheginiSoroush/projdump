@@ -202,5 +202,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [2.0.2]: https://github.com/CheginiSoroush/projdump/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/CheginiSoroush/projdump/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/CheginiSoroush/projdump/compare/v1.1.0...v2.0.0
-[1.1.0]: https://github.com/CheginiSoroush/projdump/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/CheginiSoroush/projdump/releases/tag/v1.0.0
+[1.1.0]: https://github.com/CheginiSoroush/projdump/releases/tag/v1.1.0
+[1.0.0]: https://github.com/CheginiSoroush/projdump/commit/64bf50c6047a62284d0e04430579a69daf33a85a

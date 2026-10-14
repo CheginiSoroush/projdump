@@ -2816,9 +2816,9 @@ jobs:
         pgLine('c-dim', 'try: projdump --help');
         return;
       }
-      if (o.since !== null && ['main', 'HEAD', 'HEAD~1', 'HEAD~2', 'HEAD~3', 'v1.0.0', 'v1.1.0', 'v2.0.0', 'v2.0.1', 'v2.0.2'].indexOf(o.since) === -1) {
+      if (o.since !== null && ['main', 'HEAD', 'HEAD~1', 'HEAD~2', 'HEAD~3', 'v1.1.0', 'v2.0.0', 'v2.0.1', 'v2.0.2'].indexOf(o.since) === -1) {
         pgLine('c-err', "fatal: bad revision '" + o.since + "'");
-        pgLine('c-dim', 'projdump: --since REF is invalid — try main, HEAD~2, v1.0.0…');
+        pgLine('c-dim', 'projdump: --since REF is invalid — try main, HEAD~2, v1.1.0…');
         return;
       }
       var files = pgSelect(PG_FILES, o, errs);
