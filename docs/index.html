@@ -607,7 +607,7 @@ html[dir="rtl"] .kbd-row{flex-direction:row}
       <a href="#faq" data-i18n="nav.faq">FAQ</a>
     </nav>
     <div class="nav-actions">
-      <a class="ver-pill" href="#changelog" title="Version — see what's new">v2.0.1</a>
+      <a class="ver-pill" href="#changelog" title="Version — see what's new">v2.0.2</a>
       <button id="searchBtn" class="search-trigger" aria-label="Search (Ctrl+K)" aria-haspopup="dialog">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
         <span class="st-label" data-i18n="search.open">Search</span>
@@ -642,7 +642,7 @@ html[dir="rtl"] .kbd-row{flex-direction:row}
   <div class="container">
     <div class="hero-grid">
       <div>
-        <span class="kicker"><span class="pulse"></span><span data-i18n="hero.kicker">v2.0.1 · pure bash · MIT</span></span>
+        <span class="kicker"><span class="pulse"></span><span data-i18n="hero.kicker">v2.0.2 · pure bash · MIT</span></span>
         <h1 id="heroTitle"><span data-i18n="hero.title1">Your whole codebase.</span><br><span class="grad" data-i18n="hero.title2">One file. AI-ready.</span></h1>
         <p class="lead" data-i18n="hero.lead">projdump packs any project — directory tree, sources, stats — into a single Markdown, XML or JSON file that drops straight into Claude, ChatGPT, DeepSeek or Gemini. No dependencies. One command.</p>
         <div class="hero-ctas">
@@ -935,7 +935,7 @@ projdump
 <span class="tok-c">&gt; Roughly 1,204 tokens (weighted per language)</span></pre></div>
     </div>
     <div class="tab-pane" id="pane-xml" role="tabpanel">
-      <div class="codeblock"><button class="copy" aria-label="Copy">⧉</button><pre><span class="tok-k">&lt;project</span> <span class="tok-f">name</span>=<span class="tok-s">"my-project"</span> <span class="tok-f">tool</span>=<span class="tok-s">"projdump v2.0.1"</span> <span class="tok-f">git</span>=<span class="tok-s">"main @ a1b2c3d (clean)"</span><span class="tok-k">&gt;</span>
+      <div class="codeblock"><button class="copy" aria-label="Copy">⧉</button><pre><span class="tok-k">&lt;project</span> <span class="tok-f">name</span>=<span class="tok-s">"my-project"</span> <span class="tok-f">tool</span>=<span class="tok-s">"projdump v2.0.2"</span> <span class="tok-f">git</span>=<span class="tok-s">"main @ a1b2c3d (clean)"</span><span class="tok-k">&gt;</span>
   <span class="tok-k">&lt;file</span> <span class="tok-f">path</span>=<span class="tok-s">"src/main.py"</span> <span class="tok-f">lang</span>=<span class="tok-s">"python"</span> <span class="tok-f">lines</span>=<span class="tok-s">"1"</span> <span class="tok-f">bytes</span>=<span class="tok-s">"19"</span><span class="tok-k">&gt;</span>
     <span class="tok-n">&lt;![CDATA[</span>
 <span class="tok-p">print("hello")</span>
@@ -1000,7 +1000,7 @@ projdump
             <tr><td>‎--config FILE</td><td><span class="en-only">Use this config file (default: XDG config; project-local <b>.projdumprc</b> is never auto-sourced).</span><span class="fa-only">استفاده از این فایل تنظیمات (پیش‌فرض: XDG؛ فایل‌های پروژه فقط با همین فلگ و هرگز به‌خودی‌خود اجرا نمی‌شوند).</span></td></tr>
             <tr><td>‎--no-config</td><td><span class="en-only">Ignore all config files.</span><span class="fa-only">نادیده‌گرفتن همهٔ فایل‌های تنظیمات.</span></td></tr>
             <tr><td>‎--list</td><td><span class="en-only">Dry run: print the file list with sizes, lines and token totals, then exit.</span><span class="fa-only">اجرای خشک: چاپ فهرست فایل‌ها با حجم، تعداد خط و تخمین توکن، سپس خروج.</span></td></tr>
-            <tr><td>‎--stdout</td><td><span class="en-only">Write the dump to stdout instead of a file — perfect for pipes.</span><span class="fa-only">نوشتن خروجی به stdout به‌جای فایل — عالی برای پایپ‌ها.</span></td></tr>
+            <tr><td>‎--stdout</td><td><span class="en-only">Write the dump to stdout instead of a file — perfect for pipes (status messages go to stderr).</span><span class="fa-only">نوشتن خروجی به stdout به‌جای فایل — عالی برای پایپ‌ها (پیام‌های وضعیت به stderr می‌روند).</span></td></tr>
             <tr><td>‎--copy / ‎--no-copy</td><td><span class="en-only">Force or disable the automatic clipboard copy.</span><span class="fa-only">اجبار یا غیرفعال‌سازی کپی خودکار در کلیپ‌بورد.</span></td></tr>
             <tr><td>-v, ‎--verbose</td><td><span class="en-only">Explain every skipped file and the reason, plus skip totals in the summary.</span><span class="fa-only">گزارش دلیل ردشدن هر فایل به‌همراه آمار کلی در خلاصه.</span></td></tr>
             <tr><td>-q, ‎--quiet</td><td><span class="en-only">Suppress the summary line.</span><span class="fa-only">حذف خط خلاصه.</span></td></tr>
@@ -1294,9 +1294,17 @@ jobs:
     <div class="section-head reveal">
       <span class="tag" data-i18n="changelog.tag">Changelog</span>
       <h2 id="changelogTitle" data-i18n="changelog.title">What's new</h2>
-      <p data-i18n="changelog.sub">Three releases so far — each obsessively tested. Details in CHANGELOG.md.</p>
+      <p data-i18n="changelog.sub">Four releases so far — each obsessively tested. Details in CHANGELOG.md.</p>
     </div>
     <div class="cl-grid">
+      <article class="cl-card reveal">
+        <header><span class="cl-ver">v2.0.2</span><time datetime="2026-10-14">2026-10-14</time></header>
+        <h3 data-i18n="cl.v202.t">The clean-pipe release</h3>
+        <ul>
+          <li><span class="en-only"><code class="mono">‎--stdout</code> is machine-readable again: status messages moved to stderr, so <code class="mono">‎--format json | jq</code> works without <code class="mono">‎--quiet</code></span><span class="fa-only"><code class="mono">‎--stdout</code> دوباره ماشین‌خوان است: پیام‌های وضعیت به stderr منتقل شدند و <code class="mono">‎--format json | jq</code> بدون <code class="mono">‎--quiet</code> کار می‌کند</span></li>
+          <li><span class="en-only"><code class="mono">‎--help</code> documents the <code class="mono">‎--dry-run</code> alias</span><span class="fa-only">نام مستعار <code class="mono">‎--dry-run</code> در <code class="mono">‎--help</code> مستند شد</span></li>
+        </ul>
+      </article>
       <article class="cl-card reveal">
         <header><span class="cl-ver">v2.0.1</span><time datetime="2026-10-13">2026-10-13</time></header>
         <h3 data-i18n="cl.v201.t">The security release</h3>
@@ -1485,7 +1493,7 @@ jobs:
       'nav.features': 'Features', 'nav.install': 'Install', 'nav.builder': 'Builder',
       'nav.formats': 'Formats', 'nav.options': 'Options', 'nav.deploy': 'Go live',
       'nav.faq': 'FAQ', 'nav.star': 'Star',
-      'hero.kicker': 'v2.0.1 · pure bash · MIT',
+      'hero.kicker': 'v2.0.2 · pure bash · MIT',
       'hero.title1': 'Your whole codebase.', 'hero.title2': 'One file. AI-ready.',
       'hero.lead': 'projdump packs any project — directory tree, sources, stats — into a single Markdown, XML or JSON file that drops straight into Claude, ChatGPT, DeepSeek or Gemini. No dependencies. One command.',
       'hero.cta1': 'Get started', 'hero.cta2': 'Star on GitHub',
@@ -1587,9 +1595,10 @@ jobs:
       'compare.h1': 'Feature', 'compare.h2': 'Copy-paste', 'compare.h3': 'Typical tools',
       'changelog.tag': 'Changelog',
       'changelog.title': "What's new",
-      'changelog.sub': 'Three releases so far — each obsessively tested. Details in CHANGELOG.md.',
+      'changelog.sub': 'Four releases so far — each obsessively tested. Details in CHANGELOG.md.',
       'changelog.all': 'Full changelog →',
       'cl.v11.t': 'The productivity release',
+      'cl.v202.t': 'The clean-pipe release',
       'cl.v201.t': 'The security release', 'cl.v200.t': 'The fast one',
       'cl.v10.t': 'The beginning',
       'footer.chlog': 'Changelog',
@@ -1709,9 +1718,10 @@ jobs:
       'compare.h1': 'ویژگی', 'compare.h2': 'کپی دستی', 'compare.h3': 'ابزارهای معمول',
       'changelog.tag': 'تاریخچهٔ نسخه‌ها',
       'changelog.title': 'چه چیزهایی تازه است',
-      'changelog.sub': 'تا حالا سه انتشار — هر کدام با وسواس تست‌شده. جزئیات در CHANGELOG.md.',
+      'changelog.sub': 'تا حالا چهار انتشار — هر کدام با وسواس تست‌شده. جزئیات در CHANGELOG.md.',
       'changelog.all': 'تاریخچهٔ کامل ←',
       'cl.v11.t': 'انتشار بهره‌وری',
+      'cl.v202.t': 'انتشار لولهٔ تمیز',
       'cl.v201.t': 'انتشار امنیتی', 'cl.v200.t': 'نسخهٔ سریع',
       'cl.v10.t': 'شروع ماجرا',
       'footer.chlog': 'تاریخچه',
@@ -2176,7 +2186,7 @@ jobs:
         var pick = lang === 'fa' ? (tds[1].querySelector('.fa-only') || tds[1]) : (tds[1].querySelector('.en-only') || tds[1]);
         lines.push('| `' + clean(tds[0].textContent) + '` | ' + clean(pick.textContent) + ' |');
       });
-      lines.push('', '---', '', 'MIT © Soroush Chegini — projdump v2.0.1');
+      lines.push('', '---', '', 'MIT © Soroush Chegini — projdump v2.0.2');
       var blob = new Blob([lines.join('\n')], { type: 'text/markdown;charset=utf-8' });
       var a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
@@ -2539,14 +2549,14 @@ jobs:
 
     function pgBanner() {
       pgOut.innerHTML = '';
-      pgHtml('<span class="c-ok">projdump</span> <span class="c-dim">v2.0.1 — playground</span>');
+      pgHtml('<span class="c-ok">projdump</span> <span class="c-dim">v2.0.2 — playground</span>');
       pgLine('c-dim', I18N[lang]['pg.banner1']);
       pgLine('c-dim', I18N[lang]['pg.banner2']);
       pgLine('c-amber', I18N[lang]['pg.hint']);
     }
 
     function pgHelp() {
-      var t = 'projdump v2.0.1 — dump an entire project into one file for AI\n\n' +
+      var t = 'projdump v2.0.2 — dump an entire project into one file for AI\n\n' +
         'Usage: projdump [output] [options]\n\n' +
         '  -o, --output FILE          output file (default <project>_dump.<ext>)\n' +
         '  -f, --format md|xml|json   output format (default md)\n' +
@@ -2633,7 +2643,7 @@ jobs:
       }
       if (o.fmt === 'xml') {
         pgLine('', '<?xml version="1.0" encoding="UTF-8"?>');
-        pgLine('', '<project name="my-project" path="/home/you/my-project" generated="' + PG_NOW + '" tool="projdump v2.0.1">');
+        pgLine('', '<project name="my-project" path="/home/you/my-project" generated="' + PG_NOW + '" tool="projdump v2.0.2">');
         if (o.note) pgLine('', '  <note>' + pgEsc(o.note) + '</note>');
         pgLine('c-dim', '  <tree><![CDATA[');
         pgLine('c-dim', PG_TREE.split('\n').slice(0, 4).join('\n') + '\n  …]]></tree>');
@@ -2646,7 +2656,7 @@ jobs:
         pgLine('', '</project>');
       } else if (o.fmt === 'json') {
         pgLine('', '{');
-        pgLine('', '  "tool": "projdump v2.0.1", "project": "my-project",');
+        pgLine('', '  "tool": "projdump v2.0.2", "project": "my-project",');
         if (o.note) pgLine('', '  "note": ' + JSON.stringify(o.note) + ',');
         pgLine('', '  "files": [');
         SHOW.forEach(function (f, ix) {
@@ -2658,7 +2668,7 @@ jobs:
         pgLine('', '  "stats": { "files": ' + kept.length + ', "lines": ' + lines + ', "bytes": ' + bytes + ', "tokens": ' + toks + ' }');
         pgLine('', '}');
       } else {
-        pgLine('c-dim', '<!-- projdump v2.0.1 · my-project · main @ ' + PG_SHA + ' (clean) · ' + PG_NOW + ' -->');
+        pgLine('c-dim', '<!-- projdump v2.0.2 · my-project · main @ ' + PG_SHA + ' (clean) · ' + PG_NOW + ' -->');
         if (o.since !== null) pgLine('c-dim', '<!-- scope: changes since ' + o.since + ' -->');
         if (o.note) { pgLine('', ''); pgMdLine('## Note for the AI'); pgLine('', '> ' + o.note); }
         pgLine('', '');
@@ -2708,7 +2718,7 @@ jobs:
       var lines = kept.reduce(function (a, f) { return a + f.lines; }, 0);
       var bytes = kept.reduce(function (a, f) { return a + f.bytes; }, 0);
       return {
-        tool: 'projdump v2.0.1', project: 'my-project',
+        tool: 'projdump v2.0.2', project: 'my-project',
         files: kept.map(function (f) { return { path: f.p, lang: f.lang, lines: f.lines, bytes: f.bytes }; }),
         stats: { files: kept.length, lines: lines, bytes: bytes, tokens: kept.reduce(function (a, f) { return a + pgTok(f.bytes, f.lang); }, 0), languages: langs }
       };
@@ -2797,7 +2807,7 @@ jobs:
         else if (a === '--copy') o.noCopy = false; /* clipboard copy is the default; --copy just cancels --no-copy */
         else if (a === '-v' || a === '--verbose') o.verbose = true;
         else if (a === '-q' || a === '--quiet') o.quiet = true;
-        else if (a === '--version') { pgLine('', 'projdump v2.0.1'); return; }
+        else if (a === '--version') { pgLine('', 'projdump v2.0.2'); return; }
         else if (a === '-h' || a === '--help') { pgHelp(); return; }
         else errs.push("projdump: unrecognized option '" + a + "'");
       }
@@ -2806,7 +2816,7 @@ jobs:
         pgLine('c-dim', 'try: projdump --help');
         return;
       }
-      if (o.since !== null && ['main', 'HEAD', 'HEAD~1', 'HEAD~2', 'HEAD~3', 'v1.0.0', 'v1.1.0', 'v2.0.0', 'v2.0.1'].indexOf(o.since) === -1) {
+      if (o.since !== null && ['main', 'HEAD', 'HEAD~1', 'HEAD~2', 'HEAD~3', 'v1.0.0', 'v1.1.0', 'v2.0.0', 'v2.0.1', 'v2.0.2'].indexOf(o.since) === -1) {
         pgLine('c-err', "fatal: bad revision '" + o.since + "'");
         pgLine('c-dim', 'projdump: --since REF is invalid — try main, HEAD~2, v1.0.0…');
         return;
