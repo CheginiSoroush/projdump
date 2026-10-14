@@ -88,8 +88,8 @@ jobs:
 
 - ✅ The site already ships: meta description, Open Graph, Twitter cards, JSON-LD, `sitemap.xml`, `robots.txt`.
 - Register the live URL in [Google Search Console](https://search.google.com/search-console) and [Bing Webmaster Tools](https://www.bing.com/webmasters); submit `sitemap.xml`.
-- Repo → **Settings → Social preview** → upload `docs/assets/og-image.png` (1200×630 — ready-made).
-- Add topics on the repo page: `bash` `cli` `llm` `chatgpt` `claude` `deepseek` `developer-tools` `prompt-engineering` `context-window` `codebase` `ai-tools` `dotfiles`
+- Repo → **Settings → Social preview** → upload `docs/assets/social-preview.png` (1280×640 — GitHub's ideal size; the 1200×630 og:image variant is already wired into the docs site meta tags).
+- Add topics on the repo page: `bash` `cli` `llm` `ai` `chatgpt` `claude` `gemini` `deepseek` `developer-tools` `prompt-engineering` `context-window` `codebase` `code-analysis` `token-count` `markdown` `xml` `json` `shell-script` — or via API: `gh api -X PUT repos/CheginiSoroush/projdump/topics`
 - About description + website link: set the Pages URL.
 
 ### 7 · Growth playbook — getting traffic 🚦
@@ -119,7 +119,7 @@ jobs:
 
 - [ ] Repo pushed, CI badge green
 - [ ] Pages live at `https://<USERNAME>.github.io/projdump/`
-- [ ] Social preview uploaded, topics added, description set
+- [ ] Social preview uploaded — **topics added ✅ and description set ✅ (2026-10-14, via API)**; only the Settings → Social preview upload is manual
 - [ ] URL submitted to Search Console, sitemap submitted
 - [ ] Launch post published (HN / Reddit), article scheduled
 - [ ] Roadmap issue pinned
@@ -186,8 +186,8 @@ git push -u origin main
 
 - ✅ سایت همین حالا متا‌تگ‌ها، Open Graph، Twitter Card، JSON-LD، `sitemap.xml` و `robots.txt` دارد.
 - نشانی سایت را در [Google Search Console](https://search.google.com/search-console) و [Bing Webmaster](https://www.bing.com/webmasters) ثبت و `sitemap.xml` را معرفی کنید.
-- در مخزن: **Settings → Social preview** → فایل `docs/assets/og-image.png` را آپلود کنید.
-- تاپیک‌ها را اضافه کنید: `bash` `cli` `llm` `chatgpt` `claude` `deepseek` `developer-tools` `prompt-engineering` `ai-tools`
+- در مخزن: **Settings → Social preview** → فایل `docs/assets/social-preview.png` را آپلود کنید (۱۲۸۰×۶۴۰ — اندازهٔ ایده‌آل گیت‌هاب).
+- تاپیک‌ها را اضافه کنید: `bash` `cli` `llm` `ai` `chatgpt` `claude` `gemini` `deepseek` `developer-tools` `prompt-engineering` `context-window` `codebase` `code-analysis` `token-count` `markdown` `xml` `json` `shell-script`
 
 ### ۷ · کتاب‌بازی رشد — چطور بازدید زیاد شود؟ 🚦
 
