@@ -1,0 +1,154 @@
+<!-- projdump social/og card source. Render: open this file with ?w=1280 (social preview 1280x640)
+     or ?w=1200 (og:image 1200x630) in a browser and screenshot at that viewport. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root { --s: 1; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  body {
+    background: #0b100e;
+    font-family: 'Inter', sans-serif;
+    position: relative;
+  }
+  .glow {
+    position: absolute; right: -12%; top: -30%;
+    width: 900px; height: 900px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(52,211,153,0.14) 0%, rgba(13,148,136,0.05) 45%, transparent 70%);
+  }
+  .glow2 {
+    position: absolute; left: -15%; bottom: -45%;
+    width: 780px; height: 780px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(45,212,191,0.10) 0%, transparent 65%);
+  }
+  .grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(148,163,184,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148,163,184,0.05) 1px, transparent 1px);
+    background-size: calc(64px * var(--s)) calc(64px * var(--s));
+  }
+  .wrap {
+    position: relative; height: 100%;
+    display: flex; align-items: center;
+    padding: 0 calc(72px * var(--s));
+    gap: calc(64px * var(--s));
+  }
+  .left { flex: 1.15; min-width: 0; }
+  .brand {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800;
+    font-size: calc(108px * var(--s));
+    line-height: 1.05;
+    color: #f8fafc;
+    letter-spacing: -0.03em;
+  }
+  .brand .cursor { color: #34d399; }
+  .tagline {
+    margin-top: calc(22px * var(--s));
+    font-size: calc(40px * var(--s));
+    font-weight: 600;
+    line-height: 1.25;
+    color: #cbd5e1;
+    max-width: calc(560px * var(--s));
+  }
+  .tagline b { color: #34d399; font-weight: 800; }
+  .chips {
+    display: flex; gap: calc(14px * var(--s));
+    margin-top: calc(34px * var(--s));
+  }
+  .chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: calc(19px * var(--s));
+    font-weight: 600;
+    color: #5eead4;
+    background: rgba(20,184,166,0.10);
+    border: 1px solid rgba(45,212,191,0.35);
+    border-radius: calc(10px * var(--s));
+    padding: calc(10px * var(--s)) calc(18px * var(--s));
+    white-space: nowrap;
+  }
+  .repo {
+    margin-top: calc(36px * var(--s));
+    font-family: 'JetBrains Mono', monospace;
+    font-size: calc(20px * var(--s));
+    color: #64748b;
+  }
+  /* terminal */
+  .term {
+    flex: 1;
+    background: #0f1713;
+    border: 1px solid rgba(52,211,153,0.28);
+    border-radius: calc(18px * var(--s));
+    box-shadow: 0 calc(30px * var(--s)) calc(80px * var(--s)) rgba(0,0,0,0.55),
+                0 0 0 1px rgba(255,255,255,0.03) inset;
+    overflow: hidden;
+  }
+  .term-bar {
+    display: flex; align-items: center; gap: calc(10px * var(--s));
+    padding: calc(16px * var(--s)) calc(20px * var(--s));
+    background: #131d18;
+    border-bottom: 1px solid rgba(52,211,153,0.15);
+  }
+  .dot { width: calc(14px * var(--s)); height: calc(14px * var(--s)); border-radius: 50%; }
+  .d1 { background: #f87171; } .d2 { background: #fbbf24; } .d3 { background: #34d399; }
+  .term-title {
+    margin-left: calc(12px * var(--s));
+    font-family: 'JetBrains Mono', monospace;
+    font-size: calc(16px * var(--s));
+    color: #475569;
+  }
+  .term-body {
+    padding: calc(26px * var(--s)) calc(28px * var(--s));
+    font-family: 'JetBrains Mono', monospace;
+    font-size: calc(21px * var(--s));
+    line-height: 1.85;
+    color: #94a3b8;
+    white-space: pre;
+  }
+  .p { color: #34d399; font-weight: 600; }
+  .ok { color: #5eead4; }
+  .dim { color: #475569; }
+  .w { color: #f1f5f9; }
+</style>
+</head>
+<body>
+  <div class="glow"></div>
+  <div class="glow2"></div>
+  <div class="grid"></div>
+  <div class="wrap">
+    <div class="left">
+      <div class="brand">projdump<span class="cursor">_</span></div>
+      <div class="tagline">Your whole codebase.<br><b>One file.</b> AI-ready.</div>
+      <div class="chips">
+        <span class="chip">md · xml · json</span>
+        <span class="chip">bash 5.0+</span>
+        <span class="chip">0 deps</span>
+      </div>
+      <div class="repo">github.com/CheginiSoroush/projdump</div>
+    </div>
+    <div class="term">
+      <div class="term-bar">
+        <span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span>
+        <span class="term-title">bash — my-project</span>
+      </div>
+      <div class="term-body"><span class="p">$</span> <span class="w">projdump</span> --split 60k
+
+<span class="ok">✓</span> 128 files · 4,213 lines · 96.4 KB
+<span class="ok">~</span> 12,000 tokens · split into 2 parts
+<span class="ok">→</span> my-project_dump.part1.md
+
+<span class="dim"># paste into Claude · GPT · Gemini</span></div>
+    </div>
+  </div>
+  <script>
+    const p = new URLSearchParams(location.search);
+    const w = parseFloat(p.get('w') || '1280');
+    document.documentElement.style.setProperty('--s', String(w / 1280));
+  </script>
+</body>
+</html>
