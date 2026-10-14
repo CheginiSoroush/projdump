@@ -7,7 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
+## [2.0.1] - 2026-10-13
+
+### 🔒 Security
+
+- **Config files are no longer sourced from the project being dumped.** A config file is
+  executable shell code, and `./.projdumprc` used to be sourced automatically — running
+  `projdump` inside an untrusted repository could execute that repository's code (the
+  shell equivalent of auto-running a Makefile). Only the user's own XDG config
+  (`$XDG_CONFIG_HOME/projdump/config`) is auto-loaded now; a project-local `.projdumprc`
+  must be passed explicitly via `--config .projdumprc`. A one-time note points existing
+  users at the new form, and `--no-config` silences it
+
+### Fixed
+
+- `--config` without a value used to exit 1 **silently** (`shift 2` under `set -e`);
+  it now prints the standard `option '--config' requires a value` error like every
+  other value-taking flag
+- `uninstall.sh --prefix=` (empty value after `=`) was accepted and resolved to `/bin`
+  and `/share`; it is now rejected with a clear message, mirroring the space form
+- zsh completion actually worked only by accident: the bash completion file was
+  installed verbatim as `_projdump` with no `#compdef` header, and `_init_completion`
+  does not exist in zsh — projdump now ships a **native zsh completion**
+  (`completions/_projdump`, full flag coverage with descriptions) alongside a
+  dependency-free bash completion (`completions/projdump.bash`)
+- Bash completion: `-h` was missing from the flag list, and `--tokens-budget` offered
+  KB-style sizes (`10 … 2000`) instead of realistic token budgets (`30000 … 900000`)
+- CHANGELOG: the `[2.0.0]` link reference was missing, so the heading rendered as
+  literal brackets and the compare chain skipped the release; a `projump.sh` typo
+
+### Docs
+
+- Docs site synced with v2: the 8 flags added in 2.0.0 (`--split`, `--model`,
+  `--list-models`, `--tree-depth`, `--git-log`, `--jobs`, `--config`, `--no-config`)
+  are now in the options table, search palette and cheat sheet; version markers,
+  sample outputs and the test count reflect v2.0.1; tree/token-estimate claims match
+  the v2 engine (built-in renderer, weighted per-language estimates)
+- README (EN/FA): corrected the `--config` documentation to match the new behaviour;
+  fixed the Persian wording for *fallback probing* (پشتیبان, not بازگشتی) and a stray
+  Persian sentence in the English README
 
 ## [2.0.0] - 2026-10-12 — THE FAST ONE
 
@@ -59,7 +97,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Single file**: `lib/common.sh` + `lib/lang.sh` are merged into `projump.sh` — no more `lib/` to install or keep in sync
+- **Single file**: `lib/common.sh` + `lib/lang.sh` are merged into `projdump.sh` — no more `lib/` to install or keep in sync
 - The directory tree is rendered by the built-in renderer (dirs first, case-insensitive alphabetical) instead of `tree(1)` where available
 - Markdown header no longer prints `**Host:**`; `**Path:**` shows `local-project` for non-git folders
 - Zero hard dependencies beyond **bash 5.0+** and `find`/`git`; all optional helpers (python3, jq) are detected and skipped gracefully — portable to BSD/macOS (no `sort -z`, no `numfmt`, BSD `stat` supported)
@@ -147,6 +185,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `stat` works on BSD/macOS as well as GNU coreutils
 - `SCRIPT_DIR` resolves symlinks (absolute *and* relative targets), so `lib/` is still found when invoked through the `~/.local/bin/projdump` symlink
 
-[Unreleased]: https://github.com/CheginiSoroush/projdump/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/CheginiSoroush/projdump/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/CheginiSoroush/projdump/compare/v2.0.0...v2.0.1
+[2.0.0]: https://github.com/CheginiSoroush/projdump/compare/v1.1.0...v2.0.0
 [1.1.0]: https://github.com/CheginiSoroush/projdump/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/CheginiSoroush/projdump/releases/tag/v1.0.0
