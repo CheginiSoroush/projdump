@@ -4,10 +4,10 @@ load helpers
 
 setup() { new_repo; }
 
-@test "version: --version prints v2.0.1" {
+@test "version: --version prints v2.0.2" {
   run bash "$PD" --version
   [ "$status" -eq 0 ]
-  [ "$output" = "projdump v2.0.1" ]
+  [ "$output" = "projdump v2.0.2" ]
 }
 
 @test "version: -h and --help print usage and exit 0" {

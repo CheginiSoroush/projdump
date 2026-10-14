@@ -4,7 +4,7 @@
 # ════════════════════════════════════════════════════════════════════════════
 #  Homepage    https://github.com/CheginiSoroush/projdump
 #  Docs        https://cheginisoroush.github.io/projdump/
-#  Version     2.0.1
+#  Version     2.0.2
 #  License     MIT — see the LICENSE file in this repository
 #
 #  SYNOPSIS
@@ -70,7 +70,7 @@
 # ════════════════════════════════════════════════════════════════════════════
 set -euo pipefail
 
-readonly SCRIPT_VERSION="2.0.1"
+readonly SCRIPT_VERSION="2.0.2"
 readonly SCRIPT_NAME="projdump"
 
 # bash 5.2 enables `patsub_replacement` by default: a bare `&` in the

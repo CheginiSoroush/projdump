@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.2] - 2026-10-14
+
+### 🐛 Fixed
+
+- **`--stdout` is machine-readable again.** Status messages (the `✓` summary,
+  the `--list`/`--stdout` notes, the config migration notice) were written to
+  stdout, so `projdump --stdout --format json` emitted invalid JSON — a leading
+  note and/or a trailing summary around the payload. All human-facing output
+  now goes to stderr; stdout carries only the dump. Piping straight into `jq`
+  or any parser no longer requires `--quiet`:
+  `projdump --stdout --format json | jq .stats`
+- `--help` documents the `--dry-run` alias of `--list`
+
 ## [2.0.1] - 2026-10-13
 
 ### 🔒 Security
@@ -185,7 +198,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `stat` works on BSD/macOS as well as GNU coreutils
 - `SCRIPT_DIR` resolves symlinks (absolute *and* relative targets), so `lib/` is still found when invoked through the `~/.local/bin/projdump` symlink
 
-[Unreleased]: https://github.com/CheginiSoroush/projdump/compare/v2.0.1...HEAD
+[Unreleased]: https://github.com/CheginiSoroush/projdump/compare/v2.0.2...HEAD
+[2.0.2]: https://github.com/CheginiSoroush/projdump/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/CheginiSoroush/projdump/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/CheginiSoroush/projdump/compare/v1.1.0...v2.0.0
 [1.1.0]: https://github.com/CheginiSoroush/projdump/compare/v1.0.0...v1.1.0
