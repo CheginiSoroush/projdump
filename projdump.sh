@@ -88,8 +88,10 @@ else
   # shellcheck disable=SC2034
   readonly C_GREEN='' C_YELLOW='' C_RED='' C_CYAN='' C_BOLD='' C_NC=''
 fi
-ok()  { printf '%b\n' "${C_GREEN}$*${C_NC}"; }
-inf() { printf '%b\n' "${C_YELLOW}$*${C_NC}"; }
+# Human-facing messages (status/notes) go to stderr so that --stdout stays
+# machine-readable: `projdump --stdout --format json | jq` needs no --quiet.
+ok()  { printf '%b\n' "${C_GREEN}$*${C_NC}" >&2; }
+inf() { printf '%b\n' "${C_YELLOW}$*${C_NC}" >&2; }
 err() { printf '%b\n' "${C_RED}$*${C_NC}" >&2; }
 die() { err "$SCRIPT_NAME: $*"; exit 1; }
 
@@ -165,8 +167,9 @@ Extras:
       --no-config        Ignore all config files
 
 Info:
-      --list             Dry run: print what would be dumped and exit
+      --list, --dry-run  Dry run: print what would be dumped and exit
       --stdout           Write the dump to stdout instead of a file
+                         (status messages go to stderr)
       --copy | --no-copy Force / disable clipboard copy (default: auto)
   -v, --verbose          Explain skipped files on stderr
   -q, --quiet            Don't print the summary
