@@ -8,7 +8,7 @@ setup() { new_repo; a src/main.py $'print("hello")\n'; }
   run_pd --no-tree
   [ "$status" -eq 0 ]
   [[ "$output" == *"Project Dump"* ]]
-  [[ "$output" == *"projdump v2.0.0"* ]]
+  [[ "$output" == *"projdump v2.0.1"* ]]
 }
 
 @test "md: directory tree section" {
@@ -57,7 +57,7 @@ setup() { new_repo; a src/main.py $'print("hello")\n'; }
   run_pd --no-tree --format xml
   [ "$status" -eq 0 ]
   [[ "$output" == *'<project name="repo'* ]]
-  [[ "$output" == *'tool="projdump v2.0.0"'* ]]
+  [[ "$output" == *'tool="projdump v2.0.1"'* ]]
 }
 
 @test "xml: file element with path, lang and CDATA content" {

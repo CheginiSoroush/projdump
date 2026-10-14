@@ -7,6 +7,9 @@ PD="$BATS_TEST_DIRNAME/../projdump.sh"
 
 new_repo() {
   REPO="$(mktemp -d "${BATS_TEST_TMPDIR}/repo.XXXXXX")"
+  # hermetic XDG config: tests never see the developer's ~/.config/projdump
+  XDG_CONFIG_HOME="$(mktemp -d "${BATS_TEST_TMPDIR}/xdg.XXXXXX")"
+  export XDG_CONFIG_HOME
   cd "$REPO" || exit 1
   git init -q
   git config user.name  "test"

@@ -4,10 +4,10 @@ load helpers
 
 setup() { new_repo; }
 
-@test "version: --version prints v2.0.0" {
+@test "version: --version prints v2.0.1" {
   run bash "$PD" --version
   [ "$status" -eq 0 ]
-  [ "$output" = "projdump v2.0.0" ]
+  [ "$output" = "projdump v2.0.1" ]
 }
 
 @test "version: -h and --help print usage and exit 0" {
@@ -132,22 +132,48 @@ setup() { new_repo; }
   [[ "${output%%Source Files*}" == *"Focus on the login flow"* ]]
 }
 
-@test "config: .projdumprc in the repo is picked up" {
+@test "config: XDG config is auto-loaded" {
   a one.txt 'x'
-  printf 'NOTE="from the config file"\n' > .projdumprc
-  run bash "$PD" --quiet --no-copy --stdout -x '.projdumprc'
+  mkdir -p xdg/projdump
+  printf 'NOTE="from the xdg config"\n' > xdg/projdump/config
+  XDG_CONFIG_HOME="$REPO/xdg" run bash "$PD" --quiet --no-copy --stdout -x 'xdg/*'
   [ "$status" -eq 0 ]
-  [[ "$output" == *"from the config file"* ]]
-  [[ "$output" != *"### \`one.txt\`"*"from the config file"* ]]
+  [[ "$output" == *"from the xdg config"* ]]
 }
 
-@test "config: --no-config ignores .projdumprc" {
+@test "config: project-local .projdumprc is never auto-sourced" {
   a one.txt 'x'
-  printf 'NOTE="from the config file"\nFORMAT="xml"\n' > .projdumprc
-  run_pd -x '.projdumprc'
+  printf 'echo pwned > pwned-canary.txt\nNOTE="from the repo rc"\n' > .projdumprc
+  run bash "$PD" --quiet --no-copy --stdout -x '.projdumprc'
   [ "$status" -eq 0 ]
-  [[ "$output" != *"from the config file"* ]]
-  [[ "$output" != *"<project"* ]]
+  [[ "$output" != *"from the repo rc"* ]]
+  [ ! -e "$REPO/pwned-canary.txt" ]
+  [[ "$output" == *"--config .projdumprc"* ]]   # migration notice points at the new form
+}
+
+@test "config: --no-config silences the notice and ignores the repo rc" {
+  a one.txt 'x'
+  printf 'NOTE="from the repo rc"\nFORMAT="xml"\n' > .projdumprc
+  run bash "$PD" --quiet --no-copy --stdout --no-config -x '.projdumprc'
+  [ "$status" -eq 0 ]
+  [[ "$output" != *"from the repo rc"* ]]
+  [[ "$output" != *"no longer auto-loaded"* ]]
+  [[ "$output" != *"<project"* ]]               # FORMAT=xml from the rc was not applied
+}
+
+@test "config: --config .projdumprc loads it explicitly" {
+  a one.txt 'x'
+  printf 'NOTE="explicit project config"\n' > .projdumprc
+  run bash "$PD" --quiet --no-copy --stdout --config .projdumprc -x '.projdumprc'
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"explicit project config"* ]]
+}
+
+@test "config: --config without a value fails with a clear error" {
+  a one.txt 'x'
+  run bash "$PD" --quiet --no-copy --stdout --config
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"requires a value"* ]]
 }
 
 @test "config: --config FILE wins over the repo rc" {

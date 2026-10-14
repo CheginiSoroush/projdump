@@ -4,7 +4,7 @@
 # ════════════════════════════════════════════════════════════════════════════
 #  Homepage    https://github.com/CheginiSoroush/projdump
 #  Docs        https://cheginisoroush.github.io/projdump/
-#  Version     2.0.0
+#  Version     2.0.1
 #  License     MIT — see the LICENSE file in this repository
 #
 #  SYNOPSIS
@@ -46,6 +46,10 @@
 #      attributes are escaped.
 #    * File pipelines are NUL-delimited, so filenames containing spaces,
 #      tabs or literal newlines survive all three output formats.
+#    * Config files are executable shell code, so they are never sourced
+#      from the project being dumped: only the user's own XDG config is
+#      auto-loaded; a project-local .projdumprc must be passed explicitly
+#      via --config (an opt-in trust decision, like `source`).
 #    * Runs 100% locally — no network access, no telemetry, ever.
 #
 #  EXIT CODES
@@ -66,7 +70,7 @@
 # ════════════════════════════════════════════════════════════════════════════
 set -euo pipefail
 
-readonly SCRIPT_VERSION="2.0.0"
+readonly SCRIPT_VERSION="2.0.1"
 readonly SCRIPT_NAME="projdump"
 
 # bash 5.2 enables `patsub_replacement` by default: a bare `&` in the
@@ -155,8 +159,9 @@ Extras:
       --note TEXT        Add a "note for the AI" block at the top
       --git-log N        Include the last N commits in the dump
   -j, --jobs N           Parallel workers for fallback probing (default: auto)
-      --config FILE      Use this config file (default: .projdumprc, then
-                         \$XDG_CONFIG_HOME/projdump/config)
+      --config FILE      Use this config file (default:
+                         \$XDG_CONFIG_HOME/projdump/config; project-local
+                         files are never sourced unless given here)
       --no-config        Ignore all config files
 
 Info:
@@ -213,11 +218,15 @@ require_value() {
 }
 
 # ════════════════════════════════════════════════════════════════════════════
-#  Config file (.projdumprc) — sourced BEFORE flag parsing so flags win.
+#  Config file — sourced BEFORE flag parsing so flags win.
 #  Recognised keys: FORMAT, MAX_FILE_SIZE, EXT_FILTER, SHOW_TREE, TREE_DEPTH,
 #  SORT_KEY, BUDGET (alias TOKENS_BUDGET), NOTE, EXCLUDES=(…), INCLUDES=(…),
 #  COPY_MODE, GIT_LOG, JOBS, SPLIT, MODEL.
-#  NOTE: the file is sourced like ~/.bashrc — only use configs you trust.
+#
+#  SECURITY (v2.0.1): a config file is executable shell code, so it is never
+#  loaded from the project being dumped. Only the user's own XDG config is
+#  auto-loaded; a project-local .projdumprc must be passed explicitly with
+#  --config .projdumprc (the same trust decision as `source`).
 # ════════════════════════════════════════════════════════════════════════════
 load_config() {
   local cfg="$1"
@@ -228,13 +237,12 @@ load_config() {
 }
 
 find_config() {
-  local c
-  for c in "./.projdumprc" "${XDG_CONFIG_HOME:-$HOME/.config}/projdump/config"; do
-    if [[ -f "$c" ]]; then
-      printf '%s' "$c"
-      return 0
-    fi
-  done
+  # Auto-load ONLY the user's own XDG config — never files from the project.
+  local c="${XDG_CONFIG_HOME:-$HOME/.config}/projdump/config"
+  if [[ -f "$c" ]]; then
+    printf '%s' "$c"
+    return 0
+  fi
   return 1
 }
 
@@ -255,6 +263,10 @@ CONFIG_LOADED_FROM=""
       load_config "$CONFIG_FILE"
     elif cfg_auto="$(find_config)"; then
       load_config "$cfg_auto"
+    elif [[ -f "./.projdumprc" ]]; then
+      # Migration notice (v2.0.1): the project-local rc used to be sourced
+      # automatically — point old users at the explicit, safe form.
+      inf "note: found ./.projdumprc — project configs are no longer auto-loaded; use --config .projdumprc (pass --no-config to silence)"
     fi
   fi
 }
@@ -283,7 +295,7 @@ while [[ $# -gt 0 ]]; do
     --split)     require_value "$@"; SPLIT_RAW="$2"; shift 2 ;;
     --jobs|-j)   require_value "$@"; JOBS="$2"; shift 2 ;;
     --note)      require_value "$@"; NOTE="$2"; shift 2 ;;
-    --config)    shift 2 ;;   # already honoured by the pre-scan
+    --config)    require_value "$@"; shift 2 ;;   # value validated; config was loaded by the pre-scan
     --no-config) shift ;;
     --list|--dry-run) LIST_ONLY=1; shift ;;
     --stdout|-)  STDOUT=1; shift ;;
