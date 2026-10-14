@@ -1,0 +1,42 @@
+#compdef projdump
+# projdump — native zsh completion.
+#
+# Installed by install.sh into ~/.local/share/zsh/site-functions/_projdump
+# (picked up by compinit; run `rm -f ~/.zcompdump && exec zsh` after installing).
+
+_projdump() {
+  local -a opts
+  opts=(
+    '(-o --output)'{-o,--output}'[output file (default: <project>_dump.<ext>)]:output file:_files'
+    '(-f --format)'{-f,--format}'[output format]:format:(md xml json)'
+    '--split[write multiple parts, each ≤ N tokens]:tokens per part:(30k 60k 100k 200k 400k 1m)'
+    '(-e --ext-only)'{-e,--ext-only}'[only include files with these extensions]:extensions:'
+    '(-x --exclude)'{-x,--exclude}'[skip paths matching GLOB (repeatable)]:glob:_directories'
+    '(-i --include)'{-i,--include}'[only include paths matching GLOB (repeatable)]:glob:_directories'
+    '--since[only files changed since a git ref]:git ref:(HEAD HEAD~1 HEAD~5 main master)'
+    '--sort[control the file order]:sort key:(name size size-desc ext)'
+    '--tokens-budget[stop adding files once ~N tokens are reached]:token budget:(30000 60000 120000 180000 900000)'
+    '--model[preset token budget for a model]:model:(gpt-4o gpt-4.1 o3 claude-sonnet claude-opus gemini-2.5-pro deepseek-v3 llama-3.1)'
+    '--list-models[show available model presets and exit]'
+    '--max-size[skip files larger than N KB]:size in KB:(10 50 100 200 500 1000 2000)'
+    '--no-tree[do not include the directory tree]'
+    '--tree-depth[limit the tree depth]:depth:(1 2 3 5 10)'
+    '--note[add a "note for the AI" block at the top]:note text:'
+    '--git-log[include the last N commits in the dump]:commit count:(5 10 20 50)'
+    '(-j --jobs)'{-j,--jobs}'[parallel workers for fallback probing]:workers:(1 2 4 8)'
+    '--config[use this config file]:config file:_files'
+    '--no-config[ignore all config files]'
+    '--list[dry run: print what would be dumped and exit]'
+    '--stdout[write the dump to stdout instead of a file]'
+    '--copy[force clipboard copy]'
+    '--no-copy[disable clipboard copy]'
+    '(-v --verbose)'{-v,--verbose}'[explain skipped files on stderr]'
+    '(-q --quiet)'{-q,--quiet}'[do not print the summary]'
+    '--version[show version]'
+    '(-h --help)'{-h,--help}'[show help]'
+    '*:output file:_files'
+  )
+  _arguments -S $opts
+}
+
+_projdump "$@"
